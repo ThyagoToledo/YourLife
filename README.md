@@ -2,81 +2,108 @@
 
 > Conecte-se com quem importa
 
-**Versao:** 3.0.0 | **Atualizado em:** Novembro 2025 | **Status:** Pronto para Vercel
+**Versão:** 3.0.0 | **Atualizado em:** 2 de Novembro 2025 | **Status:** ✅ Em Produção
+
+**🌐 Acesso ao Site:** https://your-life-gamma.vercel.app
 
 ---
 
-## INDICE
+## 📑 ÍNDICE
 
-1. [Deploy Rapido](#deploy-rapido)
-2. [Funcionalidades](#funcionalidades)
-3. [Tecnologias](#tecnologias)
-4. [Desenvolvimento Local](#desenvolvimento-local)
-5. [Variaveis de Ambiente](#variaveis-de-ambiente)
-6. [Banco de Dados](#banco-de-dados)
-7. [API Reference](#api-reference)
-8. [Solucao de Problemas](#solucao-de-problemas)
-9. [Changelog](#changelog)
+1. [🚀 Deploy e Acesso](#-deploy-e-acesso)
+2. [✨ Funcionalidades](#-funcionalidades)
+3. [🛠️ Tecnologias](#️-tecnologias)
+4. [💻 Desenvolvimento Local](#-desenvolvimento-local)
+5. [🔐 Variáveis de Ambiente](#-variáveis-de-ambiente)
+6. [🗄️ Banco de Dados](#️-banco-de-dados)
+7. [📡 API Reference](#-api-reference)
+8. [🐛 Solução de Problemas](#-solução-de-problemas)
+9. [📝 Changelog](#-changelog)
 
 ---
 
-## DEPLOY RAPIDO
+## 🚀 DEPLOY E ACESSO
 
-### Opcao 1: Via Interface do Vercel (Recomendado)
+### ✅ Status da Aplicação
 
-**Passo 1: Criar repositorio no GitHub**
-- Acesse: https://github.com/new
-- Nome: `yourlife`
-- Clique em "Create repository"
+**URL Produção:** https://your-life-gamma.vercel.app  
+**Repositório:** https://github.com/ThyagoToledo/YourLife  
+**Banco de Dados:** Neon PostgreSQL (Serverless)  
+**Hospedagem:** Vercel (Serverless Functions)  
+**Status:** 🟢 Online
 
-**Passo 2: Conectar ao GitHub**
+### 📦 Deploy Automático
+
+Este projeto está configurado com **deploy automático**:
+
 ```bash
-git remote add origin https://github.com/SEU-USUARIO/yourlife.git
-git branch -M main
+# 1. Faça suas alterações localmente
+git add .
+git commit -m "sua mensagem"
+
+# 2. Envie para o GitHub
+git push origin main
+
+# 3. Vercel detecta e faz deploy automático (30-60 segundos)
+```
+
+**Monitorar Deploy:**
+- Dashboard Vercel: https://vercel.com/dashboard
+- Logs em tempo real durante o deploy
+- Notificações por email quando deploy termina
+
+### 🆕 Novo Projeto (Fork/Clone)
+
+**Se você quer criar sua própria versão:**
+
+**Passo 1: Fork no GitHub**
+```bash
+# Clone o repositório
+git clone https://github.com/ThyagoToledo/YourLife.git
+cd YourLife
+
+# Crie seu próprio repositório no GitHub
+git remote set-url origin https://github.com/SEU-USUARIO/seu-projeto.git
 git push -u origin main
 ```
 
-**Passo 3: Deploy no Vercel**
-- Acesse: https://vercel.com
-- Login com GitHub
-- Clique em "New Project"
-- Importe seu repositorio
-- Configure Environment Variables:
-  - `JWT_SECRET` = (gere com comando abaixo)
-  - `NODE_ENV` = production
-- Clique em "Deploy"
+**Passo 2: Deploy no Vercel**
+1. Acesse: https://vercel.com
+2. Login com GitHub
+3. Clique em "New Project"
+4. Importe seu repositório
+5. Configure variáveis de ambiente (ver seção abaixo)
+6. Clique em "Deploy"
+
+**Passo 3: Conectar Banco de Dados Neon**
+1. No Dashboard do Vercel, vá em "Storage"
+2. Clique em "Create Database"
+3. Escolha "Neon" (PostgreSQL serverless)
+4. Clique em "Connect"
+5. Variáveis serão adicionadas automaticamente
+
+**Passo 4: Criar Tabelas no Banco**
+1. Acesse: https://console.neon.tech/
+2. Selecione seu banco de dados
+3. Vá em "SQL Editor"
+4. Execute o script SQL (ver seção [Banco de Dados](#️-banco-de-dados))
 
 **Gerar JWT_SECRET:**
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### Opcao 2: Via CLI (Mais Rapido)
-
-```bash
-# Instalar Vercel CLI
-npm install -g vercel
-
-# Login
-vercel login
-
-# Deploy
-vercel --prod
-```
-
-**Resultado:** Seu site estara no ar em `https://seu-projeto.vercel.app`
-
 ---
 
-## FUNCIONALIDADES
+## ✨ FUNCIONALIDADES
 
-### Interface v3.0.0
+### 🎨 Interface v3.0.0
 
 **Tela de Login**
 - Design centralizado e minimalista
 - Logo circular no centro
 - Nome "Your Life" em destaque
-- Formulario de login abaixo
+- Formulário de login abaixo
 - Fundo roxo em gradiente (blue-600 -> purple-600 -> purple-700)
 
 **Tema Escuro (Dark Mode)**
@@ -326,49 +353,71 @@ npm run init-db        # Recria banco de dados
 
 ---
 
-## ARQUITETURA
+## 🛠️ ARQUITETURA
 
-### Stack
+### Stack Tecnológico
 ```
-Frontend: HTML5 + Tailwind CSS + JavaScript ES6+
-Backend:  Node.js + Express + SQLite
-Auth:     JWT + bcrypt
+Frontend:    HTML5 + Tailwind CSS (CDN) + JavaScript ES6+
+Backend:     Node.js 18+ + Express 4.18
+Banco:       Neon PostgreSQL (Serverless)
+Driver DB:   @vercel/postgres 0.10.0
+Auth:        JWT + bcryptjs
+Deploy:      Vercel Serverless Functions
+Repository:  GitHub (Deploy Automático)
 ```
 
-### Estrutura de Arquivos
+### 📁 Estrutura de Arquivos
 ```
-redesocial/
-├── server.js              # Backend Express
-├── init-database.js       # Setup do banco
-├── database.sqlite        # Banco SQLite
-├── site.html              # Interface principal
-├── app.js                 # Lógica frontend
-├── api.js                 # Cliente HTTP
+YourLife/
+├── server.js              # Backend Express (API Routes)
+├── index.html             # Landing/Login Page
+├── site.html              # Interface principal (App)
+├── app.js                 # Lógica frontend principal
+├── api.js                 # Cliente HTTP (fetch wrapper)
 ├── state.js               # State management
 ├── utils.js               # Utilitários
-├── iniciar.sh             # Script de start
-├── expor-internet.sh      # Exposição internet
-└── DOCUMENTACAO.md        # Esta documentação
+├── types.ts               # TypeScript definitions
+├── vercel.json            # Configuração Vercel
+├── package.json           # Dependências npm
+├── .env                   # Variáveis ambiente (local)
+└── README.md              # Esta documentação
 ```
 
-### Fluxo de Dados
+### 🔄 Fluxo de Dados (Produção)
 ```
-1. Usuário acessa site.html
-2. Login via POST /api/auth/login
-3. Backend retorna JWT token
-4. Token salvo no localStorage
-5. Todas requisições usam token no header
-6. Polling verifica atualizações a cada 10s
-7. Frontend atualiza automaticamente
+1. Usuário acessa https://your-life-gamma.vercel.app
+2. Vercel serve index.html estático
+3. Login via POST /api/auth/login → server.js (serverless)
+4. Backend consulta Neon PostgreSQL via @vercel/postgres
+5. JWT token retornado e salvo no localStorage
+6. Todas requisições incluem token no header Authorization
+7. Polling verifica atualizações a cada 10s
+8. Frontend atualiza automaticamente
+```
+
+### 🌐 Arquitetura Serverless
+```
+Vercel Edge Network
+    ↓
+Static Files (HTML/CSS/JS)
+    ↓
+API Routes (/api/*) → server.js (Node.js Function)
+    ↓
+Neon PostgreSQL (Connection Pool)
 ```
 
 ---
 
-##  API
+## 📡 API REFERENCE
 
-**Base URL:** `http://localhost:3000/api`
+**Base URL (Produção):** `https://your-life-gamma.vercel.app/api`  
+**Base URL (Local):** `http://localhost:3000/api`
 
 **Autenticação:** Header `Authorization: Bearer {token}`
+
+**Formato de Resposta:**
+- Sucesso: Retorna array ou objeto diretamente
+- Erro: `{ success: false, error: "mensagem" }`
 
 ### Autenticação
 
@@ -460,154 +509,370 @@ Response: { "success": true, "token": "jwt...", "user": {...} }
 
 ---
 
-## BANCO DE DADOS
+## 🗄️ BANCO DE DADOS
 
-### Tabelas (9)
+### 🔧 Provedor: Neon PostgreSQL
 
+**Console:** https://console.neon.tech/  
+**Tipo:** PostgreSQL 15+ (Serverless)  
+**Conexão:** Automática via `@vercel/postgres`  
+**Variáveis:** Configuradas automaticamente pelo Vercel
+
+### 📊 Schema - 9 Tabelas
+
+#### 1️⃣ users - Usuários
 ```sql
-users           # Usuarios
-|-- id, name, email, password, avatar, bio, created_at
-
-posts           # Postagens
-|-- id, user_id, content, created_at
-
-likes           # Curtidas
-|-- id, user_id, post_id, created_at
-
-comments        # Comentarios
-|-- id, user_id, post_id, content, created_at
-
-followers       # Amigos (+ status: pending/accepted)
-|-- id, follower_id, following_id, status, created_at
-
-user_interests  # Interesses do usuario
-|-- id, user_id, interest
-
-advices         # Conselhos
-|-- id, title, content, category, author_id, created_at
-
-notifications   # Notificacoes (+ related_user_id)
-|-- id, user_id, type, content, related_user_id, is_read, created_at
-
-messages        # Mensagens privadas (NOVO)
-|-- id, from_user_id, to_user_id, content, is_read, created_at
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    avatar TEXT,
+    bio TEXT,
+    cover_image TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
-### Relacionamentos
+#### 2️⃣ posts - Postagens
+```sql
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
-users (1) --|-- (N) posts
-            |-- (N) likes
-            |-- (N) comments
-            |-- (N) user_interests
-            |-- (N) followers
-            |-- (N) notifications
 
-posts (1) --|-- (N) likes
-            |-- (N) comments
+#### 3️⃣ likes - Curtidas
+```sql
+CREATE TABLE likes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, post_id)
+);
 ```
+
+#### 4️⃣ comments - Comentários
+```sql
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 5️⃣ followers - Sistema de Amizade
+```sql
+CREATE TABLE followers (
+    id SERIAL PRIMARY KEY,
+    follower_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    following_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(follower_id, following_id)
+);
+```
+
+#### 6️⃣ user_interests - Interesses
+```sql
+CREATE TABLE user_interests (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    interest TEXT NOT NULL
+);
+```
+
+#### 7️⃣ advices - Conselhos
+```sql
+CREATE TABLE advices (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT,
+    author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 8️⃣ notifications - Notificações
+```sql
+CREATE TABLE notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    content TEXT NOT NULL,
+    related_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 9️⃣ messages - Mensagens Privadas
+```sql
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    from_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    to_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### 🔗 Relacionamentos
+```
+users (1) ──┬── (N) posts
+            ├── (N) likes
+            ├── (N) comments
+            ├── (N) user_interests
+            ├── (N) followers (follower_id)
+            ├── (N) followers (following_id)
+            ├── (N) notifications (user_id)
+            ├── (N) notifications (related_user_id)
+            ├── (N) messages (from_user_id)
+            └── (N) messages (to_user_id)
+
+posts (1) ──┬── (N) likes
+            └── (N) comments
+```
+
+### 🚀 Criar Tabelas (Novo Deploy)
+
+Se você está fazendo deploy pela primeira vez:
+
+1. Acesse: https://console.neon.tech/
+2. Selecione seu banco de dados
+3. Vá em "SQL Editor"
+4. Cole e execute o script completo acima
+5. Verifique com: `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';`
 
 ---
 
-## ACESSO EXTERNO
+## 🔐 VARIÁVEIS DE AMBIENTE
 
-### Rede Local (Automatico)
+### Produção (Vercel Dashboard)
 
-```bash
-./iniciar.sh
-# Compartilhe: http://SEU-IP:8000/site.html
+**Configuradas automaticamente:**
+- `POSTGRES_URL` - Connection string completa (Neon)
+- `POSTGRES_PRISMA_URL` - Para uso com Prisma
+- `POSTGRES_URL_NON_POOLING` - Sem connection pool
+- `POSTGRES_USER` - Usuário do banco
+- `POSTGRES_HOST` - Host do servidor Neon
+- `POSTGRES_PASSWORD` - Senha do banco
+- `POSTGRES_DATABASE` - Nome do banco
+
+**Configurar manualmente:**
+1. Acesse: https://vercel.com/dashboard
+2. Selecione seu projeto
+3. Settings → Environment Variables
+4. Adicione:
+   - `JWT_SECRET` = (gere com comando abaixo)
+   - `NODE_ENV` = `production`
+   - `CORS_ORIGIN` = `*` (ou seu domínio específico)
+
+### Desenvolvimento Local
+
+Arquivo `.env`:
+```env
+# Servidor
+PORT=3000
+NODE_ENV=development
+
+# JWT (OBRIGATÓRIO - gere um novo!)
+JWT_SECRET=56f33fa1da043c9d631e6b4d0d1719089d241d283957544aa70bb285cc27dea0
+
+# CORS
+CORS_ORIGIN=*
+
+# PostgreSQL (copie do Vercel ou use local)
+POSTGRES_URL=postgresql://usuario:senha@host:5432/banco
 ```
 
-**Liberar firewall:**
+**Gerar JWT_SECRET seguro:**
 ```bash
-sudo ufw allow 3000
-sudo ufw allow 8000
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### Internet (ngrok)
+### ⚠️ Segurança
 
-**1. Instalar:**
-```bash
-sudo snap install ngrok
-```
-
-**2. Configurar:**
-- Cadastre em https://dashboard.ngrok.com/signup
-- Pegue o token
-- Execute: `ngrok config add-authtoken SEU_TOKEN`
-
-**3. Usar:**
-```bash
-# Terminal 1
-./iniciar.sh
-
-# Terminal 2
-./expor-internet.sh
-# Escolha opcao 1 (ngrok)
-```
-
-**4. Configurar backend:**
-- Acesse: `https://SEU-URL.ngrok.io/config.html`
-- Digite a URL do backend: `https://api-url.ngrok.io/api`
-- Salve e acesse o site
+**Nunca comite `.env` no Git!**
+- Arquivo já está no `.gitignore`
+- Use valores diferentes para dev e produção
+- JWT_SECRET deve ser único e secreto
 
 ---
 
-## SOLUCAO DE PROBLEMAS
+## 💻 DESENVOLVIMENTO LOCAL
 
-### Backend nao inicia
+### Requisitos
+- Node.js >= 18.0
+- npm >= 9.0
+- Conta no Neon (ou PostgreSQL local)
+
+### 🚀 Setup Inicial
 
 ```bash
-# Verificar se porta esta ocupada
-sudo lsof -ti:3000 | xargs kill -9
+# 1. Clone o repositório
+git clone https://github.com/ThyagoToledo/YourLife.git
+cd YourLife
 
-# Reinstalar dependencias
-rm -rf node_modules package-lock.json
+# 2. Instale dependências
 npm install
+
+# 3. Configure .env
+cp .env.example .env
+# Edite .env e adicione suas variáveis
+
+# 4. Crie as tabelas no banco
+# Execute o script SQL no Neon Console ou PostgreSQL local
+
+# 5. Inicie o servidor
+npm start
 ```
 
-### Erro "Cannot connect"
+**Acesso Local:**
+- Backend: http://localhost:3000/api
+- Frontend: Abra `index.html` no navegador
+
+### 📝 Scripts Disponíveis
 
 ```bash
-# Reiniciar tudo
-pkill -f "node server.js"
-pkill -f "python3 -m http.server"
-./iniciar.sh
+npm start              # Inicia servidor backend
+npm run dev            # Modo desenvolvimento com auto-reload
+npm test               # Executa testes (se configurado)
 ```
 
-### Banco de dados corrompido
+### 🔧 Desenvolvimento com Live Reload
 
 ```bash
-rm database.sqlite
-npm run init-db
+# Instalar nodemon globalmente
+npm install -g nodemon
+
+# Iniciar com auto-reload
+nodemon server.js
 ```
 
-### Token invalido
+---
 
+## 🐛 SOLUÇÃO DE PROBLEMAS
+
+### ❌ Erro: "relation does not exist"
+
+**Causa:** Tabelas não criadas no banco de dados
+
+**Solução:**
+1. Acesse https://console.neon.tech/
+2. Execute o script SQL completo (seção [Banco de Dados](#️-banco-de-dados))
+3. Verifique: `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';`
+
+### ❌ Erro: "missing_connection_string"
+
+**Causa:** Variáveis do banco não configuradas
+
+**Solução:**
+1. Vercel: Reconecte o banco em Storage → Neon
+2. Local: Adicione `POSTGRES_URL` no `.env`
+
+### ❌ Frontend mostra "Object" ao invés de dados
+
+**Causa:** API retornando objeto wrapper ao invés de array
+
+**Solução:**
+- Já corrigido na versão atual (commit 65afa2e)
+- Se persistir: `git pull origin main` e redesploy
+
+### ❌ Token inválido / Não autenticado
+
+**Solução:**
 ```javascript
 // No console do navegador
 localStorage.clear()
-// Faca login novamente
+// Faça login novamente
 ```
 
-### Polling nao funciona
+### ❌ CORS bloqueado em produção
 
-```javascript
-// No console do navegador
-app.stopPolling()
-app.startPolling()
-```
+**Solução:**
+1. Vercel Dashboard → Settings → Environment Variables
+2. Adicione/verifique: `CORS_ORIGIN=*`
+3. Ou restrinja: `CORS_ORIGIN=https://seu-dominio.com`
 
-### CORS bloqueado
+### ❌ Deploy falha no Vercel
 
-Ja configurado para aceitar qualquer origem. Se persistir:
+**Passos:**
+1. Vercel Dashboard → Deployments → Ver logs
+2. Verifique erros de build
+3. Confirme que `package.json` tem todas as dependências
+4. Verifique `vercel.json` está correto
+
+### 🔍 Logs de Produção
+
 ```bash
-# Verificar se backend esta com CORS ativado
-curl -H "Origin: http://localhost:8000" -I http://localhost:3000/api
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Ver logs em tempo real
+vercel logs your-life-gamma --follow
+```
+
+### 📊 Verificar Status do Banco
+
+```sql
+-- No Neon Console
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+
+-- Contar registros
+SELECT 'users' as table, COUNT(*) FROM users
+UNION ALL
+SELECT 'posts', COUNT(*) FROM posts
+UNION ALL
+SELECT 'messages', COUNT(*) FROM messages;
 ```
 
 ---
 
-## CHANGELOG
+## 📝 CHANGELOG
+
+### [3.0.0] - 02/11/2025
+
+**🚀 Deploy em Produção:**
+- ✅ Migrado de SQLite para Neon PostgreSQL
+- ✅ Deploy no Vercel com serverless functions
+- ✅ URL pública: https://your-life-gamma.vercel.app
+- ✅ Deploy automático via GitHub
+- ✅ Banco de dados em nuvem (Neon)
+
+**🔧 Mudanças Técnicas:**
+- Removido: `sqlite3`, `init-database.js`, `database.sqlite`
+- Adicionado: `@vercel/postgres` driver
+- Reescrito: Todas as queries para usar tagged templates
+- Configurado: `vercel.json` para serverless + static files
+- Corrigido: APIs retornavam objetos ao invés de arrays
+- Corrigido: Query SQL problemática em `/api/messages/conversations`
+
+**📦 Dependências:**
+```json
+{
+  "@vercel/postgres": "^0.10.0",
+  "express": "^4.18.2",
+  "cors": "^2.8.5",
+  "bcryptjs": "^2.4.3",
+  "jsonwebtoken": "^9.0.2",
+  "body-parser": "^1.20.2",
+  "dotenv": "^16.3.1"
+}
+```
+
+**🗄️ Banco de Dados:**
+- Provider: Neon PostgreSQL 15+
+- Conexão: Via `@vercel/postgres` com POSTGRES_URL
+- Schema: 9 tabelas (users, posts, likes, comments, followers, user_interests, advices, notifications, messages)
+- Região: Auto-selecionada pelo Neon
 
 ### [2.0.0] - 30/10/2025
 
@@ -667,62 +932,170 @@ curl -H "Origin: http://localhost:8000" -I http://localhost:3000/api
 
 ---
 
-## NOTAS
+## 📚 NOTAS TÉCNICAS
 
-### Estrutura do Codigo
+### 🔧 Estrutura do Código
 
 **Frontend (app.js):**
 ```javascript
-App                    # Controller principal
-|-- handleLogin()       # Processa login
-|-- loadFeed()          # Carrega feed
-|-- showEditProfile()   # Modal editar perfil
-|-- loadFriends()       # Lista amigos
-|-- loadAdvices()       # Lista conselhos
-|-- startPolling()      # Inicia atualizacoes
-|-- stopPolling()       # Para atualizacoes
+App                         # Controller principal
+|-- handleLogin()            # Processa login
+|-- handleRegister()         # Processa registro
+|-- loadFeed()               # Carrega feed de posts
+|-- handleCreatePost()       # Cria nova postagem
+|-- showEditProfile()        # Modal editar perfil
+|-- loadFriends()            # Lista amigos
+|-- loadFriendRequests()     # Lista pedidos pendentes
+|-- sendFriendRequest()      # Envia pedido de amizade
+|-- loadConversations()      # Lista conversas
+|-- openChat()               # Abre chat com amigo
+|-- loadAdvices()            # Lista conselhos
+|-- startPolling()           # Inicia polling (10s)
+|-- stopPolling()            # Para polling
+|-- toggleDarkMode()         # Alterna tema escuro/claro
 ```
 
 **API Client (api.js):**
 ```javascript
 ApiService
 |-- login(credentials)
+|-- register(data)
 |-- getFeed()
 |-- createPost(data)
-|-- addFriend(userId)
+|-- getFriends()
+|-- sendFriendRequest(userId)
+|-- acceptFriendRequest(requesterId)
+|-- getConversations()
+|-- getMessages(userId)
+|-- sendMessage(data)
 |-- getUpdates(since)
 ```
 
-### Variaveis de Ambiente
+**Backend (server.js):**
+```javascript
+// Conexão PostgreSQL
+const { sql } = require('@vercel/postgres');
 
-Arquivo `.env`:
-```env
-PORT=3000
-DB_PATH=./database.sqlite
-JWT_SECRET=seu_segredo_aqui
-CORS_ORIGIN=*
+// Middleware
+authenticateToken()      # Valida JWT
+
+// Rotas principais
+POST   /api/auth/register
+POST   /api/auth/login
+GET    /api/feed
+POST   /api/posts
+GET    /api/friends
+POST   /api/friends/request
+GET    /api/messages/conversations
+POST   /api/messages
 ```
 
-### Seguranca
+### 🔐 Segurança
 
-- [OK] Senhas com bcrypt (hash)
-- [OK] JWT para autenticacao
-- [OK] Prepared statements (SQL injection)
-- [OK] CORS configurado
-- [!] Em producao: alterar JWT_SECRET, restringir CORS, usar HTTPS
+**✅ Implementado:**
+- Senhas hasheadas com bcrypt (salt rounds: 10)
+- JWT para autenticação stateless
+- Token expira em 7 dias
+- Prepared statements via `@vercel/postgres` (previne SQL injection)
+- CORS configurado
+- Middleware de autenticação em todas as rotas protegidas
+- Validação de entrada nos endpoints
+
+**⚠️ Recomendações Produção:**
+- ✅ Usar HTTPS (Vercel já fornece)
+- ✅ JWT_SECRET forte e único
+- ⏳ Considerar rate limiting (Express Rate Limit)
+- ⏳ Implementar refresh tokens
+- ⏳ Adicionar logs de auditoria
+- ⏳ Configurar CORS específico: `CORS_ORIGIN=https://seu-dominio.com`
+
+### 🎯 Performance
+
+**Otimizações implementadas:**
+- Connection pooling automático (Neon)
+- Queries indexadas por primary/foreign keys
+- Limite de 50 posts no feed
+- Limite de 20 conselhos por categoria
+- Polling inteligente (só busca se há updates)
+
+**Melhorias futuras:**
+- Cache Redis para queries frequentes
+- Paginação infinita no feed
+- Compressão de imagens
+- CDN para assets estáticos
+- WebSocket para chat em tempo real
 
 ---
 
-## PROXIMAS VERSOES
+## 🚀 PRÓXIMAS VERSÕES
 
-**Planejado para v1.1.0:**
-- Editar/deletar posts
-- Upload de imagens
-- Chat em tempo real (WebSocket)
-- Paginacao do feed
-- Temas claro/escuro
+### Planejado para v3.1.0
+- [ ] Editar/deletar posts
+- [ ] Upload de imagens (Cloudinary/S3)
+- [ ] Busca avançada de usuários
+- [ ] Sistema de hashtags
+- [ ] Menções (@usuario)
+
+### Planejado para v4.0.0
+- [ ] Chat em tempo real (WebSocket)
+- [ ] Chamadas de vídeo (WebRTC)
+- [ ] Stories (24h)
+- [ ] Grupos/Comunidades
+- [ ] Sistema de moderação
 
 ---
 
-**Ultima atualizacao:** 30 de outubro de 2025  
-**Mantenha este arquivo atualizado ao adicionar novas funcionalidades!**
+## 🤝 CONTRIBUINDO
+
+### Como Contribuir
+
+1. Fork o projeto
+2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
+3. Commit suas mudanças: `git commit -m 'feat: adicionar nova funcionalidade'`
+4. Push para a branch: `git push origin feature/nova-funcionalidade`
+5. Abra um Pull Request
+
+### Padrão de Commits
+
+```
+feat: nova funcionalidade
+fix: correção de bug
+docs: documentação
+style: formatação
+refactor: refatoração
+test: testes
+chore: tarefas de manutenção
+```
+
+---
+
+## 📄 LICENÇA
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+## 👨‍💻 AUTOR
+
+**Thyago Toledo**  
+GitHub: [@ThyagoToledo](https://github.com/ThyagoToledo)  
+Projeto: [YourLife](https://github.com/ThyagoToledo/YourLife)
+
+---
+
+## 🌟 AGRADECIMENTOS
+
+- Vercel pela hospedagem serverless
+- Neon pela infraestrutura PostgreSQL
+- Tailwind CSS pelo framework CSS
+- Comunidade open-source
+
+---
+
+**Última atualização:** 2 de novembro de 2025  
+**Versão:** 3.0.0  
+**Status:** 🟢 Em Produção
+
+---
+
+**⭐ Se este projeto te ajudou, deixe uma estrela no GitHub!**
