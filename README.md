@@ -2,37 +2,37 @@
 
 > Conecte-se com quem importa
 
-**Versão:** 3.0.0 | **Atualizado em:** 2 de Novembro 2025 | **Status:** ✅ Em Produção
+**Versão:** 3.0.0 | **Atualizado em:** 2 de Novembro 2025 | **Status:**  Em Produção
 
-**🌐 Acesso ao Site:** https://your-life-gamma.vercel.app
-
----
-
-## 📑 ÍNDICE
-
-1. [🚀 Deploy e Acesso](#-deploy-e-acesso)
-2. [✨ Funcionalidades](#-funcionalidades)
-3. [🛠️ Tecnologias](#️-tecnologias)
-4. [💻 Desenvolvimento Local](#-desenvolvimento-local)
-5. [🔐 Variáveis de Ambiente](#-variáveis-de-ambiente)
-6. [🗄️ Banco de Dados](#️-banco-de-dados)
-7. [📡 API Reference](#-api-reference)
-8. [🐛 Solução de Problemas](#-solução-de-problemas)
-9. [📝 Changelog](#-changelog)
+** Acesso ao Site:** https://your-life-gamma.vercel.app
 
 ---
 
-## 🚀 DEPLOY E ACESSO
+##  ÍNDICE
 
-### ✅ Status da Aplicação
+1. [ Deploy e Acesso](#-deploy-e-acesso)
+2. [ Funcionalidades](#-funcionalidades)
+3. [ Tecnologias](#️-tecnologias)
+4. [ Desenvolvimento Local](#-desenvolvimento-local)
+5. [ Variáveis de Ambiente](#-variáveis-de-ambiente)
+6. [ Banco de Dados](#️-banco-de-dados)
+7. [ API Reference](#-api-reference)
+8. [ Solução de Problemas](#-solução-de-problemas)
+9. [ Changelog](#-changelog)
+
+---
+
+##  DEPLOY E ACESSO
+
+###  Status da Aplicação
 
 **URL Produção:** https://your-life-gamma.vercel.app  
 **Repositório:** https://github.com/ThyagoToledo/YourLife  
 **Banco de Dados:** Neon PostgreSQL (Serverless)  
 **Hospedagem:** Vercel (Serverless Functions)  
-**Status:** 🟢 Online
+**Status:**  Online
 
-### 📦 Deploy Automático
+###  Deploy Automático
 
 Este projeto está configurado com **deploy automático**:
 
@@ -52,7 +52,7 @@ git push origin main
 - Logs em tempo real durante o deploy
 - Notificações por email quando deploy termina
 
-### 🆕 Novo Projeto (Fork/Clone)
+###  Novo Projeto (Fork/Clone)
 
 **Se você quer criar sua própria versão:**
 
@@ -95,9 +95,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ---
 
-## ✨ FUNCIONALIDADES
+##  FUNCIONALIDADES
 
-### 🎨 Interface v3.0.0
+###  Interface v3.0.0
 
 **Tela de Login**
 - Design centralizado e minimalista
@@ -353,7 +353,7 @@ npm run init-db        # Recria banco de dados
 
 ---
 
-## 🛠️ ARQUITETURA
+##  ARQUITETURA
 
 ### Stack Tecnológico
 ```
@@ -366,7 +366,7 @@ Deploy:      Vercel Serverless Functions
 Repository:  GitHub (Deploy Automático)
 ```
 
-### 📁 Estrutura de Arquivos
+###  Estrutura de Arquivos
 ```
 YourLife/
 ├── server.js              # Backend Express (API Routes)
@@ -383,7 +383,7 @@ YourLife/
 └── README.md              # Esta documentação
 ```
 
-### 🔄 Fluxo de Dados (Produção)
+###  Fluxo de Dados (Produção)
 ```
 1. Usuário acessa https://your-life-gamma.vercel.app
 2. Vercel serve index.html estático
@@ -395,7 +395,7 @@ YourLife/
 8. Frontend atualiza automaticamente
 ```
 
-### 🌐 Arquitetura Serverless
+###  Arquitetura Serverless
 ```
 Vercel Edge Network
     ↓
@@ -408,7 +408,7 @@ Neon PostgreSQL (Connection Pool)
 
 ---
 
-## 📡 API REFERENCE
+##  API REFERENCE
 
 **Base URL (Produção):** `https://your-life-gamma.vercel.app/api`  
 **Base URL (Local):** `http://localhost:3000/api`
@@ -509,18 +509,18 @@ Response: { "success": true, "token": "jwt...", "user": {...} }
 
 ---
 
-## 🗄️ BANCO DE DADOS
+##  BANCO DE DADOS
 
-### 🔧 Provedor: Neon PostgreSQL
+###  Provedor: Neon PostgreSQL
 
 **Console:** https://console.neon.tech/  
 **Tipo:** PostgreSQL 15+ (Serverless)  
 **Conexão:** Automática via `@vercel/postgres`  
 **Variáveis:** Configuradas automaticamente pelo Vercel
 
-### 📊 Schema - 9 Tabelas
+### Schema - 9 Tabelas
 
-#### 1️⃣ users - Usuários
+#### 1 users - Usuários
 ```sql
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -534,7 +534,7 @@ CREATE TABLE users (
 );
 ```
 
-#### 2️⃣ posts - Postagens
+#### 2️ posts - Postagens
 ```sql
 CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
@@ -544,7 +544,7 @@ CREATE TABLE posts (
 );
 ```
 
-#### 3️⃣ likes - Curtidas
+#### 3️ likes - Curtidas
 ```sql
 CREATE TABLE likes (
     id SERIAL PRIMARY KEY,
@@ -555,7 +555,7 @@ CREATE TABLE likes (
 );
 ```
 
-#### 4️⃣ comments - Comentários
+#### 4️ comments - Comentários
 ```sql
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
@@ -566,7 +566,7 @@ CREATE TABLE comments (
 );
 ```
 
-#### 5️⃣ followers - Sistema de Amizade
+#### 5️ followers - Sistema de Amizade
 ```sql
 CREATE TABLE followers (
     id SERIAL PRIMARY KEY,
@@ -578,7 +578,7 @@ CREATE TABLE followers (
 );
 ```
 
-#### 6️⃣ user_interests - Interesses
+#### 6️ user_interests - Interesses
 ```sql
 CREATE TABLE user_interests (
     id SERIAL PRIMARY KEY,
@@ -587,7 +587,7 @@ CREATE TABLE user_interests (
 );
 ```
 
-#### 7️⃣ advices - Conselhos
+#### 7️ advices - Conselhos
 ```sql
 CREATE TABLE advices (
     id SERIAL PRIMARY KEY,
@@ -599,7 +599,7 @@ CREATE TABLE advices (
 );
 ```
 
-#### 8️⃣ notifications - Notificações
+#### 8️ notifications - Notificações
 ```sql
 CREATE TABLE notifications (
     id SERIAL PRIMARY KEY,
@@ -612,7 +612,7 @@ CREATE TABLE notifications (
 );
 ```
 
-#### 9️⃣ messages - Mensagens Privadas
+#### 9️ messages - Mensagens Privadas
 ```sql
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
@@ -624,7 +624,7 @@ CREATE TABLE messages (
 );
 ```
 
-### 🔗 Relacionamentos
+### Relacionamentos
 ```
 users (1) ──┬── (N) posts
             ├── (N) likes
@@ -641,7 +641,7 @@ posts (1) ──┬── (N) likes
             └── (N) comments
 ```
 
-### 🚀 Criar Tabelas (Novo Deploy)
+### Criar Tabelas (Novo Deploy)
 
 Se você está fazendo deploy pela primeira vez:
 
@@ -653,7 +653,7 @@ Se você está fazendo deploy pela primeira vez:
 
 ---
 
-## 🔐 VARIÁVEIS DE AMBIENTE
+## VARIÁVEIS DE AMBIENTE
 
 ### Produção (Vercel Dashboard)
 
@@ -698,7 +698,7 @@ POSTGRES_URL=postgresql://usuario:senha@host:5432/banco
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### ⚠️ Segurança
+### Segurança
 
 **Nunca comite `.env` no Git!**
 - Arquivo já está no `.gitignore`
@@ -707,14 +707,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ---
 
-## 💻 DESENVOLVIMENTO LOCAL
+## DESENVOLVIMENTO LOCAL
 
 ### Requisitos
 - Node.js >= 18.0
 - npm >= 9.0
 - Conta no Neon (ou PostgreSQL local)
 
-### 🚀 Setup Inicial
+### Setup Inicial
 
 ```bash
 # 1. Clone o repositório
@@ -739,7 +739,7 @@ npm start
 - Backend: http://localhost:3000/api
 - Frontend: Abra `index.html` no navegador
 
-### 📝 Scripts Disponíveis
+### Scripts Disponíveis
 
 ```bash
 npm start              # Inicia servidor backend
@@ -747,7 +747,7 @@ npm run dev            # Modo desenvolvimento com auto-reload
 npm test               # Executa testes (se configurado)
 ```
 
-### 🔧 Desenvolvimento com Live Reload
+### Desenvolvimento com Live Reload
 
 ```bash
 # Instalar nodemon globalmente
@@ -759,9 +759,9 @@ nodemon server.js
 
 ---
 
-## 🐛 SOLUÇÃO DE PROBLEMAS
+## SOLUÇÃO DE PROBLEMAS
 
-### ❌ Erro: "relation does not exist"
+### Erro: "relation does not exist"
 
 **Causa:** Tabelas não criadas no banco de dados
 
@@ -770,7 +770,7 @@ nodemon server.js
 2. Execute o script SQL completo (seção [Banco de Dados](#️-banco-de-dados))
 3. Verifique: `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';`
 
-### ❌ Erro: "missing_connection_string"
+### Erro: "missing_connection_string"
 
 **Causa:** Variáveis do banco não configuradas
 
@@ -778,7 +778,7 @@ nodemon server.js
 1. Vercel: Reconecte o banco em Storage → Neon
 2. Local: Adicione `POSTGRES_URL` no `.env`
 
-### ❌ Frontend mostra "Object" ao invés de dados
+### Frontend mostra "Object" ao invés de dados
 
 **Causa:** API retornando objeto wrapper ao invés de array
 
@@ -786,7 +786,7 @@ nodemon server.js
 - Já corrigido na versão atual (commit 65afa2e)
 - Se persistir: `git pull origin main` e redesploy
 
-### ❌ Token inválido / Não autenticado
+### Token inválido / Não autenticado
 
 **Solução:**
 ```javascript
@@ -795,14 +795,14 @@ localStorage.clear()
 // Faça login novamente
 ```
 
-### ❌ CORS bloqueado em produção
+### CORS bloqueado em produção
 
 **Solução:**
 1. Vercel Dashboard → Settings → Environment Variables
 2. Adicione/verifique: `CORS_ORIGIN=*`
 3. Ou restrinja: `CORS_ORIGIN=https://seu-dominio.com`
 
-### ❌ Deploy falha no Vercel
+### Deploy falha no Vercel
 
 **Passos:**
 1. Vercel Dashboard → Deployments → Ver logs
@@ -810,7 +810,7 @@ localStorage.clear()
 3. Confirme que `package.json` tem todas as dependências
 4. Verifique `vercel.json` está correto
 
-### 🔍 Logs de Produção
+### Logs de Produção
 
 ```bash
 # Instalar Vercel CLI
@@ -820,7 +820,7 @@ npm i -g vercel
 vercel logs your-life-gamma --follow
 ```
 
-### 📊 Verificar Status do Banco
+### Verificar Status do Banco
 
 ```sql
 -- No Neon Console
@@ -836,18 +836,18 @@ SELECT 'messages', COUNT(*) FROM messages;
 
 ---
 
-## 📝 CHANGELOG
+## CHANGELOG
 
 ### [3.0.0] - 02/11/2025
 
-**🚀 Deploy em Produção:**
-- ✅ Migrado de SQLite para Neon PostgreSQL
-- ✅ Deploy no Vercel com serverless functions
-- ✅ URL pública: https://your-life-gamma.vercel.app
-- ✅ Deploy automático via GitHub
-- ✅ Banco de dados em nuvem (Neon)
+**Deploy em Produção:**
+-  Migrado de SQLite para Neon PostgreSQL
+-  Deploy no Vercel com serverless functions
+-  URL pública: https://your-life-gamma.vercel.app
+-  Deploy automático via GitHub
+-  Banco de dados em nuvem (Neon)
 
-**🔧 Mudanças Técnicas:**
+**Mudanças Técnicas:**
 - Removido: `sqlite3`, `init-database.js`, `database.sqlite`
 - Adicionado: `@vercel/postgres` driver
 - Reescrito: Todas as queries para usar tagged templates
@@ -855,7 +855,7 @@ SELECT 'messages', COUNT(*) FROM messages;
 - Corrigido: APIs retornavam objetos ao invés de arrays
 - Corrigido: Query SQL problemática em `/api/messages/conversations`
 
-**📦 Dependências:**
+**Dependências:**
 ```json
 {
   "@vercel/postgres": "^0.10.0",
@@ -868,7 +868,7 @@ SELECT 'messages', COUNT(*) FROM messages;
 }
 ```
 
-**🗄️ Banco de Dados:**
+**Banco de Dados:**
 - Provider: Neon PostgreSQL 15+
 - Conexão: Via `@vercel/postgres` com POSTGRES_URL
 - Schema: 9 tabelas (users, posts, likes, comments, followers, user_interests, advices, notifications, messages)
@@ -932,9 +932,9 @@ SELECT 'messages', COUNT(*) FROM messages;
 
 ---
 
-## 📚 NOTAS TÉCNICAS
+## NOTAS TÉCNICAS
 
-### 🔧 Estrutura do Código
+### Estrutura do Código
 
 **Frontend (app.js):**
 ```javascript
@@ -990,9 +990,9 @@ GET    /api/messages/conversations
 POST   /api/messages
 ```
 
-### 🔐 Segurança
+### Segurança
 
-**✅ Implementado:**
+**Implementado:**
 - Senhas hasheadas com bcrypt (salt rounds: 10)
 - JWT para autenticação stateless
 - Token expira em 7 dias
@@ -1001,15 +1001,15 @@ POST   /api/messages
 - Middleware de autenticação em todas as rotas protegidas
 - Validação de entrada nos endpoints
 
-**⚠️ Recomendações Produção:**
-- ✅ Usar HTTPS (Vercel já fornece)
-- ✅ JWT_SECRET forte e único
-- ⏳ Considerar rate limiting (Express Rate Limit)
-- ⏳ Implementar refresh tokens
-- ⏳ Adicionar logs de auditoria
-- ⏳ Configurar CORS específico: `CORS_ORIGIN=https://seu-dominio.com`
+**Recomendações Produção:**
+- Usar HTTPS (Vercel já fornece)
+- JWT_SECRET forte e único
+- Considerar rate limiting (Express Rate Limit)
+- Implementar refresh tokens
+- Adicionar logs de auditoria
+- Configurar CORS específico: `CORS_ORIGIN=https://seu-dominio.com`
 
-### 🎯 Performance
+### Performance
 
 **Otimizações implementadas:**
 - Connection pooling automático (Neon)
@@ -1027,7 +1027,7 @@ POST   /api/messages
 
 ---
 
-## 🚀 PRÓXIMAS VERSÕES
+## PRÓXIMAS VERSÕES
 
 ### Planejado para v3.1.0
 - [ ] Editar/deletar posts
@@ -1045,7 +1045,7 @@ POST   /api/messages
 
 ---
 
-## 🤝 CONTRIBUINDO
+## CONTRIBUINDO
 
 ### Como Contribuir
 
@@ -1069,13 +1069,13 @@ chore: tarefas de manutenção
 
 ---
 
-## 📄 LICENÇA
+## LICENÇA
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
 
-## 👨‍💻 AUTOR
+##  AUTOR
 
 **Thyago Toledo**  
 GitHub: [@ThyagoToledo](https://github.com/ThyagoToledo)  
@@ -1083,7 +1083,7 @@ Projeto: [YourLife](https://github.com/ThyagoToledo/YourLife)
 
 ---
 
-## 🌟 AGRADECIMENTOS
+## AGRADECIMENTOS
 
 - Vercel pela hospedagem serverless
 - Neon pela infraestrutura PostgreSQL
@@ -1094,8 +1094,8 @@ Projeto: [YourLife](https://github.com/ThyagoToledo/YourLife)
 
 **Última atualização:** 2 de novembro de 2025  
 **Versão:** 3.0.0  
-**Status:** 🟢 Em Produção
+**Status:**  Em Produção
 
 ---
 
-**⭐ Se este projeto te ajudou, deixe uma estrela no GitHub!**
+**Se este projeto te ajudou, deixe uma estrela no GitHub!**
