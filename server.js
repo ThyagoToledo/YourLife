@@ -375,7 +375,7 @@ app.get('/api/feed', authenticateToken, async (req, res) => {
             LIMIT 50
         `;
 
-        res.json({ success: true, posts: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar feed:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar feed' });
@@ -574,7 +574,7 @@ app.get('/api/friends', authenticateToken, async (req, res) => {
             )
         `;
 
-        res.json({ success: true, friends: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar amigos:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar amigos' });
@@ -595,7 +595,7 @@ app.get('/api/friends/requests', authenticateToken, async (req, res) => {
             ORDER BY f.created_at DESC
         `;
 
-        res.json({ success: true, requests: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar pedidos:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar pedidos' });
@@ -750,41 +750,44 @@ app.delete('/api/friends/:id', authenticateToken, async (req, res) => {
 // Listar conversas
 app.get('/api/messages/conversations', authenticateToken, async (req, res) => {
     try {
+        // Buscar todas as mensagens do usuário e agrupar por conversas
         const result = await sql`
-            SELECT DISTINCT
-                CASE 
-                    WHEN m.from_user_id = ${req.user.id} THEN m.to_user_id
-                    ELSE m.from_user_id
-                END as friend_id,
+            WITH conversation_partners AS (
+                SELECT DISTINCT
+                    CASE 
+                        WHEN from_user_id = ${req.user.id} THEN to_user_id
+                        ELSE from_user_id
+                    END as partner_id
+                FROM messages
+                WHERE from_user_id = ${req.user.id} OR to_user_id = ${req.user.id}
+            )
+            SELECT 
+                cp.partner_id as friend_id,
                 u.name as friend_name,
                 u.avatar as friend_avatar,
                 (
                     SELECT content FROM messages
-                    WHERE (from_user_id = friend_id AND to_user_id = ${req.user.id})
-                       OR (from_user_id = ${req.user.id} AND to_user_id = friend_id)
+                    WHERE (from_user_id = cp.partner_id AND to_user_id = ${req.user.id})
+                       OR (from_user_id = ${req.user.id} AND to_user_id = cp.partner_id)
                     ORDER BY created_at DESC LIMIT 1
                 ) as last_message,
                 (
                     SELECT COUNT(*) FROM messages
-                    WHERE from_user_id = friend_id 
+                    WHERE from_user_id = cp.partner_id 
                       AND to_user_id = ${req.user.id} 
                       AND is_read = FALSE
                 ) as unread_count,
                 (
                     SELECT MAX(created_at) FROM messages
-                    WHERE (from_user_id = friend_id AND to_user_id = ${req.user.id})
-                       OR (from_user_id = ${req.user.id} AND to_user_id = friend_id)
+                    WHERE (from_user_id = cp.partner_id AND to_user_id = ${req.user.id})
+                       OR (from_user_id = ${req.user.id} AND to_user_id = cp.partner_id)
                 ) as last_message_time
-            FROM messages m
-            JOIN users u ON u.id = CASE 
-                WHEN m.from_user_id = ${req.user.id} THEN m.to_user_id
-                ELSE m.from_user_id
-            END
-            WHERE m.from_user_id = ${req.user.id} OR m.to_user_id = ${req.user.id}
+            FROM conversation_partners cp
+            JOIN users u ON u.id = cp.partner_id
             ORDER BY last_message_time DESC
         `;
 
-        res.json({ success: true, conversations: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar conversas:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar conversas' });
@@ -912,7 +915,7 @@ app.get('/api/advices', authenticateToken, async (req, res) => {
             `;
         }
 
-        res.json({ success: true, advices: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar conselhos:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar conselhos' });
@@ -960,7 +963,7 @@ app.get('/api/notifications', authenticateToken, async (req, res) => {
             LIMIT 50
         `;
 
-        res.json({ success: true, notifications: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar notificações:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar notificações' });
