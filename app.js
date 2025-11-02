@@ -671,18 +671,37 @@ class App {
             
             console.log(`[INFO] ${feed.length} posts recebidos`);
             
-            // Processa comentários para cada post
+            // Normaliza formato dos posts e carrega comentários
+            const normalizedFeed = [];
             for (const post of feed) {
+                // Normalizar estrutura do post
+                const normalizedPost = {
+                    id: post.id,
+                    content: post.content,
+                    created_at: post.created_at,
+                    author: {
+                        id: post.user_id,
+                        name: post.user_name,
+                        avatar: post.user_avatar
+                    },
+                    likes: parseInt(post.likes_count) || 0,
+                    isLiked: parseInt(post.user_liked) > 0,
+                    commentsCount: parseInt(post.comments_count) || 0,
+                    comments: []
+                };
+                
+                // Carregar comentários
                 try {
                     const comments = await this.api.getComments(post.id);
-                    post.comments = comments || [];
+                    normalizedPost.comments = comments || [];
                 } catch (err) {
                     console.error(`[ERRO] Erro ao carregar comentários do post ${post.id}:`, err);
-                    post.comments = [];
                 }
+                
+                normalizedFeed.push(normalizedPost);
             }
             
-            this.state.setFeed(feed);
+            this.state.setFeed(normalizedFeed);
             this.renderFeed();
             console.log('✅ Feed carregado com sucesso');
             
@@ -952,8 +971,23 @@ class App {
             const response = await this.api.createPost({ content });
             
             if (response && response.post) {
-                response.post.comments = [];
-                this.state.addPost(response.post);
+                // Normalizar formato do post para compatibilidade com o feed
+                const normalizedPost = {
+                    id: response.post.id,
+                    content: response.post.content,
+                    created_at: response.post.created_at,
+                    author: {
+                        id: response.post.user_id,
+                        name: response.post.user_name,
+                        avatar: response.post.user_avatar
+                    },
+                    likes: response.post.likes_count || 0,
+                    isLiked: response.post.user_liked > 0,
+                    commentsCount: response.post.comments_count || 0,
+                    comments: []
+                };
+                
+                this.state.addPost(normalizedPost);
                 this.elements.newPostContent.value = '';
                 this.renderFeed();
                 Toast.success('Postagem criada com sucesso!');
