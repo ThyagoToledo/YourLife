@@ -1081,7 +1081,7 @@ class App {
                         avatar: response.comment.user_avatar
                     }
                 };
-                
+
                 this.state.addComment(postId, normalizedComment);
 
                 const postElement = document.querySelector(`[data-post-id="${postId}"]`);
