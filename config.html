@@ -9,7 +9,7 @@
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">🔧 Configuração Necessária</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2"> Configuração Necessária</h1>
             <p class="text-gray-600">Configure a URL do backend para o site funcionar corretamente</p>
         </div>
 
@@ -48,7 +48,7 @@
                     required
                 />
                 <p class="mt-2 text-sm text-gray-500">
-                    ⚠️ Importante: A URL deve terminar com <code class="bg-gray-100 px-2 py-1 rounded">/api</code>
+                     Importante: A URL deve terminar com <code class="bg-gray-100 px-2 py-1 rounded">/api</code>
                 </p>
             </div>
 
@@ -67,14 +67,14 @@
                     type="submit" 
                     class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
-                    💾 Salvar e Ir para o Site
+                     Salvar e Ir para o Site
                 </button>
                 <button 
                     type="button" 
                     id="clearBtn"
                     class="px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
                 >
-                    🗑️ Limpar
+                     Limpar
                 </button>
             </div>
         </form>
@@ -134,7 +134,7 @@
             // Feedback visual
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
-            btn.textContent = '✅ Salvo!';
+            btn.textContent = ' Salvo!';
             btn.disabled = true;
             
             setTimeout(() => {
@@ -148,7 +148,7 @@
                 localStorage.removeItem('BACKEND_URL');
                 backendUrlInput.value = '';
                 currentConfig.classList.add('hidden');
-                alert('✅ Configuração limpa! Será usado localhost:3000 por padrão.');
+                alert(' Configuração limpa! Será usado localhost:3000 por padrão.');
             }
         });
 

@@ -1,211 +1,254 @@
-# 📚 YOUR LIFE - REDE SOCIAL INTEGRADA
+# YOUR LIFE - Rede Social
 
-> **Versão:** 3.0.0 | **Atualizada em:** 30/10/2025
+> Conecte-se com quem importa
 
----
-
-## 📋 ÍNDICE
-
-1. [Início Rápido](#início-rápido)
-2. [Novidades v3.0.0](#-novidades-v30)
-3. [Regras de Design](#-regras-de-design)
-4. [Funcionalidades v2.0.0](#-novidades-v200)
-5. [Arquitetura](#arquitetura)
-6. [API](#api)
-7. [Banco de Dados](#banco-de-dados)
-8. [Acesso Externo](#acesso-externo)
-9. [Solução de Problemas](#solução-de-problemas)
-10. [Changelog](#changelog)
+**Versao:** 3.0.0 | **Atualizado em:** Novembro 2025 | **Status:** Pronto para Vercel
 
 ---
 
-## ✨ NOVIDADES v3.0.0
+## INDICE
 
-### 🎨 Interface Minimalista
-- **Tela de Login**: Design centralizado e limpo
-  - Logo circular no centro (preparado para imagem futura)
-  - Nome "Your Life" em destaque
-  - Formulário de login abaixo
-  - Fundo roxo em gradiente (blue-600 → purple-600 → purple-700)
-  - Sem textos promocionais ou features
+1. [Deploy Rapido](#deploy-rapido)
+2. [Funcionalidades](#funcionalidades)
+3. [Tecnologias](#tecnologias)
+4. [Desenvolvimento Local](#desenvolvimento-local)
+5. [Variaveis de Ambiente](#variaveis-de-ambiente)
+6. [Banco de Dados](#banco-de-dados)
+7. [API Reference](#api-reference)
+8. [Solucao de Problemas](#solucao-de-problemas)
+9. [Changelog](#changelog)
 
-### 🌙 Tema Escuro (Dark Mode)
-- **Ativação**: Botão no menu do usuário (canto superior direito)
-- **Persistência**: Salva preferência no navegador
-- **Cobertura Completa**:
-  - Posts e cards do feed
-  - Modais (editar perfil, criar conselho, visualizar perfil)
-  - Áreas de amigos, conselhos e mensagens
-  - Notificações e dropdowns
-  - Formulários e inputs
-- **Paleta Dark**:
-  - Backgrounds: `gray-800`, `gray-700`
-  - Textos: `white`, `gray-300`, `gray-400`
-  - Bordas: `gray-700`, `gray-600`
+---
 
-### 🔔 Dropdown de Notificações
-- **Localização**: Ícone de sino no header
-- **Funcionalidade**: Clique para abrir/fechar
-- **Histórico**: Mostra todas as notificações recentes
-- **Marcação**: Indica notificações não lidas
-- **Auto-close**: Fecha ao clicar fora
+## DEPLOY RAPIDO
 
-### 👤 Menu do Usuário
-- **Localização**: Foto e nome no header (direita)
-- **Opções**:
+### Opcao 1: Via Interface do Vercel (Recomendado)
+
+**Passo 1: Criar repositorio no GitHub**
+- Acesse: https://github.com/new
+- Nome: `yourlife`
+- Clique em "Create repository"
+
+**Passo 2: Conectar ao GitHub**
+```bash
+git remote add origin https://github.com/SEU-USUARIO/yourlife.git
+git branch -M main
+git push -u origin main
+```
+
+**Passo 3: Deploy no Vercel**
+- Acesse: https://vercel.com
+- Login com GitHub
+- Clique em "New Project"
+- Importe seu repositorio
+- Configure Environment Variables:
+  - `JWT_SECRET` = (gere com comando abaixo)
+  - `NODE_ENV` = production
+- Clique em "Deploy"
+
+**Gerar JWT_SECRET:**
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### Opcao 2: Via CLI (Mais Rapido)
+
+```bash
+# Instalar Vercel CLI
+npm install -g vercel
+
+# Login
+vercel login
+
+# Deploy
+vercel --prod
+```
+
+**Resultado:** Seu site estara no ar em `https://seu-projeto.vercel.app`
+
+---
+
+## FUNCIONALIDADES
+
+### Interface v3.0.0
+
+**Tela de Login**
+- Design centralizado e minimalista
+- Logo circular no centro
+- Nome "Your Life" em destaque
+- Formulario de login abaixo
+- Fundo roxo em gradiente (blue-600 -> purple-600 -> purple-700)
+
+**Tema Escuro (Dark Mode)**
+- Ativacao: Botao no menu do usuario (canto superior direito)
+- Persistencia: Salva preferencia no navegador
+- Cobertura completa: Posts, modais, formularios, notificacoes
+- Paleta Dark:
+  - Backgrounds: gray-800, gray-700
+  - Textos: white, gray-300, gray-400
+  - Bordas: gray-700, gray-600
+
+**Dropdown de Notificacoes**
+- Localizacao: Icone de sino no header
+- Funcionalidade: Clique para abrir/fechar
+- Historico: Mostra todas as notificacoes recentes
+- Marcacao: Indica notificacoes nao lidas
+- Auto-close: Fecha ao clicar fora
+
+### Menu do Usuario
+- **Localizacao**: Foto e nome no header (direita)
+- **Opcoes**:
   - Alternar Tema Escuro/Claro
   - Deslogar da conta
 - **Auto-close**: Fecha ao clicar fora
 
-### 🎯 Branding
+### Branding
 - **Nome**: "Your Life"
 - **Slogan**: "Conecte-se com quem importa"
-- **Logo**: Arara azul estilizada (preparada para customização)
+- **Logo**: Arara azul estilizada (preparada para customizacao)
 
 ---
 
-## 🎨 REGRAS DE DESIGN
+## REGRAS DE DESIGN
 
-### Símbolos ASCII vs Unicode Emojis
+### Simbolos ASCII vs Unicode Emojis
 
-**OBRIGATÓRIO**: Usar apenas símbolos ASCII de texto, NÃO usar emojis Unicode.
+**OBRIGATORIO**: Usar apenas simbolos ASCII de texto, NAO usar emojis Unicode.
 
-#### Razão
-- Consistência visual em todas as plataformas
+#### Razao
+- Consistencia visual em todas as plataformas
 - Melhor acessibilidade (screen readers)
-- Estética minimalista e profissional
-- Evita problemas de renderização
+- Estetica minimalista e profissional
+- Evita problemas de renderizacao
 
-#### Mapeamento de Símbolos
+#### Mapeamento de Simbolos
 
-| Função | Unicode (❌) | ASCII (✅) |
+| Funcao | Unicode (X) | ASCII (OK) |
 |--------|-------------|-----------|
-| Adicionar | ➕ | + |
-| Pendente/Aguardando | ⏳ | ... |
-| Confirmado/Sucesso | ✅ | [✓] |
-| Erro/Recusar | ❌ | [X] |
-| Notificação | 🔔 | (!) |
-| Mensagem | 💬 | [msg] |
-| Usuário/Pessoa | 👤 | [@] |
-| Curtir/Amor | ❤️ | <3 |
-| Comentário | 💭 | [...] |
-| Post/Documento | 📝 | [#] |
-| Amigos/Grupo | 👥 | [@] |
+| Adicionar | Unicode | + |
+| Pendente/Aguardando | Unicode | ... |
+| Confirmado/Sucesso | Unicode | [OK] |
+| Erro/Recusar | Unicode | [X] |
+| Notificacao | Unicode | (!) |
+| Mensagem | Unicode | [msg] |
+| Usuario/Pessoa | Unicode | [@] |
+| Curtir/Amor | Unicode | <3 |
+| Comentario | Unicode | [...] |
+| Post/Documento | Unicode | [#] |
+| Amigos/Grupo | Unicode | [@] |
 
 #### Exemplo de Uso
 ```html
-<!-- ❌ ERRADO -->
-<button>➕ Adicionar</button>
-<span>✅ Aceitar</span>
+<!-- ERRADO -->
+<button>Unicode Adicionar</button>
+<span>Unicode Aceitar</span>
 
-<!-- ✅ CORRETO -->
+<!-- CORRETO -->
 <button>+ Adicionar</button>
-<span>[✓] Aceitar</span>
+<span>[OK] Aceitar</span>
 ```
 
 ---
 
-## ✨ NOVIDADES v2.0.0
+## NOVIDADES v2.0.0
 
-## ✨ NOVIDADES v2.0.0
+### Sistema de Pedidos de Amizade
 
-### 🎯 Sistema de Pedidos de Amizade
-
-#### Botão nos Posts
-- **Localização**: Ao lado do nome do autor em cada postagem
-- **Funcionalidade**: Clique no botão "+ Adicionar" para enviar pedido instantaneamente
-- **Visual**: Muda para "... Pendente" após envio
-- **Inteligência**: Só aparece para usuários que não são você
+#### Botao nos Posts
+- **Localizacao**: Ao lado do nome do autor em cada postagem
+- **Funcionalidade**: Clique no botao "+ Adicionar" para enviar pedido instantaneamente
+- **Visual**: Muda para "... Pendente" apos envio
+- **Inteligencia**: So aparece para usuarios que nao sao voce
 
 #### Categoria Pedidos
-- **Localização**: Dentro da aba "Amigos" no menu lateral
+- **Localizacao**: Dentro da aba "Amigos" no menu lateral
 - **Tabs**: 
   - "Amigos" → Lista de amigos aceitos
   - "Pedidos" → Lista de pedidos pendentes recebidos
 - **Badge Vermelho**: Contador de pedidos pendentes
-- **Ações**:
-  - [✓] Aceitar - Confirma amizade (reciprocamente)
+- **Acoes**:
+  - [OK] Aceitar - Confirma amizade (reciprocamente)
   - [X] Recusar - Remove o pedido
 
-#### Notificações
+#### Notificacoes
 - (!) Quando **recebe** pedido de amizade
-- (!) Quando seu pedido é **aceito**
+- (!) Quando seu pedido e **aceito**
 - Aparecem no sino do header com badge
 
-### [msg] Correspondências (Mensagens Privadas)
+### Correspondencias (Mensagens Privadas)
 
 #### Nova Aba no Menu
-- **Nome**: "Correspondências"
-- **Badge**: Contador de mensagens não lidas
+- **Nome**: "Correspondencias"
+- **Badge**: Contador de mensagens nao lidas
 - **Interface**: Estilo WhatsApp/Telegram
 
-#### 3 Áreas Principais
+#### 3 Areas Principais
 
 **1. Lista de Conversas**
-- Todos os amigos com quem você já conversou
-- Última mensagem de cada conversa
-- Badge vermelho com mensagens não lidas
-- Timestamp da última mensagem
+- Todos os amigos com quem voce ja conversou
+- Ultima mensagem de cada conversa
+- Badge vermelho com mensagens nao lidas
+- Timestamp da ultima mensagem
 
-**2. Área de Chat**
+**2. Area de Chat**
 - Header com avatar e nome do amigo
 - Suas mensagens: fundo azul (direita)
 - Mensagens do amigo: fundo cinza (esquerda)
-- Scroll automático para última mensagem
+- Scroll automatico para ultima mensagem
 - Timestamp em cada mensagem
 
 **3. Input de Mensagem**
 - Campo de texto arredondado
-- Botão "Enviar" azul
-- Atalho: **Enter** para enviar rápido
+- Botao "Enviar" azul
+- Atalho: **Enter** para enviar rapido
 
-#### Segurança
-- [✓] Só funciona entre **amigos aceitos**
-- [✓] Validação automática no backend
-- [✓] Marcação automática de leitura
+#### Seguranca
+- [OK] So funciona entre **amigos aceitos**
+- [OK] Validacao automatica no backend
+- [OK] Marcacao automatica de leitura
 
-### (!) Sistema de Notificações Aprimorado
-- Notificações para pedidos de amizade
-- Notificações para mensagens novas
-- Notificações quando pedidos são aceitos
+### Sistema de Notificacoes Aprimorado
+- Notificacoes para pedidos de amizade
+- Notificacoes para mensagens novas
+- Notificacoes quando pedidos sao aceitos
 - Badges com contadores em tempo real
 
-### 📋 Como Usar
+### Como Usar
 
 **Para Enviar Pedido de Amizade:**
 1. Veja uma postagem no feed
 2. Clique em "+ Adicionar" ao lado do nome
 3. Aguarde "Pedido de amizade enviado!"
-4. O botão mudará para "... Pendente"
+4. O botao mudara para "... Pendente"
 
 **Para Gerenciar Pedidos:**
 1. Menu → "Amigos"
 2. Clique na tab "Pedidos"
-3. Clique em "[✓] Aceitar" ou "[X] Recusar"
+3. Clique em "[OK] Aceitar" ou "[X] Recusar"
 
 **Para Enviar Mensagens:**
-1. Menu → "Correspondências"
+1. Menu → "Correspondencias"
 2. Clique em uma conversa existente
 3. Digite e pressione Enter ou "Enviar"
-4. *Nota: Só funciona com amigos aceitos*
+4. *Nota: So funciona com amigos aceitos*
 
 **Para Ativar Tema Escuro:**
 1. Clique na sua foto/nome (canto superior direito)
 2. Clique em "Alternar Tema"
-3. Preferência é salva automaticamente
+3. Preferencia e salva automaticamente
 
 ---
 
-## 🚀 INÍCIO RÁPIDO
+## INICIO RAPIDO
 
 ### Requisitos
 - Node.js >= 18.0
 - Python3 >= 3.8
 
-### Instalação
+### Instalacao
 
 ```bash
-# 1. Instalar dependências
+# 1. Instalar dependencias
 npm install
 
 # 2. Inicializar banco de dados
@@ -219,71 +262,71 @@ npm run init-db
 - Local: http://localhost:8000/site.html
 - Rede: http://SEU-IP:8000/site.html
 
-### Comandos Úteis
+### Comandos Uteis
 
 ```bash
 npm start              # Inicia apenas backend
 npm run init-db        # Recria banco de dados
 ./iniciar.sh           # Inicia backend + frontend
-./expor-internet.sh    # Expõe na internet (ngrok)
+./expor-internet.sh    # Expoe na internet (ngrok)
 ```
 
 ---
 
-## ✨ FUNCIONALIDADES
+## FUNCIONALIDADES
 
-### Autenticação
-- [✓] Login e registro com JWT
-- [✓] Senha criptografada (bcrypt)
-- [✓] Token válido por 7 dias
+### Autenticacao
+- [OK] Login e registro com JWT
+- [OK] Senha criptografada (bcrypt)
+- [OK] Token valido por 7 dias
 
 ### Feed e Posts
-- [✓] Criar postagens
-- [✓] Curtir/descurtir
-- [✓] Comentar
-- [✓] Feed em tempo real
+- [OK] Criar postagens
+- [OK] Curtir/descurtir
+- [OK] Comentar
+- [OK] Feed em tempo real
 
 ### Perfil
-- [✓] Editar perfil (nome, bio, avatar, interesses)
-- [✓] Ver perfil de outros usuários
-- [✓] Estatísticas (posts, amigos, likes)
+- [OK] Editar perfil (nome, bio, avatar, interesses)
+- [OK] Ver perfil de outros usuarios
+- [OK] Estatisticas (posts, amigos, likes)
 
 ### Amigos
-- [✓] Sistema de pedidos de amizade (enviar/aceitar/recusar)
-- [✓] Botão de adicionar amigo nos posts
-- [✓] Categoria "Pedidos" com contador
-- [✓] Buscar usuários
-- [✓] Ver lista de amigos
-- [✓] Indicador de amizade mútua
-- [✓] Notificações de pedidos
+- [OK] Sistema de pedidos de amizade (enviar/aceitar/recusar)
+- [OK] Botao de adicionar amigo nos posts
+- [OK] Categoria "Pedidos" com contador
+- [OK] Buscar usuarios
+- [OK] Ver lista de amigos
+- [OK] Indicador de amizade mutua
+- [OK] Notificacoes de pedidos
 
-### Correspondências (Mensagens)
-- [✓] Chat privado com amigos
-- [✓] Lista de conversas
-- [✓] Badge de mensagens não lidas
-- [✓] Histórico completo de mensagens
-- [✓] Interface intuitiva tipo WhatsApp
-- [✓] Notificações de novas mensagens
+### Correspondencias (Mensagens)
+- [OK] Chat privado com amigos
+- [OK] Lista de conversas
+- [OK] Badge de mensagens nao lidas
+- [OK] Historico completo de mensagens
+- [OK] Interface intuitiva tipo WhatsApp
+- [OK] Notificacoes de novas mensagens
 
 ### Conselhos
-- [✓] Criar conselhos
-- [✓] Ver conselhos do dia
-- [✓] Categorias (saúde, carreira, relacionamentos, etc)
+- [OK] Criar conselhos
+- [OK] Ver conselhos do dia
+- [OK] Categorias (saude, carreira, relacionamentos, etc)
 
 ### Interface (v3.0.0)
-- [✓] Tema escuro/claro com persistência
-- [✓] Dropdowns de notificações e menu
-- [✓] Design minimalista
-- [✓] Símbolos ASCII consistentes
+- [OK] Tema escuro/claro com persistencia
+- [OK] Dropdowns de notificacoes e menu
+- [OK] Design minimalista
+- [OK] Simbolos ASCII consistentes
 
-### Atualizações em Tempo Real
-- [✓] Polling a cada 10 segundos
-- [✓] Notificações de likes e comentários
-- [✓] Atualização automática do feed
+### Atualizacoes em Tempo Real
+- [OK] Polling a cada 10 segundos
+- [OK] Notificacoes de likes e comentarios
+- [OK] Atualizacao automatica do feed
 
 ---
 
-## 🏗️ ARQUITETURA
+## ARQUITETURA
 
 ### Stack
 ```
@@ -321,7 +364,7 @@ redesocial/
 
 ---
 
-## 📡 API
+##  API
 
 **Base URL:** `http://localhost:3000/api`
 
@@ -417,57 +460,57 @@ Response: { "success": true, "token": "jwt...", "user": {...} }
 
 ---
 
-## 🗄️ BANCO DE DADOS
+## BANCO DE DADOS
 
 ### Tabelas (9)
 
 ```sql
-users           # Usuários
-├─ id, name, email, password, avatar, bio, created_at
+users           # Usuarios
+|-- id, name, email, password, avatar, bio, created_at
 
 posts           # Postagens
-├─ id, user_id, content, created_at
+|-- id, user_id, content, created_at
 
 likes           # Curtidas
-├─ id, user_id, post_id, created_at
+|-- id, user_id, post_id, created_at
 
-comments        # Comentários
-├─ id, user_id, post_id, content, created_at
+comments        # Comentarios
+|-- id, user_id, post_id, content, created_at
 
 followers       # Amigos (+ status: pending/accepted)
-├─ id, follower_id, following_id, status, created_at
+|-- id, follower_id, following_id, status, created_at
 
-user_interests  # Interesses do usuário
-├─ id, user_id, interest
+user_interests  # Interesses do usuario
+|-- id, user_id, interest
 
 advices         # Conselhos
-├─ id, title, content, category, author_id, created_at
+|-- id, title, content, category, author_id, created_at
 
-notifications   # Notificações (+ related_user_id)
-├─ id, user_id, type, content, related_user_id, is_read, created_at
+notifications   # Notificacoes (+ related_user_id)
+|-- id, user_id, type, content, related_user_id, is_read, created_at
 
 messages        # Mensagens privadas (NOVO)
-├─ id, from_user_id, to_user_id, content, is_read, created_at
+|-- id, from_user_id, to_user_id, content, is_read, created_at
 ```
 
 ### Relacionamentos
 ```
-users (1) ──┬── (N) posts
-            ├── (N) likes
-            ├── (N) comments
-            ├── (N) user_interests
-            ├── (N) followers
-            └── (N) notifications
+users (1) --|-- (N) posts
+            |-- (N) likes
+            |-- (N) comments
+            |-- (N) user_interests
+            |-- (N) followers
+            |-- (N) notifications
 
-posts (1) ──┬── (N) likes
-            └── (N) comments
+posts (1) --|-- (N) likes
+            |-- (N) comments
 ```
 
 ---
 
-## 🌐 ACESSO EXTERNO
+## ACESSO EXTERNO
 
-### Rede Local (Automático)
+### Rede Local (Automatico)
 
 ```bash
 ./iniciar.sh
@@ -499,7 +542,7 @@ sudo snap install ngrok
 
 # Terminal 2
 ./expor-internet.sh
-# Escolha opção 1 (ngrok)
+# Escolha opcao 1 (ngrok)
 ```
 
 **4. Configurar backend:**
@@ -509,15 +552,15 @@ sudo snap install ngrok
 
 ---
 
-## 🔧 SOLUÇÃO DE PROBLEMAS
+## SOLUCAO DE PROBLEMAS
 
-### Backend não inicia
+### Backend nao inicia
 
 ```bash
-# Verificar se porta está ocupada
+# Verificar se porta esta ocupada
 sudo lsof -ti:3000 | xargs kill -9
 
-# Reinstalar dependências
+# Reinstalar dependencias
 rm -rf node_modules package-lock.json
 npm install
 ```
@@ -538,15 +581,15 @@ rm database.sqlite
 npm run init-db
 ```
 
-### Token inválido
+### Token invalido
 
 ```javascript
 // No console do navegador
 localStorage.clear()
-// Faça login novamente
+// Faca login novamente
 ```
 
-### Polling não funciona
+### Polling nao funciona
 
 ```javascript
 // No console do navegador
@@ -556,101 +599,101 @@ app.startPolling()
 
 ### CORS bloqueado
 
-Já configurado para aceitar qualquer origem. Se persistir:
+Ja configurado para aceitar qualquer origem. Se persistir:
 ```bash
-# Verificar se backend está com CORS ativado
+# Verificar se backend esta com CORS ativado
 curl -H "Origin: http://localhost:8000" -I http://localhost:3000/api
 ```
 
 ---
 
-## 📝 CHANGELOG
+## CHANGELOG
 
-### [2.0.0] - 30/10/2025 🎉
+### [2.0.0] - 30/10/2025
 
-**✨ Novidades Principais:**
-- 🤝 **Sistema de Pedidos de Amizade**
-  - Botão "Adicionar" em cada post
+**Novidades Principais:**
+- **Sistema de Pedidos de Amizade**
+  - Botao "Adicionar" em cada post
   - Categoria "Pedidos" na aba Amigos
   - Aceitar/recusar pedidos
-  - Notificações automáticas
+  - Notificacoes automaticas
   - Badge contador de pedidos pendentes
   
-- 💬 **Correspondências (Mensagens Privadas)**
+- **Correspondencias (Mensagens Privadas)**
   - Chat privado entre amigos
-  - Lista de conversas com últimas mensagens
-  - Badge de mensagens não lidas
+  - Lista de conversas com ultimas mensagens
+  - Badge de mensagens nao lidas
   - Interface moderna tipo WhatsApp
-  - Histórico completo de mensagens
+  - Historico completo de mensagens
   
-- 🔔 **Melhorias nas Notificações**
-  - Notificações para pedidos de amizade
-  - Notificações para novas mensagens
-  - Notificações quando pedidos são aceitos
+- **Melhorias nas Notificacoes**
+  - Notificacoes para pedidos de amizade
+  - Notificacoes para novas mensagens
+  - Notificacoes quando pedidos sao aceitos
   - Sistema de badges visuais
 
-**🔧 Mudanças Técnicas:**
+**Mudancas Tecnicas:**
 - Nova tabela `messages` no banco de dados
 - Coluna `status` na tabela `followers` (pending/accepted)
 - Coluna `related_user_id` na tabela `notifications`
 - 8 novas rotas de API para mensagens
 - 5 novas rotas de API para pedidos de amizade
-- Método `sendFriendRequest()` no frontend
-- Métodos `loadConversations()` e `openChat()` no frontend
+- Metodo `sendFriendRequest()` no frontend
+- Metodos `loadConversations()` e `openChat()` no frontend
 
 ### [1.0.0] - 30/10/2025
 
-**✨ Implementado:**
-- Sistema completo de autenticação (JWT + bcrypt)
-- Feed de postagens com likes e comentários
-- Perfis editáveis com interesses
-- Sistema de amigos básico (adicionar/remover/buscar)
+**Implementado:**
+- Sistema completo de autenticacao (JWT + bcrypt)
+- Feed de postagens com likes e comentarios
+- Perfis editaveis com interesses
+- Sistema de amigos basico (adicionar/remover/buscar)
 - Conselhos do dia com categorias
-- Notificações em tempo real (polling 10s)
-- Busca de usuários
+- Notificacoes em tempo real (polling 10s)
+- Busca de usuarios
 - Acesso externo (rede local + internet)
-- Scripts de automação (iniciar.sh, expor-internet.sh)
+- Scripts de automacao (iniciar.sh, expor-internet.sh)
 
-**🔧 Tecnologias:**
+**Tecnologias:**
 - Backend: Node.js 18 + Express 4.18 + SQLite 5.1
 - Frontend: HTML5 + Tailwind CSS + JavaScript ES6+
 - Auth: JWT 9.0 + bcryptjs 2.4
 
-**🐛 Corrigido:**
-- Erro ao carregar perfil de outros usuários
-- CORS bloqueando requisições externas
+**Corrigido:**
+- Erro ao carregar perfil de outros usuarios
+- CORS bloqueando requisicoes externas
 - TypeScript moduleResolution deprecated
 - Problemas com portas ocupadas
 
 ---
 
-## 📌 NOTAS
+## NOTAS
 
-### Estrutura do Código
+### Estrutura do Codigo
 
 **Frontend (app.js):**
 ```javascript
 App                    # Controller principal
-├─ handleLogin()       # Processa login
-├─ loadFeed()          # Carrega feed
-├─ showEditProfile()   # Modal editar perfil
-├─ loadFriends()       # Lista amigos
-├─ loadAdvices()       # Lista conselhos
-├─ startPolling()      # Inicia atualizações
-└─ stopPolling()       # Para atualizações
+|-- handleLogin()       # Processa login
+|-- loadFeed()          # Carrega feed
+|-- showEditProfile()   # Modal editar perfil
+|-- loadFriends()       # Lista amigos
+|-- loadAdvices()       # Lista conselhos
+|-- startPolling()      # Inicia atualizacoes
+|-- stopPolling()       # Para atualizacoes
 ```
 
 **API Client (api.js):**
 ```javascript
 ApiService
-├─ login(credentials)
-├─ getFeed()
-├─ createPost(data)
-├─ addFriend(userId)
-└─ getUpdates(since)
+|-- login(credentials)
+|-- getFeed()
+|-- createPost(data)
+|-- addFriend(userId)
+|-- getUpdates(since)
 ```
 
-### Variáveis de Ambiente
+### Variaveis de Ambiente
 
 Arquivo `.env`:
 ```env
@@ -660,26 +703,26 @@ JWT_SECRET=seu_segredo_aqui
 CORS_ORIGIN=*
 ```
 
-### Segurança
+### Seguranca
 
-- ✅ Senhas com bcrypt (hash)
-- ✅ JWT para autenticação
-- ✅ Prepared statements (SQL injection)
-- ✅ CORS configurado
-- ⚠️ Em produção: alterar JWT_SECRET, restringir CORS, usar HTTPS
+- [OK] Senhas com bcrypt (hash)
+- [OK] JWT para autenticacao
+- [OK] Prepared statements (SQL injection)
+- [OK] CORS configurado
+- [!] Em producao: alterar JWT_SECRET, restringir CORS, usar HTTPS
 
 ---
 
-## 🎯 PRÓXIMAS VERSÕES
+## PROXIMAS VERSOES
 
 **Planejado para v1.1.0:**
 - Editar/deletar posts
 - Upload de imagens
 - Chat em tempo real (WebSocket)
-- Paginação do feed
+- Paginacao do feed
 - Temas claro/escuro
 
 ---
 
-**Última atualização:** 30 de outubro de 2025  
+**Ultima atualizacao:** 30 de outubro de 2025  
 **Mantenha este arquivo atualizado ao adicionar novas funcionalidades!**
