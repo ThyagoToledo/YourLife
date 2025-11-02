@@ -1,0 +1,38 @@
+# Dependências
+node_modules/
+package-lock.json
+
+# Ambiente
+.env
+.env.local
+.env.production
+
+# Banco de dados local
+database.sqlite
+*.db
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Backups
+*.backup
+*.bak
+
+# Ngrok e tunnels (removidos para Vercel)
+ngrok.yml
+*.ngrok.io
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vercel
+.vercel

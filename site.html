@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark-mode-transition">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Life - Conecte-se com quem importa</title>
+    <!-- Carrega o Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configura Tailwind para dark mode
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <!-- Carrega a fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilo base com a fonte Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Transição suave para dark mode */
+        .dark-mode-transition {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .dark-mode-transition * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Classes para controlar a visibilidade das "paginas" */
+        .view {
+            display: none; /* Todas as visualizacoes comecam escondidas */
+        }
+        .view.active {
+            display: block; /* A visualizacao ativa e mostrada */
+        }
+
+        /* Animação da logo */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .logo-animate {
+            animation: fadeInScale 0.6s ease-out forwards;
+        }
+
+        /* Animação de fade-in para toasts */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- 
+    ==================================================
+    PAGINA DE LOGIN
+    ================================================== 
+    -->
+    <div id="login-page" class="flex min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-purple-700">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%">
+                <defs>
+                    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <circle cx="30" cy="30" r="2" fill="white"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+        
+        <!-- Conteúdo Centralizado -->
+        <div class="relative z-10 flex flex-col items-center justify-center w-full p-8">
+            <!-- Logo -->
+            <div class="mb-8">
+                <div class="w-32 h-32 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center border-4 border-white border-opacity-30 shadow-2xl">
+                    <svg class="w-20 h-20" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" fill="white"/>
+                        <ellipse cx="32" cy="38" rx="18" ry="22" fill="#E0E7FF"/>
+                        <circle cx="26" cy="28" r="4" fill="#1E3A8A"/>
+                        <circle cx="38" cy="28" r="4" fill="#1E3A8A"/>
+                        <circle cx="26" cy="28" r="2" fill="white"/>
+                        <circle cx="38" cy="28" r="2" fill="white"/>
+                        <path d="M28 36 Q32 38 36 36" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Nome -->
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-12 tracking-tight">Your Life</h1>
+            
+            <!-- Card de Login -->
+            <div class="w-full max-w-md">
+                <div class="bg-white bg-opacity-95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
+                    
+                    
+                    <form id="login-form" class="space-y-5">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">
+                                E-mail
+                            </label>
+                            <input 
+                                type="email" 
+                                id="login-email" 
+                                name="email" 
+                                required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                placeholder="seu@email.com">
+                        </div>
+                        
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">
+                                Senha
+                            </label>
+                            <input 
+                                type="password" 
+                                id="login-password" 
+                                name="password" 
+                                required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                placeholder="••••••••">
+                        </div>
+                        
+                        <button 
+                            type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl">
+                            Entrar
+                        </button>
+                    </form>
+                    
+                    <div class="text-center pt-6 border-t border-gray-200">
+                        <p class="text-gray-600">
+                            Não tem uma conta?
+                            <button id="show-register" class="text-purple-600 hover:text-purple-700 font-semibold ml-1 hover:underline">
+                                Registre-se
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">ou</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-gray-600 dark:text-gray-400">
+                        Não tem uma conta? 
+                        <a href="#" id="show-register-modal" class="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                            Cadastre-se gratuitamente
+                        </a>
+                    </p>
+                </div>
+                
+                <p class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    Ao continuar, você concorda com nossos Termos de Uso e Política de Privacidade
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ==================================================
+    MODAL DE REGISTRO
+    ================================================== 
+    -->
+    <div id="register-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-xl">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Criar Conta</h2>
+                <button id="close-register-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="register-form" class="space-y-4">
+                <div>
+                    <label for="register-name" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                    <input id="register-name" name="name" type="text" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Seu nome completo">
+                </div>
+                
+                <div>
+                    <label for="register-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input id="register-email" name="email" type="email" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="voce@exemplo.com">
+                </div>
+                
+                <div>
+                    <label for="register-password" class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input id="register-password" name="password" type="password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Mínimo 6 caracteres">
+                </div>
+                
+                <div>
+                    <label for="register-confirm-password" class="block text-sm font-medium text-gray-700">Confirmar Senha</label>
+                    <input id="register-confirm-password" name="confirmPassword" type="password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Digite a senha novamente">
+                </div>
+                
+                <div>
+                    <button type="submit" class="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                        Criar Conta
+                    </button>
+                </div>
+            </form>
+            
+            <p class="text-sm text-center text-gray-600">
+                Já tem uma conta? 
+                <a href="#" id="back-to-login" class="font-medium text-blue-600 hover:text-blue-500">Faça login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- 
+    ==================================================
+    APLICACAO PRINCIPAL (Escondida por padrao)
+    ================================================== 
+    -->
+    <div id="main-app" class="hidden">
+        
+        <!-- Header (Barra Superior) -->
+        <header class="fixed top-0 left-0 right-0 z-10 flex items-center justify-between h-16 px-4 bg-white dark:bg-gray-800 shadow-md md:px-8 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-3 logo-animate">
+                <!-- Logo Arara Azul SVG -->
+                <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" fill="#3B82F6"/>
+                    <ellipse cx="32" cy="38" rx="20" ry="24" fill="#2563EB"/>
+                    <circle cx="26" cy="28" r="4" fill="white"/>
+                    <circle cx="38" cy="28" r="4" fill="white"/>
+                    <circle cx="26" cy="28" r="2" fill="#1E3A8A"/>
+                    <circle cx="38" cy="28" r="2" fill="#1E3A8A"/>
+                    <path d="M28 36 Q32 38 36 36" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path d="M12 28 Q8 22 10 16" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M52 28 Q56 22 54 16" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <ellipse cx="32" cy="16" rx="8" ry="6" fill="#1E40AF"/>
+                    <path d="M24 46 L20 56 L24 54 L28 56 L26 46" fill="#FCD34D"/>
+                    <path d="M40 46 L44 56 L40 54 L36 56 L38 46" fill="#FCD34D"/>
+                </svg>
+                <span class="text-xl font-bold text-blue-600 dark:text-blue-400">Your Life</span>
+            </div>
+            
+            <div class="flex-1 max-w-xs mx-4">
+                <label for="search" class="sr-only">Buscar</label>
+                <input id="search" name="search" type="search" class="w-full px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Buscar usuarios ou postagens...">
+                <!-- BACKEND: Conforme o usuario digita, fazer GET /api/search?q=... -->
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Notificações -->
+                <div class="relative">
+                    <button id="notifications-button" class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 relative">
+                        <!-- Icone de Notificacao (Sino) -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span id="notification-badge-header" class="hidden absolute top-0 right-0 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full"></span>
+                    </button>
+                    
+                    <!-- Dropdown de Notificações -->
+                    <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-[500px] overflow-hidden">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="font-bold text-gray-800 dark:text-white">Notificações</h3>
+                        </div>
+                        <div id="notifications-list" class="overflow-y-auto max-h-[400px]">
+                            <!-- Notificações serão injetadas aqui -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Menu do Usuario -->
+                <div class="relative">
+                    <button class="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors" id="user-menu-button">
+                        <img id="user-menu-avatar" class="w-8 h-8 rounded-full" src="https://placehold.co/40x40/E0E7FF/4F46E5?text=U" alt="Foto do Usuario">
+                        <span id="user-menu-name" class="hidden font-medium text-gray-700 dark:text-gray-200 md:block">Usuario</span>
+                        <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Dropdown do Usuario -->
+                    <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <p class="font-semibold text-gray-800 dark:text-white" id="dropdown-user-name">Usuario</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400" id="dropdown-user-email">email@exemplo.com</p>
+                        </div>
+                        <div class="py-2">
+                            <button id="toggle-dark-mode" class="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                                </svg>
+                                <span id="dark-mode-text">Tema Escuro</span>
+                            </button>
+                            <button id="logout-button" class="w-full text-left px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Sair da Conta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Conteudo Principal (Layout com Sidebar) -->
+        <div class="flex pt-16">
+            
+            <!-- Sidebar (Menu Esquerdo) -->
+            <aside class="fixed top-16 left-0 z-0 w-64 h-screen py-8 overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
+                <nav class="px-4">
+                    <h3 class="px-4 text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">Menu</h3>
+                    <div class="mt-4 space-y-2">
+                        <a href="#" id="nav-feed" class="flex items-center px-4 py-2 font-medium text-white bg-blue-600 rounded-lg group">
+                            Feed
+                        </a>
+                        <a href="#" id="nav-profile" class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Meu Perfil
+                        </a>
+                        <a href="#" id="nav-friends" class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Amigos
+                        </a>
+                        <!-- Funcionalidade principal (Conselhos) da documentacao -->
+                        <a href="#" id="nav-advice" class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Conselhos
+                        </a>
+                        <a href="#" id="nav-messages" class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group relative">
+                            Correspondências
+                            <span id="messages-badge" class="hidden absolute top-1 right-1 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full">0</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+            
+            <!-- Area de Conteudo Principal -->
+            <main class="flex-1 p-4 md:pl-72 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+                
+                <!-- 
+                ========================================
+                VISUALIZACAO: FEED
+                ========================================
+                -->
+                <div id="feed-view" class="view active max-w-2xl mx-auto">
+                    <!-- Caixa de Nova Postagem -->
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Criar Postagem</h2>
+                        <textarea id="new-post-content" class="w-full h-24 p-2 mt-4 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="No que você está pensando?"></textarea>
+                        <div class="flex justify-end mt-4">
+                            <!-- BACKEND: POST /api/posts com { content: "..." } -->
+                            <button id="submit-post-button" class="px-6 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700">
+                                Postar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Container do Feed -->
+                    <div id="feed-container" class="mt-8 space-y-6">
+                        <!-- Postagens serao injetadas aqui pelo JS -->
+                        <!-- BACKEND: GET /api/feed -->
+                    </div>
+                </div>
+
+                <!-- 
+                ========================================
+                VISUALIZACAO: PERFIL
+                ========================================
+                -->
+                <div id="profile-view" class="view max-w-4xl mx-auto">
+                    <!-- BACKEND: GET /api/users/{userId} -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <!-- Imagem de Capa -->
+                        <div>
+                            <img class="w-full h-48 object-cover" src="https://placehold.co/1000x300/E0E7FF/4F46E5?text=Capa" alt="Imagem de Capa">
+                        </div>
+                        
+                        <!-- Informacoes do Perfil -->
+                        <div class="p-6">
+                            <div class="flex items-end -mt-20">
+                                <img id="profile-avatar" class="w-32 h-32 rounded-full border-4 border-white" src="https://placehold.co/128x128/E0E7FF/4F46E5?text=U" alt="Foto do Perfil">
+                                <button onclick="app.showEditProfile()" class="ml-auto px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50">
+                                    Editar Perfil
+                                    <!-- BACKEND: PUT /api/users/me -->
+                                </button>
+                            </div>
+                            
+                            <h1 id="profile-name" class="mt-4 text-3xl font-bold text-gray-900"></h1>
+                            <p id="profile-bio" class="mt-2 text-gray-600"></p>
+                            
+                            <div class="mt-4">
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase">Interesses</h3>
+                                <div id="profile-interests" class="flex flex-wrap gap-2 mt-2">
+                                    <!-- Interesses serao injetados aqui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Abas (Postagens, Amigos, Conselhos) -->
+                    <div class="mt-6">
+                        <div class="border-b border-gray-200">
+                            <nav class="flex -mb-px space-x-8">
+                                <a href="#" id="profile-posts-tab" class="profile-tab px-1 py-4 text-base font-medium text-blue-600 border-b-2 border-blue-600" data-tab="posts">Postagens</a>
+                                <a href="#" id="profile-friends-tab" class="profile-tab px-1 py-4 text-base font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-300 hover:text-gray-700" data-tab="friends">Amigos</a>
+                                <a href="#" id="profile-advices-tab" class="profile-tab px-1 py-4 text-base font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-300 hover:text-gray-700" data-tab="advices">Conselhos</a>
+                            </nav>
+                        </div>
+                        
+                        <!-- Conteudo da Aba Postagens -->
+                        <div id="profile-posts-content" class="profile-tab-content mt-6 space-y-6">
+                            <div id="profile-posts-container">
+                                <!-- Postagens do perfil serao injetadas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Conteudo da Aba Amigos -->
+                        <div id="profile-friends-content" class="profile-tab-content mt-6 space-y-6 hidden">
+                            <div id="profile-friends-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Amigos serao injetados aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Conteudo da Aba Conselhos -->
+                        <div id="profile-advices-content" class="profile-tab-content mt-6 space-y-6 hidden">
+                            <div id="profile-advices-list" class="grid grid-cols-1 gap-4">
+                                <!-- Conselhos serao injetados aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: AMIGOS -->
+                <div id="friends-view" class="view max-w-4xl mx-auto hidden">
+                    <!-- Tabs -->
+                    <div class="bg-white rounded-lg shadow-md mb-4">
+                        <div class="flex border-b">
+                            <button id="friends-tab" class="flex-1 px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600">
+                                Amigos
+                            </button>
+                            <button id="requests-tab" class="flex-1 px-6 py-3 font-semibold text-gray-600 hover:text-blue-600 relative">
+                                Pedidos
+                                <span id="requests-badge" class="hidden absolute top-2 right-2 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo: Amigos -->
+                    <div id="friends-content" class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Meus Amigos</h2>
+                            <button onclick="app.showAddFriendModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                + Adicionar Amigo
+                            </button>
+                        </div>
+                        <div id="friends-container" class="space-y-4">
+                            <!-- Amigos serão injetados aqui -->
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo: Pedidos -->
+                    <div id="requests-content" class="bg-white rounded-lg shadow-md p-6 hidden">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Pedidos de Amizade</h2>
+                        <div id="friend-requests-container" class="space-y-4">
+                            <!-- Pedidos serão injetados aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: CONSELHOS -->
+                                <!-- VIEW: CONSELHOS -->
+                <div id="advice-view" class="view max-w-4xl mx-auto hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Conselhos do Dia</h2>
+                            <button onclick="app.showCreateAdviceModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                + Criar Conselho
+                            </button>
+                        </div>
+                    </div>
+                    <div id="advices-container" class="space-y-4">
+                        <!-- Conselhos serão injetados aqui -->
+                    </div>
+                </div>
+
+                <!-- VIEW: CORRESPONDÊNCIAS (MENSAGENS) -->
+                <div id="messages-view" class="view max-w-6xl mx-auto hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-200px)]">
+                        <!-- Lista de Conversas -->
+                        <div class="md:col-span-1 bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="bg-blue-600 text-white p-4">
+                                <h2 class="text-xl font-bold">Conversas</h2>
+                            </div>
+                            <div id="conversations-list" class="overflow-y-auto h-full">
+                                <!-- Conversas serão injetadas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Área de Chat -->
+                        <div class="md:col-span-2 bg-white rounded-lg shadow-md flex flex-col">
+                            <!-- Header do Chat -->
+                            <div id="chat-header" class="hidden bg-blue-600 text-white p-4 flex items-center gap-3">
+                                <img id="chat-user-avatar" src="" alt="" class="w-10 h-10 rounded-full">
+                                <h3 id="chat-user-name" class="font-semibold text-lg"></h3>
+                            </div>
+
+                            <!-- Seleção Inicial -->
+                            <div id="no-chat-selected" class="flex-1 flex items-center justify-center text-gray-400">
+                                <div class="text-center">
+                                    <svg class="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                    </svg>
+                                    <p class="text-lg">Selecione uma conversa</p>
+                                    <p class="text-sm mt-2">Escolha um amigo para começar a conversar</p>
+                                </div>
+                            </div>
+
+                            <!-- Mensagens (ver seção de chat mais abaixo) -->
+                        </div>
+                    </div>
+                </div>
+                
+            </main>
+
+                <!-- 
+                ========================================
+                VISUALIZACAO: CORRESPONDENCIAS (MENSAGENS)
+                ========================================
+                -->
+                <div id="messages-view" class="view max-w-6xl mx-auto hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-120px)]">
+                        <!-- Lista de conversas -->
+                        <div class="md:col-span-1 bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="p-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                                <h2 class="text-xl font-bold text-white">Conversas</h2>
+                            </div>
+                            <div id="conversations-list" class="overflow-y-auto h-full">
+                                <!-- Conversas serão injetadas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Área de mensagens -->
+                        <div class="md:col-span-2 bg-white rounded-lg shadow-md flex flex-col">
+                            <div id="chat-header" class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white hidden">
+                                <div class="flex items-center gap-3">
+                                    <img id="chat-user-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full">
+                                    <div>
+                                        <h3 id="chat-user-name" class="font-bold"></h3>
+                                        <p class="text-xs opacity-80">Online</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="messages-container" class="flex-1 p-4 overflow-y-auto">
+                                <div id="no-chat-selected" class="h-full flex items-center justify-center text-gray-400">
+                                    <div class="text-center">
+                                        <svg class="w-24 h-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                        </svg>
+                                        <p class="text-lg">Selecione uma conversa</p>
+                                    </div>
+                                </div>
+                                <div id="messages-list" class="space-y-3 hidden">
+                                    <!-- Mensagens serão injetadas aqui -->
+                                </div>
+                            </div>
+
+                            <div id="message-input-area" class="p-4 border-t hidden">
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        id="chat-message-input" 
+                                        placeholder="Digite sua mensagem..." 
+                                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        onkeypress="if(event.key === 'Enter') app.sendMessage()"
+                                    >
+                                    <button 
+                                        onclick="app.sendMessage()" 
+                                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+                                    >
+                                        Enviar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </main>
+            
+        </div>
+        
+    </div> <!-- Fim de #main-app -->
+    
+    <!-- Badge de Notificação (oculto) -->
+    <span id="notification-badge" class="hidden absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1"></span>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        // Configuração automática da URL do backend
+        // Se acessar via localhost, usa localhost
+        // Detecta automaticamente: se acessar via ngrok, usa ngrok; se local, usa localhost
+        if (window.location.hostname.includes('ngrok')) {
+            // Acessa via ngrok - usa a mesma origem
+            window.BACKEND_URL = window.location.origin + '/api';
+        } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Acessa localmente
+            window.BACKEND_URL = 'http://localhost:3000/api';
+        } else {
+            // Fallback
+            window.BACKEND_URL = window.location.origin + '/api';
+        }
+        console.log('[INFO] Backend configurado para:', window.BACKEND_URL);
+    </script>
+    <script src="utils.js?v=13"></script>
+    <script src="api.js?v=13"></script>
+    <script src="state.js?v=13"></script>
+    <script src="app.js?v=13"></script>
+
+    <script>
+        // ==============================================
+        // DADOS MOCK (Simulacao) - DEPRECATED
+        // ==============================================
+        // Este código está mantido por compatibilidade mas não é mais usado
+        // A nova versão usa os arquivos modulares acima
+        // BACKEND: Estes dados viriam da API
+        
+        // ==============================================
+        // LOGICA DE NAVEGACAO E RENDERIZACAO
+        // ==============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Toda a lógica de navegação e rendering está no app.js
+        });
+    </script>
+
+</body>
+</html>
