@@ -1626,7 +1626,7 @@ class App {
 
                         <div class="flex gap-3 pt-4">
                             <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700">
-                                💾 Salvar Alterações
+                                Salvar Alterações
                             </button>
                             <button type="button" id="cancel-edit" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                                 Cancelar
