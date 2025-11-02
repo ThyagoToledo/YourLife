@@ -1,0 +1,12 @@
+node_modules
+.env
+database.sqlite
+*.log
+.git
+.gitignore
+ngrok.yml
+NGROK_SETUP.md
+iniciar.sh
+expor-internet.sh
+start-ngrok.sh
+*.backup
