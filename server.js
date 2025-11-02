@@ -347,7 +347,7 @@ app.get('/api/users/search/:query', authenticateToken, async (req, res) => {
             LIMIT 20
         `;
 
-        res.json({ success: true, users: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar usuários' });
@@ -811,7 +811,7 @@ app.get('/api/messages/:userId', authenticateToken, async (req, res) => {
             ORDER BY m.created_at ASC
         `;
 
-        res.json({ success: true, messages: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar mensagens:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar mensagens' });
