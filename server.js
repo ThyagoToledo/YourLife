@@ -312,7 +312,7 @@ app.put('/api/users/me', authenticateToken, async (req, res) => {
         // Atualizar interesses
         if (interests && Array.isArray(interests)) {
             await sql`DELETE FROM user_interests WHERE user_id = ${req.user.id}`;
-            
+
             for (const interest of interests) {
                 await sql`
                     INSERT INTO user_interests (user_id, interest)
@@ -493,7 +493,7 @@ app.get('/api/posts/:id/comments', authenticateToken, async (req, res) => {
             ORDER BY c.created_at ASC
         `;
 
-        res.json({ success: true, comments: result.rows });
+        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar comentários:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar comentários' });
@@ -619,8 +619,8 @@ app.get('/api/friends/status/:userId', authenticateToken, async (req, res) => {
         }
 
         const relation = result.rows[0];
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             status: relation.status,
             isSender: relation.follower_id === req.user.id
         });

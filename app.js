@@ -7,42 +7,42 @@ class App {
         console.log('🔍 Construtor App: apiService =', window.apiService);
         console.log('🔍 Construtor App: typeof apiService =', typeof window.apiService);
         console.log('🔍 Construtor App: apiService.addFriend =', typeof window.apiService?.addFriend);
-        
+
         this.api = apiService;
         this.state = stateManager;
         this.currentUserId = null;
-        
+
         console.log('✅ this.api definido como:', this.api);
         console.log('✅ this.api.addFriend =', typeof this.api?.addFriend);
-        
+
         // Elementos DOM
         this.elements = {
             loginPage: document.getElementById('login-page'),
             mainApp: document.getElementById('main-app'),
             loginForm: document.getElementById('login-form'),
-            
+
             // Navegação
             navFeed: document.getElementById('nav-feed'),
             navProfile: document.getElementById('nav-profile'),
             navFriends: document.getElementById('nav-friends'),
             navAdvice: document.getElementById('nav-advice'),
-            
+
             // Views
             feedView: document.getElementById('feed-view'),
             profileView: document.getElementById('profile-view'),
-            
+
             // Feed
             feedContainer: document.getElementById('feed-container'),
             newPostContent: document.getElementById('new-post-content'),
             submitPostButton: document.getElementById('submit-post-button'),
-            
+
             // Perfil
             profileAvatar: document.getElementById('profile-avatar'),
             profileName: document.getElementById('profile-name'),
             profileBio: document.getElementById('profile-bio'),
             profileInterests: document.getElementById('profile-interests'),
             profilePostsContainer: document.getElementById('profile-posts-container'),
-            
+
             // Header
             userMenuAvatar: document.getElementById('user-menu-avatar'),
             userMenuName: document.getElementById('user-menu-name'),
@@ -82,10 +82,10 @@ class App {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🖱️ Clicou no botão do menu usuário!');
-                
+
                 userMenuDropdown.classList.toggle('hidden');
                 console.log('Dropdown agora hidden?', userMenuDropdown.classList.contains('hidden'));
-                
+
                 // Fecha notificações se abertas
                 if (notificationsDropdown) {
                     notificationsDropdown.classList.add('hidden');
@@ -99,14 +99,14 @@ class App {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🔔 Clicou nas notificações!');
-                
+
                 notificationsDropdown.classList.toggle('hidden');
-                
+
                 // Fecha menu do usuário se aberto
                 if (userMenuDropdown) {
                     userMenuDropdown.classList.add('hidden');
                 }
-                
+
                 // Carrega notificações se abriu
                 if (!notificationsDropdown.classList.contains('hidden')) {
                     this.loadNotificationsDropdown();
@@ -120,12 +120,12 @@ class App {
             const clickedInsideNotifDropdown = notificationsDropdown?.contains(e.target);
             const clickedInsideUserButton = userMenuButton?.contains(e.target);
             const clickedInsideUserDropdown = userMenuDropdown?.contains(e.target);
-            
+
             // Fecha notificações se clicou fora
             if (!clickedInsideNotifButton && !clickedInsideNotifDropdown && notificationsDropdown) {
                 notificationsDropdown.classList.add('hidden');
             }
-            
+
             // Fecha menu do usuário se clicou fora
             if (!clickedInsideUserButton && !clickedInsideUserDropdown && userMenuDropdown) {
                 userMenuDropdown.classList.add('hidden');
@@ -189,10 +189,10 @@ class App {
                 friendsTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
                 requestsTab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
                 requestsTab.classList.add('text-gray-600');
-                
+
                 friendsContent.classList.remove('hidden');
                 requestsContent.classList.add('hidden');
-                
+
                 this.loadFriends();
             });
 
@@ -200,10 +200,10 @@ class App {
                 requestsTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
                 friendsTab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
                 friendsTab.classList.add('text-gray-600');
-                
+
                 requestsContent.classList.remove('hidden');
                 friendsContent.classList.add('hidden');
-                
+
                 this.loadFriendRequests();
             });
         }
@@ -213,7 +213,7 @@ class App {
     setupEventListeners() {
         // Inicializa dark mode do localStorage
         this.initDarkMode();
-        
+
         // Login
         if (this.elements.loginForm) {
             this.elements.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
@@ -351,12 +351,12 @@ class App {
         const html = document.documentElement;
         const isDark = html.classList.toggle('dark');
         localStorage.setItem('darkMode', isDark);
-        
+
         const text = document.getElementById('dark-mode-text');
         if (text) {
             text.textContent = isDark ? 'Tema Claro' : 'Tema Escuro';
         }
-        
+
         Toast.success(isDark ? 'Tema escuro ativado' : 'Tema claro ativado');
     }
 
@@ -368,7 +368,7 @@ class App {
         try {
             const notifications = await this.api.getNotifications();
             const container = document.getElementById('notifications-list');
-            
+
             if (!container) return;
 
             if (!notifications || notifications.length === 0) {
@@ -392,7 +392,7 @@ class App {
                     'comment': '[...]'
                 };
                 const icon = iconMap[notif.type] || '(!)';
-                
+
                 return `
                     <div class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${notif.is_read ? 'opacity-60' : ''}">
                         <div class="flex items-start gap-3">
@@ -441,7 +441,7 @@ class App {
     // Verifica se o usuário está autenticado
     async checkAuthentication() {
         const token = this.api.getToken();
-        
+
         if (!token) {
             this.showLoginPage();
             return;
@@ -473,17 +473,17 @@ class App {
     showMainApp() {
         DOMUtils.hide(this.elements.loginPage);
         DOMUtils.show(this.elements.mainApp);
-        
+
         // Atualiza informações do usuário no dropdown
         const user = this.state.getState().currentUser;
         if (user) {
             const dropdownName = document.getElementById('dropdown-user-name');
             const dropdownEmail = document.getElementById('dropdown-user-email');
-            
+
             if (dropdownName) dropdownName.textContent = user.name;
             if (dropdownEmail) dropdownEmail.textContent = user.email;
         }
-        
+
         // Configura dropdowns após o DOM estar visível
         setTimeout(() => {
             this.setupDropdowns();
@@ -493,7 +493,7 @@ class App {
     // Handle registro
     async handleRegister(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(e.target);
         const name = formData.get('name');
         const email = formData.get('email');
@@ -501,7 +501,7 @@ class App {
         const confirmPassword = formData.get('confirmPassword');
 
         const validation = Validation.validateRegisterForm(name, email, password, confirmPassword);
-        
+
         if (!validation.isValid) {
             Object.values(validation.errors).forEach(error => {
                 Toast.error(error);
@@ -511,29 +511,29 @@ class App {
 
         try {
             Loading.show('Criando conta...');
-            
+
             const response = await this.api.register({ name, email, password });
-            
+
             if (response && response.user) {
                 this.currentUserId = response.user.id;
                 this.state.setCurrentUser(response.user);
-                
+
                 // Fecha o modal
                 const registerModal = document.getElementById('register-modal');
                 if (registerModal) {
                     registerModal.classList.add('hidden');
                 }
-                
+
                 // Limpa o formulário
                 e.target.reset();
-                
+
                 this.showMainApp();
                 await this.loadInitialData();
                 Toast.success('Conta criada com sucesso! Bem-vindo!');
             } else {
                 throw new Error('Resposta inválida do servidor');
             }
-            
+
         } catch (error) {
             console.error('Erro ao registrar:', error);
             Toast.error(error.message || 'Erro ao criar conta. Tente novamente.');
@@ -545,7 +545,7 @@ class App {
     // Handle login
     async handleLogin(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(e.target);
         const email = formData.get('email');
         const password = formData.get('password');
@@ -553,7 +553,7 @@ class App {
         console.log('🔐 Iniciando login para:', email);
 
         const validation = Validation.validateLoginForm(email, password);
-        
+
         if (!validation.isValid) {
             console.log('❌ Validação falhou:', validation.errors);
             Object.values(validation.errors).forEach(error => {
@@ -564,45 +564,45 @@ class App {
 
         try {
             Loading.show('Entrando...');
-            
+
             console.log('📡 Chamando API de login...');
             const response = await this.api.login({ email, password });
-            
+
             console.log('📥 Resposta recebida:', response);
-            
+
             if (!response) {
                 console.error('❌ Resposta vazia');
                 throw new Error('Nenhuma resposta do servidor');
             }
-            
+
             if (!response.success) {
                 console.error('❌ Login não bem-sucedido:', response.message);
                 throw new Error(response.message || 'Credenciais inválidas');
             }
-            
+
             if (!response.user) {
                 console.error('❌ Usuário não retornado na resposta');
                 throw new Error('Dados do usuário não encontrados');
             }
-            
+
             if (!response.token) {
                 console.error('❌ Token não retornado na resposta');
                 throw new Error('Token de autenticação não encontrado');
             }
-            
+
             console.log('✅ Login validado. Usuário:', response.user.id);
-            
+
             this.currentUserId = response.user.id;
             this.state.setCurrentUser(response.user);
             this.showMainApp();
             await this.loadInitialData();
             Toast.success('Login realizado com sucesso!');
-            
+
         } catch (error) {
             console.error('❌ Erro ao fazer login:', error);
-            
+
             let errorMessage = 'Erro ao fazer login';
-            
+
             if (error.message.includes('conectar')) {
                 errorMessage = 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.';
             } else if (error.message.includes('Credenciais inválidas')) {
@@ -610,9 +610,9 @@ class App {
             } else {
                 errorMessage = error.message || 'Erro desconhecido. Tente novamente.';
             }
-            
+
             Toast.error(errorMessage);
-            
+
             // Garante que não entre na aplicação
             this.showLoginPage();
             this.api.removeToken();
@@ -628,10 +628,10 @@ class App {
                 this.loadFeed(),
                 this.loadNotifications(),
             ]);
-            
+
             // Inicia polling de atualizações
             this.startPolling();
-            
+
             // Atualiza UI com dados do usuário
             const user = this.state.getState().currentUser;
             if (user) {
@@ -652,7 +652,7 @@ class App {
     async loadFeed() {
         try {
             console.log('[INFO] Carregando feed...');
-            
+
             // Carrega lista de amigos primeiro
             let friends = [];
             try {
@@ -661,16 +661,16 @@ class App {
             } catch (err) {
                 console.error('[ERRO] Erro ao carregar amigos:', err);
             }
-            
+
             const feed = await this.api.getFeed();
-            
+
             if (!Array.isArray(feed)) {
                 console.error('[ERRO] Feed não é um array:', feed);
                 throw new Error('Formato de dados inválido recebido do servidor');
             }
-            
+
             console.log(`[INFO] ${feed.length} posts recebidos`);
-            
+
             // Normaliza formato dos posts e carrega comentários
             const normalizedFeed = [];
             for (const post of feed) {
@@ -689,25 +689,35 @@ class App {
                     commentsCount: parseInt(post.comments_count) || 0,
                     comments: []
                 };
-                
+
                 // Carregar comentários
                 try {
                     const comments = await this.api.getComments(post.id);
-                    normalizedPost.comments = comments || [];
+                    // Normalizar comentários
+                    normalizedPost.comments = (comments || []).map(comment => ({
+                        id: comment.id,
+                        content: comment.content,
+                        created_at: comment.created_at,
+                        author: {
+                            id: comment.user_id,
+                            name: comment.user_name,
+                            avatar: comment.user_avatar
+                        }
+                    }));
                 } catch (err) {
                     console.error(`[ERRO] Erro ao carregar comentários do post ${post.id}:`, err);
                 }
-                
+
                 normalizedFeed.push(normalizedPost);
             }
-            
+
             this.state.setFeed(normalizedFeed);
             this.renderFeed();
             console.log('✅ Feed carregado com sucesso');
-            
+
         } catch (error) {
             console.error('❌ Erro ao carregar feed:', error.message);
-            
+
             if (error.message.includes('conectar')) {
                 Toast.error('Não foi possível conectar ao servidor');
             } else if (error.message.includes('401') || error.message.includes('não autenticado')) {
@@ -716,7 +726,7 @@ class App {
             } else {
                 Toast.warning('Nenhuma postagem ainda. Seja o primeiro a postar!');
             }
-            
+
             this.state.setFeed([]);
             this.renderFeed();
         }
@@ -727,11 +737,11 @@ class App {
         const state = this.state.getState();
         const feed = state.feed;
         const friends = state.friends || [];
-        
+
         if (!this.elements.feedContainer) return;
 
         this.elements.feedContainer.innerHTML = '';
-        
+
         if (feed.length === 0) {
             this.elements.feedContainer.innerHTML = `
                 <div class="text-center py-12 text-gray-500">
@@ -788,7 +798,7 @@ class App {
         const div = document.createElement('div');
         div.className = 'p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md';
         div.dataset.postId = post.id;
-        
+
         const timestamp = DateUtils.formatRelativeTime(post.timestamp);
         const commentsHTML = post.comments.map(comment => `
             <div class="mt-2 flex space-x-2 text-sm">
@@ -901,7 +911,7 @@ class App {
                 const userId = parseInt(addFriendButton.dataset.userId);
                 try {
                     await this.sendFriendRequest(userId);
-                    
+
                     // Atualiza o botão
                     addFriendButton.textContent = 'Pedido enviado';
                     addFriendButton.disabled = true;
@@ -939,7 +949,7 @@ class App {
                 this.handleCreateComment(post.id, commentInput.value);
                 commentInput.value = '';
             });
-            
+
             commentInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     this.handleCreateComment(post.id, commentInput.value);
@@ -958,7 +968,7 @@ class App {
     // Handle criar post
     async handleCreatePost() {
         const content = this.elements.newPostContent?.value?.trim();
-        
+
         if (!content) {
             Toast.warning('Digite algo antes de postar');
             return;
@@ -966,10 +976,10 @@ class App {
 
         try {
             Loading.show('Criando postagem...');
-            
+
             // MODO REAL - Backend ativo
             const response = await this.api.createPost({ content });
-            
+
             if (response && response.post) {
                 // Normalizar formato do post para compatibilidade com o feed
                 const normalizedPost = {
@@ -986,7 +996,7 @@ class App {
                     commentsCount: response.post.comments_count || 0,
                     comments: []
                 };
-                
+
                 this.state.addPost(normalizedPost);
                 this.elements.newPostContent.value = '';
                 this.renderFeed();
@@ -1007,16 +1017,16 @@ class App {
             if (!post) return;
 
             const wasLiked = post.isLiked;
-            
+
             // Atualiza UI imediatamente (optimistic update)
             this.state.toggleLike(postId);
-            
+
             const postElement = document.querySelector(`[data-post-id="${postId}"]`);
             if (postElement) {
                 const likeButton = postElement.querySelector('.like-button');
                 const likeCount = postElement.querySelector('.like-count');
                 const svg = likeButton?.querySelector('svg');
-                
+
                 if (wasLiked) {
                     likeButton?.classList.remove('text-blue-600');
                     likeButton?.classList.add('text-gray-600');
@@ -1026,7 +1036,7 @@ class App {
                     likeButton?.classList.add('text-blue-600');
                     if (svg) svg.setAttribute('fill', 'currentColor');
                 }
-                
+
                 if (likeCount) {
                     const newCount = wasLiked ? post.likes - 1 : post.likes + 1;
                     likeCount.textContent = `(${newCount})`;
@@ -1039,7 +1049,7 @@ class App {
             } else {
                 await this.api.likePost(postId);
             }
-            
+
         } catch (error) {
             console.error('Erro ao curtir post:', error);
             // Reverte em caso de erro
@@ -1058,25 +1068,36 @@ class App {
         try {
             // MODO REAL - Backend ativo
             const response = await this.api.createComment(postId, { content });
-            
+
             if (response && response.comment) {
-                const newComment = response.comment;
-                this.state.addComment(postId, newComment);
+                // Normalizar comentário
+                const normalizedComment = {
+                    id: response.comment.id,
+                    content: response.comment.content,
+                    created_at: response.comment.created_at,
+                    author: {
+                        id: response.comment.user_id,
+                        name: response.comment.user_name,
+                        avatar: response.comment.user_avatar
+                    }
+                };
                 
+                this.state.addComment(postId, normalizedComment);
+
                 const postElement = document.querySelector(`[data-post-id="${postId}"]`);
                 if (postElement) {
                     const commentsSection = postElement.querySelector('.comments-section');
                     if (commentsSection) {
                         const commentHTML = `
                             <div class="mt-2 flex space-x-2 text-sm">
-                                <span class="font-semibold text-gray-800">${Validation.sanitizeHTML(newComment.author.name)}:</span>
-                                <span class="text-gray-700">${Validation.sanitizeHTML(newComment.content)}</span>
+                                <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(normalizedComment.author.name)}:</span>
+                                <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(normalizedComment.content)}</span>
                             </div>
                         `;
                         commentsSection.insertAdjacentHTML('beforeend', commentHTML);
                     }
                 }
-                
+
                 Toast.success('Comentário adicionado!');
             }
         } catch (error) {
@@ -1088,7 +1109,7 @@ class App {
     // Handle dar conselho
     async handleAdvice(postId) {
         const content = prompt('Digite seu conselho:');
-        
+
         if (!content || !content.trim()) {
             return;
         }
@@ -1120,17 +1141,17 @@ class App {
         try {
             console.log('🔔 Carregando notificações...');
             const notifications = await this.api.getNotifications();
-            
+
             if (!Array.isArray(notifications)) {
                 console.error('❌ Notificações não são um array:', notifications);
                 throw new Error('Formato de dados inválido');
             }
-            
+
             console.log(`📊 ${notifications.length} notificações recebidas`);
             this.state.setNotifications(notifications || []);
             this.renderNotifications();
             console.log('✅ Notificações carregadas com sucesso');
-            
+
         } catch (error) {
             console.error('❌ Erro ao carregar notificações:', error.message);
             this.state.setNotifications([]);
@@ -1183,7 +1204,7 @@ class App {
         container.innerHTML = notifications.map(notif => {
             const icon = iconMap[notif.type] || '(!)';
             const unreadClass = notif.is_read ? 'opacity-60' : '';
-            
+
             return `
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${unreadClass}">
                     <div class="flex items-start gap-3">
@@ -1203,7 +1224,7 @@ class App {
     renderNotifications() {
         const notifications = this.state.getState().notifications || [];
         const container = document.getElementById('notifications-list');
-        
+
         if (!container) return;
 
         if (notifications.length === 0) {
@@ -1227,7 +1248,7 @@ class App {
                 'comment': '[...]'
             };
             const icon = iconMap[notif.type] || '(!)';
-            
+
             return `
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${notif.is_read ? 'opacity-60' : ''}">
                     <div class="flex items-start gap-3">
@@ -1245,7 +1266,7 @@ class App {
         // Atualiza badge
         const notifBadge = document.getElementById('notifications-badge');
         const unreadCount = notifications.filter(n => !n.is_read).length;
-        
+
         if (notifBadge) {
             if (unreadCount > 0) {
                 notifBadge.textContent = unreadCount;
@@ -1260,9 +1281,9 @@ class App {
     async loadProfile(userId) {
         try {
             Loading.show('Carregando perfil...');
-            
+
             let user = this.state.getState().currentUser;
-            
+
             // Se não tem usuário ou não tem perfil, busca da API
             if (!user || !user.profile) {
                 console.log('📡 Buscando dados do usuário da API...');
@@ -1275,12 +1296,12 @@ class App {
                     throw new Error('Não foi possível carregar os dados do perfil');
                 }
             }
-            
+
             if (!user) {
                 console.error('❌ Usuário não encontrado no estado');
                 throw new Error('Usuário não autenticado');
             }
-            
+
             // Se ainda não tem perfil, cria um padrão
             if (!user.profile) {
                 console.log('⚠️ Criando perfil padrão');
@@ -1291,21 +1312,21 @@ class App {
                     interests: ['Tecnologia', 'Redes Sociais', 'Inovação']
                 };
             }
-            
+
             console.log('👤 Carregando perfil:', user);
-            
+
             if (this.elements.profileAvatar) {
                 this.elements.profileAvatar.src = user.profile.avatar;
             }
-            
+
             if (this.elements.profileName) {
                 this.elements.profileName.textContent = user.profile.name;
             }
-            
+
             if (this.elements.profileBio) {
                 this.elements.profileBio.textContent = user.profile.bio;
             }
-            
+
             if (this.elements.profileInterests) {
                 this.elements.profileInterests.innerHTML = user.profile.interests
                     .map(interest => `
@@ -1315,13 +1336,13 @@ class App {
                     `)
                     .join('');
             }
-            
+
             if (this.elements.profilePostsContainer) {
                 const feed = this.state.getState().feed;
                 this.elements.profilePostsContainer.innerHTML = '';
-                
-                const userPosts = feed.filter(post => post.user_id === user.id);
-                
+
+                const userPosts = feed.filter(post => post.author.id === user.id);
+
                 if (userPosts.length === 0) {
                     this.elements.profilePostsContainer.innerHTML = `
                         <div class="text-center py-12">
@@ -1335,12 +1356,12 @@ class App {
                     });
                 }
             }
-            
+
             // Configura as abas do perfil
             this.setupProfileTabs(user);
-            
+
             console.log('✅ Perfil carregado com sucesso');
-            
+
         } catch (error) {
             console.error('❌ Erro ao carregar perfil:', error);
             Toast.error(`Erro ao carregar perfil: ${error.message}`);
@@ -1516,21 +1537,21 @@ class App {
                 view.classList.remove('active');
             }
         });
-        
+
         const navLinks = [
             this.elements.navFeed,
             this.elements.navProfile,
             this.elements.navFriends,
             this.elements.navAdvice,
         ];
-        
+
         navLinks.forEach(link => {
             if (link) {
                 link.classList.remove('bg-blue-600', 'text-white');
                 link.classList.add('text-gray-700', 'hover:bg-gray-100');
             }
         });
-        
+
         if (viewId === 'feed-view' && this.elements.navFeed) {
             this.elements.navFeed.classList.add('bg-blue-600', 'text-white');
             this.elements.navFeed.classList.remove('text-gray-700', 'hover:bg-gray-100');
@@ -1538,7 +1559,7 @@ class App {
             this.elements.navProfile.classList.add('bg-blue-600', 'text-white');
             this.elements.navProfile.classList.remove('text-gray-700', 'hover:bg-gray-100');
         }
-        
+
         this.state.setCurrentView(viewId.replace('-view', ''));
     }
 
@@ -1561,7 +1582,7 @@ class App {
     async showEditProfile() {
         try {
             const user = await this.api.getCurrentUser();
-            
+
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
             modal.innerHTML = `
@@ -1710,7 +1731,7 @@ class App {
             try {
                 const users = await this.api.searchUsers(query);
                 const friends = this.state.getState().friends || [];
-                
+
                 if (users.length === 0) {
                     results.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum usuário encontrado</p>';
                     return;
@@ -1719,7 +1740,7 @@ class App {
                 results.innerHTML = users.map(user => {
                     const isFriend = friends.some(f => f.id === user.id);
                     const isCurrentUser = user.id === this.currentUserId;
-                    
+
                     let button = '';
                     if (isCurrentUser) {
                         button = '<span class="text-sm text-gray-500 dark:text-gray-400">Você</span>';
@@ -1738,7 +1759,7 @@ class App {
                             </button>
                         `;
                     }
-                    
+
                     return `
                         <div class="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
                             <div class="flex items-center gap-3">
@@ -1782,7 +1803,7 @@ class App {
                             console.log('🔍 DEBUG: typeof this.api.addFriend =', typeof this.api.addFriend);
                             console.log('🔍 DEBUG: apiService =', window.apiService);
                             console.log('🔍 DEBUG: typeof apiService.addFriend =', typeof window.apiService?.addFriend);
-                            
+
                             await this.api.addFriend(userId);
                             Toast.success('Pedido de amizade enviado!');
                             btn.textContent = '[OK] Pedido enviado';
@@ -1790,10 +1811,10 @@ class App {
                             btn.classList.add('bg-gray-400');
                         } catch (error) {
                             console.error('[ERRO] Erro ao adicionar amigo:', error);
-                            
+
                             // Mensagens de erro mais amigáveis
                             const errorText = error.message || '';
-                            
+
                             if (errorText.includes('Pedido já enviado')) {
                                 btn.textContent = 'Pedido enviado';
                                 btn.disabled = true;
@@ -1828,7 +1849,7 @@ class App {
             console.log('👥 Carregando amigos...');
             const friends = await this.api.getFriends();
             const container = document.getElementById('friends-container');
-            
+
             if (!container) {
                 console.error('❌ Container de amigos não encontrado');
                 return;
@@ -1874,12 +1895,12 @@ class App {
                     </div>
                 </div>
             `).join('');
-            
+
             console.log('✅ Amigos carregados com sucesso');
-            
+
         } catch (error) {
             console.error('❌ Erro ao carregar amigos:', error.message);
-            
+
             const container = document.getElementById('friends-container');
             if (container) {
                 container.innerHTML = `
@@ -1892,7 +1913,7 @@ class App {
                     </div>
                 `;
             }
-            
+
             Toast.error(`Erro ao carregar amigos: ${error.message}`);
         }
     }
@@ -1913,14 +1934,14 @@ class App {
         try {
             Loading.show('Carregando perfil...');
             const user = await this.api.getUser(userId);
-            
+
             console.log('🔍 DEBUG viewUserProfile - user:', user);
             console.log('🔍 DEBUG viewUserProfile - isFriend:', user.isFriend);
-            
+
             // Check if viewing own profile
             const currentUser = this.state.getState().currentUser;
             const isOwnProfile = parseInt(userId) === currentUser.id;
-            
+
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
             modal.innerHTML = `
@@ -2051,11 +2072,11 @@ class App {
 
     startPolling() {
         this.lastUpdateCheck = new Date().toISOString();
-        
+
         this.pollingInterval = setInterval(async () => {
             try {
                 const updates = await this.api.getUpdates(this.lastUpdateCheck);
-                
+
                 if (updates.updates.hasUpdates) {
                     // Atualiza likes
                     if (updates.updates.likes.length > 0) {
@@ -2103,7 +2124,7 @@ class App {
         try {
             const advices = await this.api.getAdvices();
             const container = document.getElementById('advices-container');
-            
+
             if (!container) return;
 
             if (advices.length === 0) {
@@ -2219,7 +2240,7 @@ class App {
         try {
             const conversations = await this.api.getConversations();
             const container = document.getElementById('conversations-list');
-            
+
             if (!conversations || conversations.length === 0) {
                 container.innerHTML = `
                     <div class="p-4 text-center text-gray-500">
@@ -2241,9 +2262,9 @@ class App {
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-center">
                                     <h3 class="font-semibold text-gray-800 truncate">${conv.name}</h3>
-                                    ${conv.unreadCount > 0 ? 
-                                        `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${conv.unreadCount}</span>` 
-                                        : ''}
+                                    ${conv.unreadCount > 0 ?
+                        `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${conv.unreadCount}</span>`
+                        : ''}
                                 </div>
                                 <p class="text-sm text-gray-500 truncate">
                                     ${conv.isFromMe ? 'Você: ' : ''}${conv.lastMessage || 'Sem mensagens'}
@@ -2282,24 +2303,24 @@ class App {
     async openChat(userId) {
         try {
             this.currentChatUserId = userId;
-            
+
             // Busca informações do usuário
             const user = await this.api.getUser(userId);
-            
+
             // Mostra o header do chat
             const chatHeader = document.getElementById('chat-header');
             const chatUserAvatar = document.getElementById('chat-user-avatar');
             const chatUserName = document.getElementById('chat-user-name');
-            
+
             chatUserAvatar.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff`;
             chatUserName.textContent = user.name;
             chatHeader.classList.remove('hidden');
-            
+
             // Mostra a área de mensagens
             document.getElementById('no-chat-selected').classList.add('hidden');
             document.getElementById('messages-list').classList.remove('hidden');
             document.getElementById('message-input-area').classList.remove('hidden');
-            
+
             // Carrega as mensagens
             await this.loadChatMessages(userId);
         } catch (error) {
@@ -2312,7 +2333,7 @@ class App {
         try {
             const messages = await this.api.getMessages(userId);
             const container = document.getElementById('messages-list');
-            
+
             if (!messages || messages.length === 0) {
                 container.innerHTML = `
                     <div class="text-center text-gray-400 py-8">
@@ -2341,7 +2362,7 @@ class App {
 
             // Marca mensagens como lidas
             await this.api.markMessagesAsRead(userId);
-            
+
             // Atualiza a lista de conversas
             this.loadConversations();
         } catch (error) {
@@ -2360,10 +2381,10 @@ class App {
         try {
             await this.api.sendMessage(this.currentChatUserId, content);
             input.value = '';
-            
+
             // Recarrega as mensagens
             await this.loadChatMessages(this.currentChatUserId);
-            
+
             Toast.success('Mensagem enviada!');
         } catch (error) {
             console.error('Erro ao enviar mensagem:', error);
@@ -2377,7 +2398,7 @@ class App {
         try {
             await this.api.sendFriendRequest(userId);
             Toast.success('Pedido de amizade enviado!');
-            
+
             // Recarrega o feed para atualizar os botões
             await this.loadFeed();
         } catch (error) {
@@ -2390,7 +2411,7 @@ class App {
         try {
             const requests = await this.api.getFriendRequests();
             const container = document.getElementById('friend-requests-container');
-            
+
             // Atualiza badge de pedidos
             const requestsBadge = document.getElementById('requests-badge');
             if (requestsBadge) {
@@ -2443,7 +2464,7 @@ class App {
         try {
             await this.api.acceptFriendRequest(requesterId);
             Toast.success('Pedido de amizade aceito!');
-            
+
             // Recarrega a lista de amigos e pedidos
             await this.loadFriendRequests();
             await this.loadFriends();
@@ -2457,7 +2478,7 @@ class App {
         try {
             await this.api.rejectFriendRequest(requesterId);
             Toast.success('Pedido de amizade recusado');
-            
+
             // Recarrega a lista de pedidos
             await this.loadFriendRequests();
         } catch (error) {
