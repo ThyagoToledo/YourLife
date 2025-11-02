@@ -266,7 +266,7 @@ app.get('/api/users/me', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
         }
 
-        res.json({ success: true, user: result.rows[0] });
+        res.json(result.rows[0]);
     } catch (error) {
         console.error('Erro ao buscar perfil:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar perfil' });
@@ -288,7 +288,7 @@ app.get('/api/users/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
         }
 
-        res.json({ success: true, user: result.rows[0] });
+        res.json(result.rows[0]);
     } catch (error) {
         console.error('Erro ao buscar usuário:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar usuário' });
