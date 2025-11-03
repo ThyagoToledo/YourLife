@@ -269,6 +269,10 @@ class ApiService {
         return await this.request(`/users/${userId}/posts`);
     }
 
+    async getUserFriends(userId) {
+        return await this.request(`/users/${userId}/friends`);
+    }
+
     // ========== CURTIDAS ==========
 
     async likePost(postId) {
