@@ -633,8 +633,6 @@ class App {
     // Carrega o feed
     async loadFeed() {
         try {
-            console.log('[INFO] Carregando feed...');
-
             // Carrega lista de amigos primeiro
             let friends = [];
             try {
@@ -650,8 +648,6 @@ class App {
                 console.error('[ERRO] Feed não é um array:', feed);
                 throw new Error('Formato de dados inválido recebido do servidor');
             }
-
-            console.log(`[INFO] ${feed.length} posts recebidos`);
 
             // Normaliza formato dos posts e carrega comentários
             const normalizedFeed = [];
@@ -1189,7 +1185,7 @@ class App {
         }
 
         try {
-            console.log('Buscando:', query);
+            // Busca funcionalidade em desenvolvimento
         } catch (error) {
             console.error('Erro na busca:', error);
         }
@@ -1342,7 +1338,6 @@ class App {
 
             // Se não tem usuário ou não tem perfil, busca da API
             if (!user || !user.profile) {
-                console.log('📡 Buscando dados do usuário da API...');
                 try {
                     user = await this.api.getCurrentUser();
                     this.state.setCurrentUser(user);
@@ -1359,7 +1354,6 @@ class App {
 
             // Se ainda não tem perfil, cria um padrão
             if (!user.profile) {
-                console.log('⚠️ Criando perfil padrão');
                 user.profile = {
                     name: user.name,
                     avatar: user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff`,
@@ -1367,8 +1361,6 @@ class App {
                     interests: ['Tecnologia', 'Redes Sociais', 'Inovação']
                 };
             }
-
-            console.log('👤 Carregando perfil:', user);
 
             // Atualizar avatar
             if (this.elements.profileAvatar) {
@@ -1945,21 +1937,18 @@ class App {
 
     async loadFriends() {
         try {
-            console.log('👥 Carregando amigos...');
             const friends = await this.api.getFriends();
             const container = document.getElementById('friends-container');
 
             if (!container) {
-                console.error('❌ Container de amigos não encontrado');
+                console.error('Container de amigos não encontrado');
                 return;
             }
 
             if (!Array.isArray(friends)) {
-                console.error('❌ Lista de amigos não é um array:', friends);
+                console.error('Lista de amigos não é um array:', friends);
                 throw new Error('Formato de dados inválido');
             }
-
-            console.log(`📊 ${friends.length} amigos encontrados`);
 
             if (friends.length === 0) {
                 container.innerHTML = `
@@ -1995,10 +1984,8 @@ class App {
                 </div>
             `).join('');
 
-            console.log('✅ Amigos carregados com sucesso');
-
         } catch (error) {
-            console.error('❌ Erro ao carregar amigos:', error.message);
+            console.error('Erro ao carregar amigos:', error.message);
 
             const container = document.getElementById('friends-container');
             if (container) {
