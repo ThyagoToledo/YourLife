@@ -1356,11 +1356,33 @@ class App {
                 }
             }
 
-            if (this.elements.profilePostsContainer) {
-                const feed = this.state.getState().feed;
-                this.elements.profilePostsContainer.innerHTML = '';
+            // Calcular e atualizar estatísticas
+            const feed = this.state.getState().feed;
+            const userPosts = feed.filter(post => post.author.id === user.id);
 
-                const userPosts = feed.filter(post => post.author.id === user.id);
+            // Buscar amigos
+            let friendsCount = 0;
+            try {
+                const friends = await this.api.getFriends();
+                friendsCount = friends.length;
+            } catch (err) {
+                console.error('Erro ao buscar amigos:', err);
+            }
+
+            // Calcular total de curtidas recebidas
+            const totalLikes = userPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
+
+            // Atualizar contadores
+            const postsCountEl = document.getElementById('profile-posts-count');
+            const friendsCountEl = document.getElementById('profile-friends-count');
+            const likesCountEl = document.getElementById('profile-likes-count');
+
+            if (postsCountEl) postsCountEl.textContent = userPosts.length;
+            if (friendsCountEl) friendsCountEl.textContent = friendsCount;
+            if (likesCountEl) likesCountEl.textContent = totalLikes;
+
+            if (this.elements.profilePostsContainer) {
+                this.elements.profilePostsContainer.innerHTML = '';
 
                 if (userPosts.length === 0) {
                     this.elements.profilePostsContainer.innerHTML = `
