@@ -6,10 +6,21 @@
 const DateUtils = {
     // Formata uma data em formato relativo (ex: "2h atrás")
     formatRelativeTime(date) {
+        if (!date) return 'Data desconhecida';
+        
         const now = new Date();
         const then = new Date(date);
+        
+        // Verifica se a data é válida
+        if (isNaN(then.getTime())) {
+            console.error('Data inválida recebida:', date);
+            return 'Data inválida';
+        }
+        
         const diff = Math.floor((now - then) / 1000); // diferença em segundos
 
+        // Se a diferença for negativa (data no futuro), trata como "agora mesmo"
+        if (diff < 0) return 'Agora mesmo';
         if (diff < 60) return 'Agora mesmo';
         if (diff < 3600) return `${Math.floor(diff / 60)}min atrás`;
         if (diff < 86400) return `${Math.floor(diff / 3600)}h atrás`;

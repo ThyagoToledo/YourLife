@@ -201,10 +201,13 @@ app.post('/api/auth/register', async (req, res) => {
         // Hash da senha
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Gerar avatar padrão usando UI Avatars
+        const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4F46E5&color=fff&size=128`;
+
         // Inserir usuário
         const result = await sql`
-            INSERT INTO users (name, email, password)
-            VALUES (${name}, ${email}, ${hashedPassword})
+            INSERT INTO users (name, email, password, avatar)
+            VALUES (${name}, ${email}, ${hashedPassword}, ${defaultAvatar})
             RETURNING id, name, email, avatar, bio, created_at
         `;
 
@@ -242,6 +245,12 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 
         const { password: _, ...userWithoutPassword } = user;
+
+        // Gerar avatar padrão se não existir
+        if (!userWithoutPassword.avatar) {
+            userWithoutPassword.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff&size=128`;
+        }
+
         res.json({ success: true, token, user: userWithoutPassword });
     } catch (error) {
         console.error('Erro no login:', error);
@@ -266,7 +275,23 @@ app.get('/api/users/me', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
         }
 
-        res.json(result.rows[0]);
+        const user = result.rows[0];
+
+        // Gerar avatar padrão se não existir
+        if (!user.avatar) {
+            user.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff&size=128`;
+        }
+
+        // Buscar interesses do usuário
+        const interestsResult = await sql`
+            SELECT interest
+            FROM user_interests
+            WHERE user_id = ${req.user.id}
+        `;
+
+        user.interests = interestsResult.rows.map(row => row.interest);
+
+        res.json(user);
     } catch (error) {
         console.error('Erro ao buscar perfil:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar perfil' });
@@ -288,7 +313,18 @@ app.get('/api/users/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
         }
 
-        res.json(result.rows[0]);
+        const user = result.rows[0];
+
+        // Buscar interesses do usuário
+        const interestsResult = await sql`
+            SELECT interest
+            FROM user_interests
+            WHERE user_id = ${userId}
+        `;
+
+        user.interests = interestsResult.rows.map(row => row.interest);
+
+        res.json(user);
     } catch (error) {
         console.error('Erro ao buscar usuário:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar usuário' });
