@@ -636,7 +636,9 @@ class App {
             const user = this.state.getState().currentUser;
             if (user) {
                 if (this.elements.userMenuAvatar) {
-                    this.elements.userMenuAvatar.src = user.avatar;
+                    // Usa avatar do usuário ou gera um padrão
+                    const avatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff&size=128`;
+                    this.elements.userMenuAvatar.src = avatarUrl;
                 }
                 if (this.elements.userMenuName) {
                     this.elements.userMenuName.textContent = user.name;
@@ -799,18 +801,20 @@ class App {
         div.className = 'p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md';
         div.dataset.postId = post.id;
 
-        const timestamp = DateUtils.formatRelativeTime(post.timestamp);
-        const commentsHTML = post.comments.map(comment => `
+        const timestamp = DateUtils.formatRelativeTime(post.created_at);
+        const commentsHTML = (post.comments || []).map(comment => `
             <div class="mt-2 flex space-x-2 text-sm">
                 <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(comment.author.name)}:</span>
                 <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(comment.content)}</span>
             </div>
         `).join('');
 
+        const authorAvatar = post.author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}&background=4F46E5&color=fff&size=128`;
+
         div.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img class="w-10 h-10 rounded-full" src="${post.author.avatar}" alt="${post.author.name}">
+                    <img class="w-10 h-10 rounded-full" src="${authorAvatar}" alt="${post.author.name}">
                     <div>
                         <p class="font-semibold text-gray-800 dark:text-white">${Validation.sanitizeHTML(post.author.name)}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">${timestamp}</p>
@@ -1315,26 +1319,41 @@ class App {
 
             console.log('👤 Carregando perfil:', user);
 
+            // Atualizar avatar
             if (this.elements.profileAvatar) {
-                this.elements.profileAvatar.src = user.profile.avatar;
+                this.elements.profileAvatar.src = user.avatar || user.profile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff`;
             }
 
+            // Atualizar nome
             if (this.elements.profileName) {
-                this.elements.profileName.textContent = user.profile.name;
+                this.elements.profileName.textContent = user.name || user.profile?.name || 'Sem nome';
             }
 
+            // Atualizar bio
             if (this.elements.profileBio) {
-                this.elements.profileBio.textContent = user.profile.bio;
+                this.elements.profileBio.textContent = user.bio || user.profile?.bio || 'Sem biografia';
             }
 
+            // Atualizar capa
+            const profileCoverImg = document.getElementById('profile-cover-img');
+            if (profileCoverImg) {
+                profileCoverImg.src = user.cover_image || 'https://placehold.co/1000x300/E0E7FF/4F46E5?text=Capa';
+            }
+
+            // Atualizar interesses
             if (this.elements.profileInterests) {
-                this.elements.profileInterests.innerHTML = user.profile.interests
-                    .map(interest => `
-                        <span class="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-200">
-                            ${Validation.sanitizeHTML(interest)}
-                        </span>
-                    `)
-                    .join('');
+                const interests = user.interests || user.profile?.interests || [];
+                if (interests.length === 0) {
+                    this.elements.profileInterests.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-sm">Nenhum interesse adicionado</p>';
+                } else {
+                    this.elements.profileInterests.innerHTML = interests
+                        .map(interest => `
+                            <span class="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-200">
+                                ${Validation.sanitizeHTML(interest)}
+                            </span>
+                        `)
+                        .join('');
+                }
             }
 
             if (this.elements.profilePostsContainer) {
@@ -1453,7 +1472,7 @@ class App {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
                         <p class="text-gray-500 dark:text-gray-400">Você ainda não tem amigos</p>
-                        <button onclick="app.navigate('friends')" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <button onclick="app.showView('friends-view'); app.loadFriends();" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                             Encontrar Amigos
                         </button>
                     </div>
@@ -1466,7 +1485,7 @@ class App {
                             <p class="font-semibold text-gray-800 dark:text-white">${Validation.sanitizeHTML(friend.name)}</p>
                             <p class="text-sm text-gray-500 dark:text-gray-400">${friend.mutualFriends || 0} amigos em comum</p>
                         </div>
-                        <button onclick="app.navigate('chat', ${friend.id})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                        <button onclick="app.showView('messages-view'); app.openChat(${friend.id});" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
                             Mensagem
                         </button>
                     </div>
@@ -1496,7 +1515,7 @@ class App {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                         </svg>
                         <p class="text-gray-500 dark:text-gray-400">Você ainda não deu nenhum conselho</p>
-                        <button onclick="app.navigate('advice')" class="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        <button onclick="app.showView('advice-view'); app.loadAdvices();" class="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                             Dar Conselho
                         </button>
                     </div>
@@ -1618,8 +1637,15 @@ class App {
                         </div>
 
                         <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">URL da Imagem de Capa</label>
+                            <input type="url" name="cover_image" value="${user.cover_image || ''}" 
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="https://...">
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Interesses (separados por vírgula)</label>
-                            <input type="text" name="interests" value="${user.profile?.interests?.join(', ') || ''}" 
+                            <input type="text" name="interests" value="${user.interests?.join(', ') || user.profile?.interests?.join(', ') || ''}" 
                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                                    placeholder="Tecnologia, Música, Esportes">
                         </div>
@@ -1665,11 +1691,18 @@ class App {
                         name: formData.get('name'),
                         bio: formData.get('bio'),
                         avatar: formData.get('avatar') || null,
+                        cover_image: formData.get('cover_image') || null,
                         interests: interests
                     });
 
                     Toast.success('Perfil atualizado com sucesso!');
                     closeModal();
+
+                    // Recarrega o usuário atual da API
+                    const updatedUser = await this.api.getCurrentUser();
+                    this.state.setCurrentUser(updatedUser);
+
+                    // Recarrega o perfil
                     this.loadProfile(this.currentUserId);
                 } catch (error) {
                     console.error('Erro ao atualizar perfil:', error);
@@ -2252,7 +2285,18 @@ class App {
             }
 
             let totalUnread = 0;
-            container.innerHTML = conversations.map(conv => {
+            // Normalizar dados do backend
+            const normalizedConversations = conversations.map(conv => ({
+                userId: conv.friend_id,
+                name: conv.friend_name,
+                avatar: conv.friend_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.friend_name)}&background=4F46E5&color=fff`,
+                lastMessage: conv.last_message,
+                lastMessageAt: conv.last_message_time,
+                unreadCount: parseInt(conv.unread_count) || 0,
+                isFromMe: false // Pode ser ajustado se necessário
+            }));
+
+            container.innerHTML = normalizedConversations.map(conv => {
                 totalUnread += conv.unreadCount;
                 return `
                     <div class="conversation-item p-4 border-b hover:bg-gray-50 cursor-pointer" 
@@ -2344,7 +2388,21 @@ class App {
                 return;
             }
 
-            container.innerHTML = messages.map(msg => `
+            // Normalizar dados do backend
+            const currentUserId = this.state.getState().currentUser?.id;
+            const normalizedMessages = messages.map(msg => ({
+                id: msg.id,
+                content: msg.content,
+                createdAt: msg.created_at,
+                isFromMe: msg.from_user_id === currentUserId,
+                sender: {
+                    id: msg.from_user_id,
+                    name: msg.sender_name,
+                    avatar: msg.sender_avatar
+                }
+            }));
+
+            container.innerHTML = normalizedMessages.map(msg => `
                 <div class="flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}">
                     <div class="${msg.isFromMe ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'} 
                                 rounded-2xl px-4 py-2 max-w-xs lg:max-w-md">
@@ -2434,7 +2492,15 @@ class App {
                 return;
             }
 
-            container.innerHTML = requests.map(request => `
+            // Normalizar dados do backend
+            const normalizedRequests = requests.map(req => ({
+                requesterId: req.id,
+                name: req.name,
+                avatar: req.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(req.name)}&background=4F46E5&color=fff`,
+                requestedAt: req.created_at
+            }));
+
+            container.innerHTML = normalizedRequests.map(request => `
                 <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                     <div class="flex items-center gap-3">
                         <img src="${request.avatar}" alt="${request.name}" class="w-12 h-12 rounded-full">

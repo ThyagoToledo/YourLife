@@ -391,9 +391,44 @@ YourLife/
 4. Backend consulta Neon PostgreSQL via @vercel/postgres
 5. JWT token retornado e salvo no localStorage
 6. Todas requisições incluem token no header Authorization
-7. Polling verifica atualizações a cada 10s
-8. Frontend atualiza automaticamente
+7. Dados do backend (snake_case) → Normalização → Frontend (camelCase)
+8. Polling verifica atualizações a cada 10s
+9. Frontend atualiza automaticamente
 ```
+
+### Normalização de Dados
+
+**Problema Resolvido (v3.0.1):**
+O backend PostgreSQL usa convenção snake_case (`created_at`, `user_id`), enquanto o frontend JavaScript usa camelCase (`createdAt`, `userId`). Isso causava o bug "NaNa atrás" em timestamps.
+
+**Solução Implementada:**
+Camada de normalização após receber dados do backend:
+
+```javascript
+// Exemplo: Normalização de Posts
+const normalizedPost = {
+    id: post.id,
+    content: post.content,
+    created_at: post.created_at,           // Mantém snake_case do backend
+    author: {
+        id: post.user_id,                  // user_id -> id
+        name: post.user_name,              // user_name -> name
+        avatar: post.user_avatar           // user_avatar -> avatar
+    },
+    likes: parseInt(post.likes_count) || 0,
+    isLiked: parseInt(post.user_liked) > 0
+};
+
+// Uso em renderização
+DateUtils.formatRelativeTime(post.created_at);  // Funciona corretamente
+```
+
+**Áreas Normalizadas:**
+- Posts: `created_at`, `user_id`, `user_name`, `user_avatar`
+- Conversas: `friend_id`, `friend_name`, `last_message_time`, `unread_count`
+- Mensagens: `from_user_id`, `created_at`, `sender_name`, `sender_avatar`
+- Pedidos: `id` -> `requesterId`, `created_at` -> `requestedAt`
+- Comentários: `user_id`, `created_at`, `user_name`, `user_avatar`
 
 ###  Arquitetura Serverless
 ```
@@ -761,6 +796,31 @@ nodemon server.js
 
 ## SOLUÇÃO DE PROBLEMAS
 
+### Erro: "NaNa atrás" ou "Data inválida"
+
+**Causa:** Inconsistência entre nomes de campos do backend (snake_case) e frontend (camelCase)
+
+**Solução:**
+- Já corrigido na versão 3.0.1
+- Se persistir: `git pull origin main` e redesploy
+- Verifique no console do navegador se há erros relacionados a timestamps
+- Limpe o cache: `Ctrl+Shift+R` (ou `Cmd+Shift+R` no Mac)
+
+**Campos Afetados e Correções:**
+```javascript
+// Posts
+post.timestamp -> post.created_at ✓
+
+// Conversas
+conv.lastMessageAt -> conv.last_message_time (normalizado) ✓
+
+// Mensagens
+msg.createdAt -> msg.created_at (normalizado) ✓
+
+// Pedidos de Amizade
+request.requestedAt -> request.created_at (normalizado) ✓
+```
+
 ### Erro: "relation does not exist"
 
 **Causa:** Tabelas não criadas no banco de dados
@@ -837,6 +897,42 @@ SELECT 'messages', COUNT(*) FROM messages;
 ---
 
 ## CHANGELOG
+
+### [3.0.1] - 02/11/2025
+
+**Correções de Bugs Críticos:**
+- [CORRIGIDO] Bug "NaNa atrás" em posts - Campo `post.timestamp` não existia, alterado para `post.created_at`
+- [CORRIGIDO] Bug "NaNa atrás" em conversas - Campo `lastMessageAt` inconsistente, normalizado de `last_message_time`
+- [CORRIGIDO] Bug "NaNa atrás" em mensagens - Campo `createdAt` inconsistente, normalizado de `created_at`
+- [CORRIGIDO] Bug "NaNa atrás" em pedidos de amizade - Campo `requestedAt` inconsistente, normalizado de `created_at`
+- [MELHORADO] Validação de datas em `formatRelativeTime()` - Adicionado `isNaN()` check e tratamento de valores nulos
+- [MELHORADO] Proteção contra arrays vazios - Adicionado fallback `|| []` em `post.comments.map()`
+
+**Impacto:**
+- Timestamps agora exibem corretamente em todas as áreas (posts, mensagens, conversas, notificações, pedidos)
+- Formato correto: "2h atrás", "5min atrás", "1d atrás", etc.
+- Eliminado completamente o erro "NaNa atrás"
+
+**Normalização de Dados:**
+```javascript
+// Conversas: Mapeamento backend -> frontend
+friend_id -> userId
+friend_name -> name
+friend_avatar -> avatar
+last_message -> lastMessage
+last_message_time -> lastMessageAt
+unread_count -> unreadCount
+
+// Mensagens: Mapeamento backend -> frontend
+created_at -> createdAt
+from_user_id -> isFromMe (comparação)
+sender_name -> sender.name
+sender_avatar -> sender.avatar
+
+// Pedidos: Mapeamento backend -> frontend
+id -> requesterId
+created_at -> requestedAt
+```
 
 ### [3.0.0] - 02/11/2025
 
@@ -941,18 +1037,31 @@ SELECT 'messages', COUNT(*) FROM messages;
 App                         # Controller principal
 |-- handleLogin()            # Processa login
 |-- handleRegister()         # Processa registro
-|-- loadFeed()               # Carrega feed de posts
+|-- loadFeed()               # Carrega feed de posts (normaliza created_at)
 |-- handleCreatePost()       # Cria nova postagem
 |-- showEditProfile()        # Modal editar perfil
 |-- loadFriends()            # Lista amigos
-|-- loadFriendRequests()     # Lista pedidos pendentes
+|-- loadFriendRequests()     # Lista pedidos pendentes (normaliza created_at)
 |-- sendFriendRequest()      # Envia pedido de amizade
-|-- loadConversations()      # Lista conversas
+|-- loadConversations()      # Lista conversas (normaliza last_message_time)
 |-- openChat()               # Abre chat com amigo
+|-- loadChatMessages()       # Carrega mensagens (normaliza created_at)
 |-- loadAdvices()            # Lista conselhos
 |-- startPolling()           # Inicia polling (10s)
 |-- stopPolling()            # Para polling
 |-- toggleDarkMode()         # Alterna tema escuro/claro
+|-- createPostElement()      # Renderiza post (usa created_at)
+```
+
+**Utilitários (utils.js):**
+```javascript
+DateUtils
+|-- formatRelativeTime(date)     # Formata data relativa ("2h atrás")
+|   |-- Validação: isNaN(), null check
+|   |-- Tratamento de datas inválidas
+|   |-- Tratamento de datas futuras
+|-- formatTimestamp(timestamp)   # Wrapper para formatRelativeTime
+|-- formatFullDate(date)         # Formata data completa
 ```
 
 **API Client (api.js):**
@@ -1000,6 +1109,8 @@ POST   /api/messages
 - CORS configurado
 - Middleware de autenticação em todas as rotas protegidas
 - Validação de entrada nos endpoints
+- Validação de tipos de dados (parseInt, isNaN)
+- Proteção contra valores nulos/undefined em operações críticas
 
 **Recomendações Produção:**
 - Usar HTTPS (Vercel já fornece)
@@ -1008,6 +1119,8 @@ POST   /api/messages
 - Implementar refresh tokens
 - Adicionar logs de auditoria
 - Configurar CORS específico: `CORS_ORIGIN=https://seu-dominio.com`
+- Implementar validação de entrada mais rigorosa (Joi/Zod)
+- Adicionar sanitização de HTML em inputs do usuário
 
 ### Performance
 
@@ -1017,6 +1130,9 @@ POST   /api/messages
 - Limite de 50 posts no feed
 - Limite de 20 conselhos por categoria
 - Polling inteligente (só busca se há updates)
+- Normalização de dados em lote (map operations)
+- Validação de tipos eficiente (parseInt, isNaN)
+- Proteção contra erros de renderização (|| [] fallbacks)
 
 **Melhorias futuras:**
 - Cache Redis para queries frequentes
@@ -1024,6 +1140,37 @@ POST   /api/messages
 - Compressão de imagens
 - CDN para assets estáticos
 - WebSocket para chat em tempo real
+- Lazy loading de componentes
+- Memoização de formatação de datas
+
+### Boas Práticas
+
+**Aprendizados da v3.0.1:**
+
+1. **Consistência de Nomenclatura:**
+   - Backend e Frontend devem usar mesma convenção (ou normalizar na camada de API)
+   - Documentar mapeamento de campos
+   - Considerar usar TypeScript para type safety
+
+2. **Validação de Dados:**
+   - Sempre validar antes de operações matemáticas (`isNaN()`)
+   - Usar fallbacks para arrays (`|| []`)
+   - Validar existência de propriedades antes de acessar (`?.` operator)
+
+3. **Formatação de Datas:**
+   - Validar timestamps antes de formatar
+   - Tratar casos especiais (null, undefined, datas futuras)
+   - Usar formato consistente em todo o sistema
+
+4. **Debugging:**
+   - Adicionar logs estratégicos (`console.log`, `console.error`)
+   - Verificar estrutura de dados recebidos do backend
+   - Testar em ambiente de produção após deploy
+
+5. **Code Review:**
+   - Revisar queries SQL e estrutura de dados
+   - Verificar nomenclatura de campos
+   - Testar fluxos completos (backend → frontend → renderização)
 
 ---
 
@@ -1035,6 +1182,8 @@ POST   /api/messages
 - [ ] Busca avançada de usuários
 - [ ] Sistema de hashtags
 - [ ] Menções (@usuario)
+- [ ] Migrar para padrão consistente (camelCase ou snake_case)
+- [ ] Implementar transformadores de dados (backend -> frontend)
 
 ### Planejado para v4.0.0
 - [ ] Chat em tempo real (WebSocket)
@@ -1042,6 +1191,8 @@ POST   /api/messages
 - [ ] Stories (24h)
 - [ ] Grupos/Comunidades
 - [ ] Sistema de moderação
+- [ ] Migração para TypeScript completo
+- [ ] Testes automatizados (Jest/Vitest)
 
 ---
 
@@ -1093,7 +1244,7 @@ Projeto: [YourLife](https://github.com/ThyagoToledo/YourLife)
 ---
 
 **Última atualização:** 2 de novembro de 2025  
-**Versão:** 3.0.0  
+**Versão:** 3.0.1  
 **Status:**  Em Produção
 
 ---
