@@ -4,16 +4,9 @@
 
 class App {
     constructor() {
-        console.log('🔍 Construtor App: apiService =', window.apiService);
-        console.log('🔍 Construtor App: typeof apiService =', typeof window.apiService);
-        console.log('🔍 Construtor App: apiService.addFriend =', typeof window.apiService?.addFriend);
-
         this.api = apiService;
         this.state = stateManager;
         this.currentUserId = null;
-
-        console.log('✅ this.api definido como:', this.api);
-        console.log('✅ this.api.addFriend =', typeof this.api?.addFriend);
 
         // Elementos DOM
         this.elements = {
@@ -74,17 +67,13 @@ class App {
         const logoutButton = document.getElementById('logout-button');
         const toggleDarkMode = document.getElementById('toggle-dark-mode');
 
-        console.log('🔧 Configurando dropdowns...');
-
         // Dropdown do Usuário
         if (userMenuButton && userMenuDropdown) {
             userMenuButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🖱️ Clicou no botão do menu usuário!');
 
                 userMenuDropdown.classList.toggle('hidden');
-                console.log('Dropdown agora hidden?', userMenuDropdown.classList.contains('hidden'));
 
                 // Fecha notificações se abertas
                 if (notificationsDropdown) {
@@ -98,7 +87,6 @@ class App {
             notificationsButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🔔 Clicou nas notificações!');
 
                 notificationsDropdown.classList.toggle('hidden');
 
@@ -550,12 +538,9 @@ class App {
         const email = formData.get('email');
         const password = formData.get('password');
 
-        console.log('🔐 Iniciando login para:', email);
-
         const validation = Validation.validateLoginForm(email, password);
 
         if (!validation.isValid) {
-            console.log('❌ Validação falhou:', validation.errors);
             Object.values(validation.errors).forEach(error => {
                 Toast.error(error);
             });
@@ -565,10 +550,7 @@ class App {
         try {
             Loading.show('Entrando...');
 
-            console.log('📡 Chamando API de login...');
             const response = await this.api.login({ email, password });
-
-            console.log('📥 Resposta recebida:', response);
 
             if (!response) {
                 console.error('❌ Resposta vazia');
@@ -589,8 +571,6 @@ class App {
                 console.error('❌ Token não retornado na resposta');
                 throw new Error('Token de autenticação não encontrado');
             }
-
-            console.log('✅ Login validado. Usuário:', response.user.id);
 
             this.currentUserId = response.user.id;
             this.state.setCurrentUser(response.user);
@@ -715,10 +695,8 @@ class App {
 
             this.state.setFeed(normalizedFeed);
             this.renderFeed();
-            console.log('✅ Feed carregado com sucesso');
-
         } catch (error) {
-            console.error('❌ Erro ao carregar feed:', error.message);
+            console.error('Erro ao carregar feed:', error.message);
 
             if (error.message.includes('conectar')) {
                 Toast.error('Não foi possível conectar ao servidor');
@@ -1112,18 +1090,95 @@ class App {
 
     // Handle dar conselho
     async handleAdvice(postId) {
-        const content = prompt('Digite seu conselho:');
+        // Criar modal para dar conselho
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold dark:text-white">💡 Dar Conselho</h3>
+                    <button id="close-advice-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="advice-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Título do Conselho</label>
+                        <input type="text" id="advice-title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="Ex: Como lidar com..." required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoria</label>
+                        <select id="advice-category" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                            <option value="geral">Geral</option>
+                            <option value="saude">Saúde Mental</option>
+                            <option value="relacionamento">Relacionamento</option>
+                            <option value="carreira">Carreira</option>
+                            <option value="estudos">Estudos</option>
+                            <option value="familia">Família</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Seu Conselho</label>
+                        <textarea id="advice-content" rows="5" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="Compartilhe sua sabedoria..." required></textarea>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" id="cancel-advice" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
+                            Publicar Conselho
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
 
-        if (!content || !content.trim()) {
-            return;
-        }
+        document.body.appendChild(modal);
 
-        try {
-            Toast.info('Funcionalidade de conselhos em desenvolvimento!');
-        } catch (error) {
-            console.error('Erro ao dar conselho:', error);
-            Toast.error('Erro ao enviar conselho');
-        }
+        // Event listeners
+        const closeBtn = modal.querySelector('#close-advice-modal');
+        const cancelBtn = modal.querySelector('#cancel-advice');
+        const form = modal.querySelector('#advice-form');
+
+        const closeModal = () => modal.remove();
+
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = modal.querySelector('#advice-title').value.trim();
+            const content = modal.querySelector('#advice-content').value.trim();
+            const category = modal.querySelector('#advice-category').value;
+
+            if (!title || !content) {
+                Toast.warning('Preencha todos os campos');
+                return;
+            }
+
+            try {
+                Loading.show('Publicando conselho...');
+                await this.api.createAdvice({ title, content, category });
+                Toast.success('Conselho publicado com sucesso!');
+                closeModal();
+
+                // Se estiver na view de conselhos, recarrega
+                if (this.state.getState().currentView === 'advices-view') {
+                    await this.loadAdvices();
+                }
+            } catch (error) {
+                console.error('Erro ao publicar conselho:', error);
+                Toast.error('Erro ao publicar conselho');
+            } finally {
+                Loading.hide();
+            }
+        });
     }
 
     // Handle busca
@@ -1143,21 +1198,18 @@ class App {
     // Carrega notificações
     async loadNotifications() {
         try {
-            console.log('🔔 Carregando notificações...');
             const notifications = await this.api.getNotifications();
 
             if (!Array.isArray(notifications)) {
-                console.error('❌ Notificações não são um array:', notifications);
+                console.error('Notificações não são um array:', notifications);
                 throw new Error('Formato de dados inválido');
             }
 
-            console.log(`📊 ${notifications.length} notificações recebidas`);
             this.state.setNotifications(notifications || []);
             this.renderNotifications();
-            console.log('✅ Notificações carregadas com sucesso');
 
         } catch (error) {
-            console.error('❌ Erro ao carregar notificações:', error.message);
+            console.error('Erro ao carregar notificações:', error.message);
             this.state.setNotifications([]);
             this.renderNotifications();
         }
@@ -1294,15 +1346,14 @@ class App {
                 try {
                     user = await this.api.getCurrentUser();
                     this.state.setCurrentUser(user);
-                    console.log('✅ Dados do usuário atualizados');
                 } catch (err) {
-                    console.error('❌ Erro ao buscar dados do usuário:', err);
+                    console.error('Erro ao buscar dados do usuário:', err);
                     throw new Error('Não foi possível carregar os dados do perfil');
                 }
             }
 
             if (!user) {
-                console.error('❌ Usuário não encontrado no estado');
+                console.error('Usuário não encontrado no estado');
                 throw new Error('Usuário não autenticado');
             }
 
@@ -1401,10 +1452,8 @@ class App {
             // Configura as abas do perfil
             this.setupProfileTabs(user);
 
-            console.log('✅ Perfil carregado com sucesso');
-
         } catch (error) {
-            console.error('❌ Erro ao carregar perfil:', error);
+            console.error('Erro ao carregar perfil:', error);
             Toast.error(`Erro ao carregar perfil: ${error.message}`);
         } finally {
             Loading.hide();
@@ -1854,11 +1903,6 @@ class App {
                     btn.addEventListener('click', async () => {
                         const userId = parseInt(btn.dataset.userId);
                         try {
-                            console.log('🔍 DEBUG: this.api =', this.api);
-                            console.log('🔍 DEBUG: typeof this.api.addFriend =', typeof this.api.addFriend);
-                            console.log('🔍 DEBUG: apiService =', window.apiService);
-                            console.log('🔍 DEBUG: typeof apiService.addFriend =', typeof window.apiService?.addFriend);
-
                             await this.api.addFriend(userId);
                             Toast.success('Pedido de amizade enviado!');
                             btn.textContent = '[OK] Pedido enviado';
@@ -1990,8 +2034,14 @@ class App {
             Loading.show('Carregando perfil...');
             const user = await this.api.getUser(userId);
 
-            console.log('🔍 DEBUG viewUserProfile - user:', user);
-            console.log('🔍 DEBUG viewUserProfile - isFriend:', user.isFriend);
+            // Verificar status de amizade
+            let friendshipStatus = 'none';
+            try {
+                const status = await this.api.getFriendshipStatus(userId);
+                friendshipStatus = status.status || 'none';
+            } catch (err) {
+                console.error('Erro ao verificar status de amizade:', err);
+            }
 
             // Check if viewing own profile
             const currentUser = this.state.getState().currentUser;
@@ -2035,7 +2085,7 @@ class App {
 
                     ${!isOwnProfile ? `
                         <div class="flex gap-3 mt-6">
-                            ${user.isFriend ? `
+                            ${friendshipStatus === 'accepted' ? `
                                 <button id="message-btn" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-semibold flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -2044,6 +2094,10 @@ class App {
                                 </button>
                                 <button id="friends-btn" class="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-red-600 transition-colors duration-200 font-semibold" title="Clique para desfazer amizade">
                                     ✓ Amigos
+                                </button>
+                            ` : friendshipStatus === 'pending' ? `
+                                <button id="pending-friend-btn" class="flex-1 bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed" disabled>
+                                    ⏳ Solicitação Pendente
                                 </button>
                             ` : `
                                 <button id="add-friend-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
