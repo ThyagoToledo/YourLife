@@ -617,6 +617,31 @@ app.get('/api/friends', authenticateToken, async (req, res) => {
     }
 });
 
+// Buscar amigos de um usuário específico (para ver perfil)
+app.get('/api/users/:id/friends', authenticateToken, async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        
+        const result = await sql`
+            SELECT 
+                u.id, u.name, u.email, u.avatar, u.bio
+            FROM users u
+            WHERE u.id IN (
+                SELECT following_id FROM followers 
+                WHERE follower_id = ${userId} AND status = 'accepted'
+                UNION
+                SELECT follower_id FROM followers 
+                WHERE following_id = ${userId} AND status = 'accepted'
+            )
+        `;
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao buscar amigos do usuário:', error);
+        res.status(500).json({ success: false, error: 'Erro ao buscar amigos' });
+    }
+});
+
 // Listar pedidos de amizade recebidos
 app.get('/api/friends/requests', authenticateToken, async (req, res) => {
     try {

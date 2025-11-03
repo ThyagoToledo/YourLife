@@ -2021,6 +2021,26 @@ class App {
             Loading.show('Carregando perfil...');
             const user = await this.api.getUser(userId);
 
+            // Buscar estatísticas do usuário (posts e amigos)
+            let postsCount = 0;
+            let friendsCount = 0;
+            
+            try {
+                // Busca posts do usuário
+                const userPosts = await this.api.getUserPosts(userId);
+                postsCount = Array.isArray(userPosts) ? userPosts.length : 0;
+            } catch (err) {
+                console.error('Erro ao buscar posts do usuário:', err);
+            }
+
+            try {
+                // Busca amigos do usuário
+                const userFriends = await this.api.getUserFriends(userId);
+                friendsCount = Array.isArray(userFriends) ? userFriends.length : 0;
+            } catch (err) {
+                console.error('Erro ao buscar amigos do usuário:', err);
+            }
+
             // Verificar status de amizade
             let friendshipStatus = 'none';
             try {
@@ -2053,8 +2073,8 @@ class App {
                             <h3 class="text-xl font-bold dark:text-white">${user.name}</h3>
                             <p class="text-gray-600 dark:text-gray-400">${user.profile?.bio || 'Sem bio'}</p>
                             <div class="flex gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                <span>${user.stats?.posts || 0} posts</span>
-                                <span>${user.stats?.friends || 0} amigos</span>
+                                <span><strong>${postsCount}</strong> posts</span>
+                                <span><strong>${friendsCount}</strong> amigos</span>
                             </div>
                         </div>
                     </div>
