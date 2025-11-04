@@ -718,8 +718,8 @@ Arquivo `.env`:
 PORT=3000
 NODE_ENV=development
 
-# JWT (OBRIGATÓRIO - gere um novo!)
-JWT_SECRET=56f33fa1da043c9d631e6b4d0d1719089d241d283957544aa70bb285cc27dea0
+# JWT (OBRIGATÓRIO - gere um novo com o comando abaixo!)
+JWT_SECRET=sua_chave_secreta_aqui_substitua_por_uma_real
 
 # CORS
 CORS_ORIGIN=*
@@ -728,17 +728,54 @@ CORS_ORIGIN=*
 POSTGRES_URL=postgresql://usuario:senha@host:5432/banco
 ```
 
-**Gerar JWT_SECRET seguro:**
+**⚠️ IMPORTANTE: Gere um JWT_SECRET único e seguro:**
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
+**NUNCA use o JWT_SECRET deste exemplo em produção!**
+
 ### Segurança
 
-**Nunca comite `.env` no Git!**
-- Arquivo já está no `.gitignore`
-- Use valores diferentes para dev e produção
-- JWT_SECRET deve ser único e secreto
+**⚠️ CHECKLIST DE SEGURANÇA:**
+
+1. **JWT_SECRET:**
+   - ✅ NUNCA use o exemplo do README em produção
+   - ✅ Gere uma chave única com: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   - ✅ Use chaves diferentes para desenvolvimento e produção
+   - ✅ Mantenha o JWT_SECRET secreto (não compartilhe)
+   - ✅ Se exposto, REGENERE imediatamente
+
+2. **Arquivo .env:**
+   - ✅ Nunca comite `.env` no Git
+   - ✅ Arquivo já está no `.gitignore`
+   - ✅ Use `.env.example` para documentar variáveis necessárias
+
+3. **CORS (Produção):**
+   - ⚠️ Atualmente configurado como `*` (aceita todas as origens)
+   - ✅ Para produção, configure um domínio específico:
+     ```env
+     CORS_ORIGIN=https://seu-dominio.com
+     ```
+   - ✅ No Vercel: Settings → Environment Variables → Adicione `CORS_ORIGIN`
+
+4. **Validações Implementadas:**
+   - ✅ Servidor não inicia se JWT_SECRET não estiver configurado
+   - ✅ Senhas hasheadas com bcrypt (salt rounds: 10)
+   - ✅ Queries parametrizadas (previne SQL Injection)
+   - ✅ Middleware de autenticação em rotas protegidas
+   - ✅ Tokens JWT expiram em 7 dias
+
+5. **Verificar Exposição:**
+   ```bash
+   # Verificar se .env foi commitado por engano
+   git log --all --full-history -- .env
+   
+   # Se encontrar, remover do histórico:
+   git filter-branch --force --index-filter \
+   "git rm --cached --ignore-unmatch .env" \
+   --prune-empty --tag-name-filter cat -- --all
+   ```
 
 ---
 
