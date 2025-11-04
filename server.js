@@ -13,11 +13,22 @@ const { sql } = require('@vercel/postgres');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'seu_segredo_jwt_altere_em_producao';
 
-// Configurações do Express
+// Validação obrigatória do JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('❌ ERRO CRÍTICO: JWT_SECRET não está configurado nas variáveis de ambiente!');
+    console.error('💡 Configure JWT_SECRET no Vercel Dashboard ou no arquivo .env');
+    process.exit(1);
+}
+
+// Configurações do Express com CORS mais restritivo
+const allowedOrigins = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',') 
+    : ['*'];
+
 app.use(cors({
-    origin: '*',
+    origin: allowedOrigins.includes('*') ? '*' : allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
