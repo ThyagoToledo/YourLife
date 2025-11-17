@@ -386,10 +386,11 @@ app.get('/api/users/search/:query', authenticateToken, async (req, res) => {
     try {
         const query = `%${req.params.query}%`;
 
+        // Buscar usuários apenas pelo nome
         const result = await sql`
             SELECT id, name, email, avatar, bio
             FROM users
-            WHERE (name ILIKE ${query} OR email ILIKE ${query})
+            WHERE name ILIKE ${query}
             AND id != ${req.user.id}
             LIMIT 20
         `;
@@ -412,11 +413,11 @@ app.get('/api/search', authenticateToken, async (req, res) => {
 
         const query = `%${searchQuery}%`;
 
-        // Buscar usuários
+        // Buscar usuários apenas pelo nome
         const usersResult = await sql`
             SELECT id, name, email, avatar, bio
             FROM users
-            WHERE (name ILIKE ${query} OR email ILIKE ${query})
+            WHERE name ILIKE ${query}
             AND id != ${req.user.id}
             LIMIT 10
         `;
