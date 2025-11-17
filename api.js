@@ -306,8 +306,15 @@ class ApiService {
         });
     }
 
-    async deleteComment(postId, commentId) {
-        return await this.request(`/posts/${postId}/comments/${commentId}`, {
+    async updateComment(commentId, commentData) {
+        return await this.request(`/comments/${commentId}`, {
+            method: 'PUT',
+            body: commentData,
+        });
+    }
+
+    async deleteComment(commentId) {
+        return await this.request(`/comments/${commentId}`, {
             method: 'DELETE',
         });
     }
