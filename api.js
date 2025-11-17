@@ -83,9 +83,10 @@ class ApiService {
 
                 // Usa o erro do backend se disponível, senão usa mensagem genérica
                 const errorMessage = error.error || error.message || `Erro HTTP ${response.status}: ${response.statusText}`;
-                console.error(`❌ Erro na API:`, errorMessage, error);
+                const errorDetails = error.details ? ` (${error.details})` : '';
+                console.error(`❌ Erro na API:`, errorMessage + errorDetails, error);
 
-                throw new Error(errorMessage);
+                throw new Error(errorMessage + errorDetails);
             }
 
             const data = await response.json();

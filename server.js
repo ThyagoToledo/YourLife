@@ -650,8 +650,14 @@ app.put('/api/comments/:id', authenticateToken, async (req, res) => {
         console.log('Resultado da atualização:', result.rows);
         res.json({ success: true, comment: result.rows[0] });
     } catch (error) {
-        console.error('Erro ao editar comentário:', error);
-        res.status(500).json({ success: false, error: 'Erro ao editar comentário' });
+        console.error('Erro completo ao editar comentário:', error);
+        console.error('Stack trace:', error.stack);
+        console.error('Mensagem:', error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Erro ao editar comentário',
+            details: error.message 
+        });
     }
 });
 
