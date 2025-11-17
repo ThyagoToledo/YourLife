@@ -313,10 +313,29 @@ class ApiService {
         });
     }
 
-    async deleteComment(commentId) {
-        return await this.request(`/comments/${commentId}`, {
-            method: 'DELETE',
-        });
+    async deleteComment(commentId, postId = null) {
+        // Tenta ambas as rotas para compatibilidade
+        try {
+            if (postId) {
+                return await this.request(`/posts/${postId}/comments/${commentId}`, {
+                    method: 'DELETE',
+                });
+            } else {
+                return await this.request(`/comments/${commentId}`, {
+                    method: 'DELETE',
+                });
+            }
+        } catch (error) {
+            // Se falhar com uma rota, tenta a outra
+            console.warn('Tentando rota alternativa para deletar comentário');
+            if (postId) {
+                return await this.request(`/comments/${commentId}`, {
+                    method: 'DELETE',
+                });
+            } else {
+                throw error;
+            }
+        }
     }
 
     async likeComment(postId, commentId) {

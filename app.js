@@ -1226,8 +1226,8 @@ class App {
         try {
             Loading.show('Excluindo comentário...');
 
-            // Chama a API para excluir o comentário
-            await this.api.deleteComment(commentId);
+            // Chama a API para excluir o comentário (passa postId para compatibilidade)
+            await this.api.deleteComment(commentId, postId);
 
             // Remove o comentário do DOM
             const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
@@ -1253,7 +1253,7 @@ class App {
 
         } catch (error) {
             console.error('Erro ao excluir comentário:', error);
-            Toast.error('Erro ao excluir comentário');
+            Toast.error('Erro ao excluir comentário: ' + (error.message || 'Tente novamente'));
         } finally {
             Loading.hide();
         }
