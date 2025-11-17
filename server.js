@@ -601,6 +601,104 @@ app.post('/api/posts/:id/comments', authenticateToken, async (req, res) => {
     }
 });
 
+// Editar comentário
+app.put('/api/comments/:id', authenticateToken, async (req, res) => {
+    try {
+        const commentId = parseInt(req.params.id);
+        const { content } = req.body;
+
+        if (!content || content.trim() === '') {
+            return res.status(400).json({ success: false, error: 'Comentário não pode ser vazio' });
+        }
+
+        // Verifica se o comentário existe e pertence ao usuário
+        const checkResult = await sql`
+            SELECT user_id FROM comments WHERE id = ${commentId}
+        `;
+
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
+        }
+
+        if (checkResult.rows[0].user_id !== req.user.id) {
+            return res.status(403).json({ success: false, error: 'Você não pode editar este comentário' });
+        }
+
+        // Atualiza o comentário
+        const result = await sql`
+            UPDATE comments 
+            SET content = ${content}, updated_at = NOW()
+            WHERE id = ${commentId}
+            RETURNING *
+        `;
+
+        res.json({ success: true, comment: result.rows[0] });
+    } catch (error) {
+        console.error('Erro ao editar comentário:', error);
+        res.status(500).json({ success: false, error: 'Erro ao editar comentário' });
+    }
+});
+
+// Excluir comentário
+app.delete('/api/comments/:id', authenticateToken, async (req, res) => {
+    try {
+        const commentId = parseInt(req.params.id);
+
+        // Verifica se o comentário existe e pertence ao usuário
+        const checkResult = await sql`
+            SELECT user_id FROM comments WHERE id = ${commentId}
+        `;
+
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
+        }
+
+        if (checkResult.rows[0].user_id !== req.user.id) {
+            return res.status(403).json({ success: false, error: 'Você não pode excluir este comentário' });
+        }
+
+        // Exclui o comentário
+        await sql`
+            DELETE FROM comments WHERE id = ${commentId}
+        `;
+
+        res.json({ success: true, message: 'Comentário excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir comentário:', error);
+        res.status(500).json({ success: false, error: 'Erro ao excluir comentário' });
+    }
+});
+
+// Rota alternativa para deletar comentário (compatibilidade)
+app.delete('/api/posts/:postId/comments/:commentId', authenticateToken, async (req, res) => {
+    try {
+        const commentId = parseInt(req.params.commentId);
+
+        // Verifica se o comentário existe e pertence ao usuário
+        const checkResult = await sql`
+            SELECT user_id FROM comments WHERE id = ${commentId}
+        `;
+
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
+        }
+
+        if (checkResult.rows[0].user_id !== req.user.id) {
+            return res.status(403).json({ success: false, error: 'Você não pode excluir este comentário' });
+        }
+
+        // Exclui o comentário
+        await sql`
+            DELETE FROM comments WHERE id = ${commentId}
+        `;
+
+        res.json({ success: true, message: 'Comentário excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir comentário:', error);
+        res.status(500).json({ success: false, error: 'Erro ao excluir comentário' });
+    }
+});
+
 // ============================================
 // ROTAS DE AMIGOS
 // ============================================
