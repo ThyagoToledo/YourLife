@@ -802,7 +802,7 @@ class App {
                                 <span class="text-xs text-gray-400 dark:text-gray-500">${DateUtils.formatRelativeTime(comment.created_at)}</span>
                             </div>
                             ${isOwnComment ? `
-                                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div class="flex items-center gap-1 opacity-50 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                     <button onclick="app.editComment(${post.id}, ${comment.id})" 
                                             class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" 
                                             title="Editar comentário">
@@ -1219,6 +1219,8 @@ class App {
 
     // Excluir comentário
     async deleteComment(postId, commentId) {
+        console.log('Tentando excluir comentário:', { postId, commentId });
+        
         if (!confirm('Tem certeza que deseja excluir este comentário?')) {
             return;
         }
@@ -1227,7 +1229,8 @@ class App {
             Loading.show('Excluindo comentário...');
 
             // Chama a API para excluir o comentário (passa postId para compatibilidade)
-            await this.api.deleteComment(commentId, postId);
+            const result = await this.api.deleteComment(commentId, postId);
+            console.log('Resultado da exclusão:', result);
 
             // Remove o comentário do DOM
             const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
@@ -1252,8 +1255,9 @@ class App {
             Toast.success('Comentário excluído!');
 
         } catch (error) {
-            console.error('Erro ao excluir comentário:', error);
-            Toast.error('Erro ao excluir comentário: ' + (error.message || 'Tente novamente'));
+            console.error('Erro completo ao excluir comentário:', error);
+            const errorMsg = error.message || error.error || 'Tente novamente';
+            Toast.error('Erro ao excluir: ' + errorMsg);
         } finally {
             Loading.hide();
         }
