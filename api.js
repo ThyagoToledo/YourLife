@@ -168,6 +168,11 @@ class ApiService {
         return await this.request(`/users/search/${encodeURIComponent(query)}`);
     }
 
+    // Busca global (usuários e postagens)
+    async search(query) {
+        return await this.request(`/search?q=${encodeURIComponent(query)}`);
+    }
+
     // ========== AMIGOS ==========
 
     async getFriends() {

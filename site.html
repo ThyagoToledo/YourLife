@@ -328,12 +328,19 @@
                 <span class="text-xl font-bold text-blue-600 dark:text-blue-400">Your Life</span>
             </div>
 
-            <div class="flex-1 max-w-xs mx-4">
+            <div class="flex-1 max-w-xs mx-4 relative">
                 <label for="search" class="sr-only">Buscar</label>
                 <input id="search" name="search" type="search"
                     class="w-full px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Buscar usuarios ou postagens...">
-                <!-- BACKEND: Conforme o usuario digita, fazer GET /api/search?q=... -->
+                
+                <!-- Dropdown de Resultados da Busca -->
+                <div id="search-results" 
+                    class="hidden absolute top-full mt-2 w-96 max-h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                    <div class="overflow-y-auto max-h-[500px]">
+                        <!-- Resultados serão injetados aqui -->
+                    </div>
+                </div>
             </div>
 
             <div class="flex items-center space-x-4">

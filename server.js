@@ -401,6 +401,52 @@ app.get('/api/users/search/:query', authenticateToken, async (req, res) => {
     }
 });
 
+// Busca global (usuários e postagens)
+app.get('/api/search', authenticateToken, async (req, res) => {
+    try {
+        const searchQuery = req.query.q;
+        
+        if (!searchQuery || searchQuery.trim() === '') {
+            return res.json({ users: [], posts: [] });
+        }
+
+        const query = `%${searchQuery}%`;
+
+        // Buscar usuários
+        const usersResult = await sql`
+            SELECT id, name, email, avatar, bio
+            FROM users
+            WHERE (name ILIKE ${query} OR email ILIKE ${query})
+            AND id != ${req.user.id}
+            LIMIT 10
+        `;
+
+        // Buscar postagens
+        const postsResult = await sql`
+            SELECT 
+                p.id,
+                p.content,
+                p.created_at,
+                u.id as user_id,
+                u.name as user_name,
+                u.avatar as user_avatar
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.content ILIKE ${query}
+            ORDER BY p.created_at DESC
+            LIMIT 10
+        `;
+
+        res.json({
+            users: usersResult.rows,
+            posts: postsResult.rows
+        });
+    } catch (error) {
+        console.error('Erro ao buscar:', error);
+        res.status(500).json({ success: false, error: 'Erro ao realizar busca' });
+    }
+});
+
 // ============================================
 // ROTAS DE FEED E POSTS
 // ============================================

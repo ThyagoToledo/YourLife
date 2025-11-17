@@ -359,12 +359,39 @@ class App {
             });
         }
 
+        // Fechar dropdown de busca ao clicar fora
+        document.addEventListener('click', (e) => {
+            const searchInput = document.getElementById('search');
+            const searchResults = document.getElementById('search-results');
+            
+            if (searchInput && searchResults) {
+                const isClickInsideSearch = searchInput.contains(e.target);
+                const isClickInsideResults = searchResults.contains(e.target);
+                
+                if (!isClickInsideSearch && !isClickInsideResults) {
+                    searchResults.classList.add('hidden');
+                }
+            }
+        });
+
         // Atalhos de teclado
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd + K para focar na busca
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
                 this.elements.searchInput?.focus();
+            }
+            
+            // ESC para fechar dropdown de busca
+            if (e.key === 'Escape') {
+                const searchResults = document.getElementById('search-results');
+                if (searchResults && !searchResults.classList.contains('hidden')) {
+                    searchResults.classList.add('hidden');
+                    const searchInput = document.getElementById('search');
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                }
             }
         });
     }
@@ -1457,16 +1484,152 @@ class App {
 
     // Handle busca
     async handleSearch(query) {
+        const searchResultsContainer = document.getElementById('search-results');
+        
         if (!query || query.length < 2) {
-            this.state.clearSearchResults();
+            if (searchResultsContainer) {
+                searchResultsContainer.classList.add('hidden');
+            }
             return;
         }
 
         try {
-            // Busca funcionalidade em desenvolvimento
+            const results = await this.api.search(query);
+            
+            if (!results) {
+                return;
+            }
+
+            const { users = [], posts = [] } = results;
+            
+            // Mostrar container de resultados
+            if (searchResultsContainer) {
+                searchResultsContainer.classList.remove('hidden');
+                
+                let html = '';
+                
+                // Seção de usuários
+                if (users.length > 0) {
+                    html += `
+                        <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Usuários</h4>
+                        </div>
+                    `;
+                    
+                    users.forEach(user => {
+                        const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff`;
+                        html += `
+                            <a href="#" onclick="app.viewUserProfile(${user.id}); return false;" 
+                               class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <img src="${avatar}" alt="${Validation.sanitizeHTML(user.name)}" 
+                                     class="w-10 h-10 rounded-full">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                                        ${Validation.sanitizeHTML(user.name)}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        ${Validation.sanitizeHTML(user.email)}
+                                    </p>
+                                </div>
+                            </a>
+                        `;
+                    });
+                }
+                
+                // Seção de postagens
+                if (posts.length > 0) {
+                    html += `
+                        <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Postagens</h4>
+                        </div>
+                    `;
+                    
+                    posts.forEach(post => {
+                        const avatar = post.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user_name)}&background=4F46E5&color=fff`;
+                        const timestamp = DateUtils.formatRelativeTime(post.created_at);
+                        const preview = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
+                        
+                        html += `
+                            <a href="#" onclick="app.scrollToPost(${post.id}); return false;" 
+                               class="block p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <div class="flex items-start gap-2 mb-1">
+                                    <img src="${avatar}" alt="${Validation.sanitizeHTML(post.user_name)}" 
+                                         class="w-8 h-8 rounded-full">
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-sm font-semibold text-gray-800 dark:text-white">
+                                            ${Validation.sanitizeHTML(post.user_name)}
+                                        </span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                            ${timestamp}
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300 ml-10">
+                                    ${Validation.sanitizeHTML(preview)}
+                                </p>
+                            </a>
+                        `;
+                    });
+                }
+                
+                // Se não houver resultados
+                if (users.length === 0 && posts.length === 0) {
+                    html = `
+                        <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <p>Nenhum resultado encontrado</p>
+                        </div>
+                    `;
+                }
+                
+                searchResultsContainer.innerHTML = html;
+            }
+            
         } catch (error) {
             console.error('Erro na busca:', error);
+            Toast.error('Erro ao realizar busca');
         }
+    }
+
+    // Visualizar perfil de outro usuário
+    viewUserProfile(userId) {
+        const searchResultsContainer = document.getElementById('search-results');
+        if (searchResultsContainer) {
+            searchResultsContainer.classList.add('hidden');
+        }
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        this.showView('profile-view');
+        this.loadProfile(userId);
+    }
+
+    // Rolar até uma postagem específica
+    scrollToPost(postId) {
+        const searchResultsContainer = document.getElementById('search-results');
+        if (searchResultsContainer) {
+            searchResultsContainer.classList.add('hidden');
+        }
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        this.showView('feed-view');
+        setTimeout(() => {
+            const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postElement) {
+                postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                postElement.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50');
+                setTimeout(() => {
+                    postElement.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50');
+                }, 2000);
+            }
+        }, 100);
     }
 
     // Carrega notificações
