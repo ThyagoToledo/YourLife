@@ -847,7 +847,7 @@ class App {
     // Cria elemento de post
     createPostElement(post, friendsList = null) {
         const div = document.createElement('div');
-        div.className = 'p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md';
+        div.className = 'p-6 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg hover:shadow-xl transition-shadow';
         div.dataset.postId = post.id;
 
         const timestamp = DateUtils.formatRelativeTime(post.created_at);
@@ -2404,9 +2404,9 @@ class App {
             }
 
             container.innerHTML = friends.map(friend => `
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center justify-between">
+                <div class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl p-4 flex items-center justify-between hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
                     <div class="flex items-center gap-4">
-                        <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full">
+                        <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full border-2 border-gray-300 dark:border-gray-600">
                         <div>
                             <div class="font-semibold dark:text-white">${friend.name}</div>
                             ${friend.isMutual ? '<span class="text-xs text-green-600 dark:text-green-400">Amizade mútua</span>' : ''}
@@ -2690,11 +2690,11 @@ class App {
             }
 
             container.innerHTML = advices.map(advice => `
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
+                <div class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl p-6 shadow-lg hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500 transition-all">
                     <h3 class="font-bold text-lg mb-2 dark:text-white">${advice.title}</h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3">${advice.content}</p>
                     <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">${advice.category}</span>
+                        <span class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">${advice.category}</span>
                         <span>${DateUtils.formatTimestamp(advice.created_at)}</span>
                     </div>
                 </div>
