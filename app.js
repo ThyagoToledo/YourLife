@@ -1108,10 +1108,41 @@ class App {
                 if (postElement) {
                     const commentsSection = postElement.querySelector('.comments-section');
                     if (commentsSection) {
+                        const currentUserId = this.state.getState().currentUser?.id;
+                        const isOwnComment = normalizedComment.author.id === currentUserId;
+                        
                         const commentHTML = `
-                            <div class="mt-2 flex space-x-2 text-sm">
-                                <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(normalizedComment.author.name)}:</span>
-                                <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(normalizedComment.content)}</span>
+                            <div class="mt-2 flex items-start gap-2 group" data-comment-id="${normalizedComment.id}">
+                                <img src="${normalizedComment.author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(normalizedComment.author.name)}&background=4F46E5&color=fff`}" 
+                                     alt="${normalizedComment.author.name}" 
+                                     class="w-8 h-8 rounded-full flex-shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex-1">
+                                            <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">${Validation.sanitizeHTML(normalizedComment.author.name)}</span>
+                                            <p class="text-gray-700 dark:text-gray-300 text-sm comment-content-text">${Validation.sanitizeHTML(normalizedComment.content)}</p>
+                                            <span class="text-xs text-gray-400 dark:text-gray-500">Agora</span>
+                                        </div>
+                                        ${isOwnComment ? `
+                                            <div class="flex items-center gap-1 opacity-50 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                <button onclick="app.editComment(${postId}, ${normalizedComment.id})" 
+                                                        class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" 
+                                                        title="Editar comentário">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="app.deleteComment(${postId}, ${normalizedComment.id})" 
+                                                        class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
+                                                        title="Excluir comentário">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
                             </div>
                         `;
                         commentsSection.insertAdjacentHTML('beforeend', commentHTML);
