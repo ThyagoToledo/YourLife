@@ -642,7 +642,7 @@ app.put('/api/comments/:id', authenticateToken, async (req, res) => {
         console.log('Atualizando comentário...');
         const result = await sql`
             UPDATE comments 
-            SET content = ${content}, updated_at = NOW()
+            SET content = ${content}
             WHERE id = ${commentId}
             RETURNING *
         `;
