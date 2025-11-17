@@ -307,10 +307,13 @@ class ApiService {
     }
 
     async updateComment(commentId, commentData) {
-        return await this.request(`/comments/${commentId}`, {
+        console.log('API.updateComment chamado:', { commentId, commentData });
+        const response = await this.request(`/comments/${commentId}`, {
             method: 'PUT',
             body: commentData,
         });
+        console.log('API.updateComment resposta:', response);
+        return response;
     }
 
     async deleteComment(commentId, postId = null) {

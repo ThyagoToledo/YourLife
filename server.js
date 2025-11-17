@@ -603,28 +603,43 @@ app.post('/api/posts/:id/comments', authenticateToken, async (req, res) => {
 
 // Editar comentário
 app.put('/api/comments/:id', authenticateToken, async (req, res) => {
+    console.log('PUT /api/comments/:id chamado');
+    console.log('Params:', req.params);
+    console.log('Body:', req.body);
+    console.log('User:', req.user);
+    
     try {
         const commentId = parseInt(req.params.id);
         const { content } = req.body;
 
+        console.log('CommentId parseado:', commentId);
+        console.log('Content:', content);
+
         if (!content || content.trim() === '') {
+            console.log('Conteúdo vazio');
             return res.status(400).json({ success: false, error: 'Comentário não pode ser vazio' });
         }
 
         // Verifica se o comentário existe e pertence ao usuário
+        console.log('Verificando comentário...');
         const checkResult = await sql`
             SELECT user_id FROM comments WHERE id = ${commentId}
         `;
 
+        console.log('CheckResult:', checkResult.rows);
+
         if (checkResult.rows.length === 0) {
+            console.log('Comentário não encontrado');
             return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
         }
 
         if (checkResult.rows[0].user_id !== req.user.id) {
+            console.log('Usuário não autorizado');
             return res.status(403).json({ success: false, error: 'Você não pode editar este comentário' });
         }
 
         // Atualiza o comentário
+        console.log('Atualizando comentário...');
         const result = await sql`
             UPDATE comments 
             SET content = ${content}, updated_at = NOW()
@@ -632,6 +647,7 @@ app.put('/api/comments/:id', authenticateToken, async (req, res) => {
             RETURNING *
         `;
 
+        console.log('Resultado da atualização:', result.rows);
         res.json({ success: true, comment: result.rows[0] });
     } catch (error) {
         console.error('Erro ao editar comentário:', error);

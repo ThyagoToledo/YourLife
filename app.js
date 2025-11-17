@@ -1172,9 +1172,24 @@ class App {
     // Salvar edição de comentário
     async saveEditComment(postId, commentId) {
         try {
+            console.log('saveEditComment chamado:', { postId, commentId });
+            
             const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+            if (!commentElement) {
+                console.error('Elemento do comentário não encontrado');
+                Toast.error('Elemento do comentário não encontrado');
+                return;
+            }
+
             const textarea = commentElement.querySelector('textarea');
+            if (!textarea) {
+                console.error('Textarea não encontrado');
+                Toast.error('Textarea não encontrado');
+                return;
+            }
+
             const newContent = textarea.value.trim();
+            console.log('Novo conteúdo:', newContent);
 
             if (!newContent) {
                 Toast.warning('O comentário não pode estar vazio');
@@ -1184,7 +1199,9 @@ class App {
             Loading.show('Salvando alterações...');
 
             // Chama a API para atualizar o comentário
-            await this.api.updateComment(commentId, { content: newContent });
+            console.log('Chamando API updateComment...');
+            const response = await this.api.updateComment(commentId, { content: newContent });
+            console.log('Resposta da API:', response);
 
             // Atualiza o conteúdo no DOM
             const contentText = commentElement.querySelector('.comment-content-text');
@@ -1198,8 +1215,8 @@ class App {
             Toast.success('Comentário atualizado!');
 
         } catch (error) {
-            console.error('Erro ao salvar comentário:', error);
-            Toast.error('Erro ao salvar alterações');
+            console.error('Erro completo ao salvar comentário:', error);
+            Toast.error(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
         } finally {
             Loading.hide();
         }
