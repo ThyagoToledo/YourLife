@@ -232,10 +232,6 @@
         </a>
     </p>
     </div>
-
-    <p class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-        Ao continuar, você concorda com nossos Termos de Uso e Política de Privacidade
-    </p>
     </div>
     </div>
     </div>
@@ -439,6 +435,17 @@
                             Correspondências
                             <span id="messages-badge"
                                 class="hidden absolute top-1 right-1 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full">0</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Link para Termos e Política -->
+                    <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <a href="#" id="nav-terms"
+                            class="flex items-center px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 group">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Termos e Privacidade
                         </a>
                     </div>
                 </nav>
@@ -736,6 +743,66 @@
         </div>
 
     </div> <!-- Fim de #main-app -->
+
+    <!-- Modal de Termos e Privacidade -->
+    <div id="terms-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="w-full max-w-2xl max-h-[80vh] p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Termos de Uso e Política de Privacidade</h2>
+                <button id="close-terms-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6 text-gray-700 dark:text-gray-300">
+                <section>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">1. Termos de Uso</h3>
+                    <p class="mb-2">Ao utilizar o YourLife, você concorda com os seguintes termos:</p>
+                    <ul class="list-disc list-inside space-y-2 ml-4">
+                        <li>Você é responsável por manter a confidencialidade de sua conta e senha.</li>
+                        <li>Você não deve compartilhar conteúdo ofensivo, ilegal ou prejudicial.</li>
+                        <li>Você concorda em respeitar outros usuários e suas opiniões.</li>
+                        <li>O YourLife pode modificar ou encerrar o serviço a qualquer momento.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">2. Política de Privacidade</h3>
+                    <p class="mb-2">Sua privacidade é importante para nós. Esta política descreve como coletamos e usamos suas informações:</p>
+                    <ul class="list-disc list-inside space-y-2 ml-4">
+                        <li><strong>Informações coletadas:</strong> Nome, email, foto de perfil e conteúdo que você publica.</li>
+                        <li><strong>Uso das informações:</strong> Para fornecer e melhorar nossos serviços.</li>
+                        <li><strong>Compartilhamento:</strong> Não compartilhamos suas informações com terceiros sem seu consentimento.</li>
+                        <li><strong>Segurança:</strong> Utilizamos criptografia e medidas de segurança para proteger seus dados.</li>
+                        <li><strong>Cookies:</strong> Utilizamos cookies para melhorar sua experiência no site.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">3. Seus Direitos</h3>
+                    <ul class="list-disc list-inside space-y-2 ml-4">
+                        <li>Você pode acessar, corrigir ou excluir suas informações pessoais a qualquer momento.</li>
+                        <li>Você pode desativar sua conta permanentemente.</li>
+                        <li>Você pode optar por não receber notificações.</li>
+                    </ul>
+                </section>
+
+                <section class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Última atualização: 17 de novembro de 2025
+                    </p>
+                </section>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button id="close-terms-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Entendi
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Badge de Notificação (oculto) -->
     <span id="notification-badge"
