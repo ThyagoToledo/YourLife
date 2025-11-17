@@ -1129,11 +1129,18 @@ class App {
     // Editar comentário
     async editComment(postId, commentId) {
         try {
+            console.log('editComment chamado:', { postId, commentId });
+            
             const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-            if (!commentElement) return;
+            if (!commentElement) {
+                console.error('Elemento do comentário não encontrado');
+                return;
+            }
 
             const contentText = commentElement.querySelector('.comment-content-text');
             const currentContent = contentText.textContent;
+
+            console.log('Conteúdo atual:', currentContent);
 
             // Criar input de edição
             const editHTML = `
@@ -1157,6 +1164,8 @@ class App {
             contentText.style.display = 'none';
             const container = contentText.parentElement;
             container.insertAdjacentHTML('beforeend', editHTML);
+            
+            console.log('Formulário de edição criado');
             
             // Focus no textarea
             const textarea = container.querySelector('textarea');
