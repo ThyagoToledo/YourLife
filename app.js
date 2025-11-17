@@ -847,7 +847,7 @@ class App {
     // Cria elemento de post
     createPostElement(post, friendsList = null) {
         const div = document.createElement('div');
-        div.className = 'p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md';
+        div.className = 'p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md';
         div.dataset.postId = post.id;
 
         const timestamp = DateUtils.formatRelativeTime(post.created_at);
@@ -2404,7 +2404,7 @@ class App {
             }
 
             container.innerHTML = friends.map(friend => `
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center justify-between">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full">
                         <div>
@@ -2690,7 +2690,7 @@ class App {
             }
 
             container.innerHTML = advices.map(advice => `
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
                     <h3 class="font-bold text-lg mb-2 dark:text-white">${advice.title}</h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3">${advice.content}</p>
                     <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
