@@ -1527,9 +1527,6 @@ class App {
                                     <p class="text-sm font-semibold text-gray-800 dark:text-white truncate">
                                         ${Validation.sanitizeHTML(user.name)}
                                     </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                        ${Validation.sanitizeHTML(user.email)}
-                                    </p>
                                 </div>
                             </a>
                         `;
