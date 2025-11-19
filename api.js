@@ -266,7 +266,7 @@ class ApiService {
     }
 
     async deletePost(postId) {
-        return await this.request(`/posts/${postId}`, {
+        return await this.request(`/api/posts/${postId}`, {
             method: 'DELETE',
         });
     }

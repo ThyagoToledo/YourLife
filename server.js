@@ -514,6 +514,36 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     }
 });
 
+// Deletar post
+app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+
+        // Verifica se o post existe e pertence ao usuário
+        const checkResult = await sql`
+            SELECT user_id FROM posts WHERE id = ${postId}
+        `;
+
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Post não encontrado' });
+        }
+
+        if (checkResult.rows[0].user_id !== req.user.id) {
+            return res.status(403).json({ success: false, error: 'Você não pode deletar este post' });
+        }
+
+        // Deleta o post (comentários e likes são deletados automaticamente por CASCADE)
+        await sql`
+            DELETE FROM posts WHERE id = ${postId}
+        `;
+
+        res.json({ success: true, message: 'Post deletado com sucesso' });
+    } catch (error) {
+        console.error('Erro ao deletar post:', error);
+        res.status(500).json({ success: false, error: 'Erro ao deletar post' });
+    }
+});
+
 // Curtir post
 app.post('/api/posts/:id/like', authenticateToken, async (req, res) => {
     try {
