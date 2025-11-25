@@ -23,8 +23,8 @@ if (!JWT_SECRET) {
 }
 
 // Configurações do Express com CORS mais restritivo
-const allowedOrigins = process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(',') 
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',')
     : ['*'];
 
 app.use(cors({
@@ -632,7 +632,7 @@ app.get('/api/friends', authenticateToken, async (req, res) => {
 app.get('/api/users/:id/friends', authenticateToken, async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        
+
         const result = await sql`
             SELECT 
                 u.id, u.name, u.email, u.avatar, u.bio
