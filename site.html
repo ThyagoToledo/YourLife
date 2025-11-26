@@ -26,15 +26,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Fundo do HTML para evitar faixas brancas */
-        html {
-            background-color: #f3f4f6;
-        }
-
-        html.dark {
-            background-color: #111827;
-        }
-
         /* Transição suave para dark mode */
         .dark-mode-transition {
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -88,67 +79,10 @@
         .animate-fade-in {
             animation: fadeIn 0.3s ease-out;
         }
-
-        /* Animação de pulse para status online */
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        /* Scroll suave para área de mensagens */
-        #messages-container {
-            scroll-behavior: smooth;
-        }
-
-        /* Estilo para conversa ativa */
-        .conversation-item.active {
-            background-color: rgb(219, 234, 254);
-            border-left: 4px solid rgb(37, 99, 235);
-        }
-
-        .dark .conversation-item.active {
-            background-color: rgb(30, 58, 138);
-            border-left: 4px solid rgb(96, 165, 250);
-        }
-
-        /* Customização da scrollbar */
-        #conversations-list::-webkit-scrollbar,
-        #messages-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #conversations-list::-webkit-scrollbar-track,
-        #messages-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #conversations-list::-webkit-scrollbar-thumb,
-        #messages-container::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-
-        .dark #conversations-list::-webkit-scrollbar-thumb,
-        .dark #messages-container::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
-
-        #conversations-list::-webkit-scrollbar-thumb:hover,
-        #messages-container::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
     </style>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900">
+<body class="bg-gray-100">
 
     <!-- 
     ==================================================
@@ -241,6 +175,10 @@
         </a>
     </p>
     </div>
+
+    <p class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        Ao continuar, você concorda com nossos Termos de Uso e Política de Privacidade
+    </p>
     </div>
     </div>
     </div>
@@ -254,7 +192,7 @@
         <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-xl">
             <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-gray-900">Criar Conta</h2>
-                <button id="close-register-modal" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-all" title="Voltar">
+                <button id="close-register-modal" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                         </path>
@@ -302,12 +240,7 @@
 
             <p class="text-sm text-center text-gray-600">
                 Já tem uma conta?
-                <a href="#" id="back-to-login" class="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    Voltar para o login
-                </a>
+                <a href="#" id="back-to-login" class="font-medium text-blue-600 hover:text-blue-500">Faça login</a>
             </p>
         </div>
     </div>
@@ -328,19 +261,12 @@
                 <span class="text-xl font-bold text-blue-600 dark:text-blue-400">Your Life</span>
             </div>
 
-            <div class="flex-1 max-w-xs mx-4 relative">
+            <div class="flex-1 max-w-xs mx-4">
                 <label for="search" class="sr-only">Buscar</label>
                 <input id="search" name="search" type="search"
                     class="w-full px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Buscar usuarios ou postagens...">
-                
-                <!-- Dropdown de Resultados da Busca -->
-                <div id="search-results" 
-                    class="hidden absolute top-full mt-2 w-96 max-h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
-                    <div class="overflow-y-auto max-h-[500px]">
-                        <!-- Resultados serão injetados aqui -->
-                    </div>
-                </div>
+                <!-- BACKEND: Conforme o usuario digita, fazer GET /api/search?q=... -->
             </div>
 
             <div class="flex items-center space-x-4">
@@ -502,20 +428,20 @@
                 -->
                 <div id="profile-view" class="view max-w-4xl mx-auto">
                     <!-- BACKEND: GET /api/users/{userId} -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 border-gray-300 dark:border-gray-600 overflow-hidden">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <!-- Imagem de Capa -->
-                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800">
+                        <div>
                             <img id="profile-cover-img" class="w-full h-48 object-cover"
-                                src="https://placehold.co/1000x300/4F46E5/FFFFFF?text=Capa" alt="Imagem de Capa">
+                                src="https://placehold.co/1000x300/E0E7FF/4F46E5?text=Capa" alt="Imagem de Capa">
                         </div>
 
                         <!-- Informacoes do Perfil -->
                         <div class="p-6">
                             <div class="flex items-end -mt-20">
-                                <img id="profile-avatar" class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 shadow-lg"
-                                    src="https://placehold.co/128x128/4F46E5/FFFFFF?text=U" alt="Foto do Perfil">
+                                <img id="profile-avatar" class="w-32 h-32 rounded-full border-4 border-white"
+                                    src="https://placehold.co/128x128/E0E7FF/4F46E5?text=U" alt="Foto do Perfil">
                                 <button onclick="app.showEditProfile()"
-                                    class="ml-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg shadow-md hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-lg transition-all">
+                                    class="ml-auto px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50">
                                     Editar Perfil
                                     <!-- BACKEND: PUT /api/users/me -->
                                 </button>
@@ -555,16 +481,16 @@
 
                     <!-- Abas (Postagens, Amigos, Conselhos) -->
                     <div class="mt-6">
-                        <div class="border-b border-gray-200 dark:border-gray-700">
+                        <div class="border-b border-gray-200">
                             <nav class="flex -mb-px space-x-8">
                                 <a href="#" id="profile-posts-tab"
-                                    class="profile-tab px-1 py-4 text-base font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
+                                    class="profile-tab px-1 py-4 text-base font-medium text-blue-600 border-b-2 border-blue-600"
                                     data-tab="posts">Postagens</a>
                                 <a href="#" id="profile-friends-tab"
-                                    class="profile-tab px-1 py-4 text-base font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+                                    class="profile-tab px-1 py-4 text-base font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-300 hover:text-gray-700"
                                     data-tab="friends">Amigos</a>
                                 <a href="#" id="profile-advices-tab"
-                                    class="profile-tab px-1 py-4 text-base font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+                                    class="profile-tab px-1 py-4 text-base font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-300 hover:text-gray-700"
                                     data-tab="advices">Conselhos</a>
                             </nav>
                         </div>
@@ -595,14 +521,14 @@
                 <!-- VIEW: AMIGOS -->
                 <div id="friends-view" class="view max-w-4xl mx-auto hidden">
                     <!-- Tabs -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-600 mb-4">
-                        <div class="flex border-b-2 border-gray-300 dark:border-gray-600">
+                    <div class="bg-white rounded-lg shadow-md mb-4">
+                        <div class="flex border-b">
                             <button id="friends-tab"
-                                class="flex-1 px-6 py-3 font-semibold text-blue-600 dark:text-blue-400 border-b-4 border-blue-600 dark:border-blue-400 transition-colors">
+                                class="flex-1 px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600">
                                 Amigos
                             </button>
                             <button id="requests-tab"
-                                class="flex-1 px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 relative transition-colors">
+                                class="flex-1 px-6 py-3 font-semibold text-gray-600 hover:text-blue-600 relative">
                                 Pedidos
                                 <span id="requests-badge"
                                     class="hidden absolute top-2 right-2 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full"></span>
@@ -611,11 +537,11 @@
                     </div>
 
                     <!-- Conteúdo: Amigos -->
-                    <div id="friends-content" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-600 p-6">
+                    <div id="friends-content" class="bg-white rounded-lg shadow-md p-6">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Meus Amigos</h2>
+                            <h2 class="text-2xl font-bold text-gray-800">Meus Amigos</h2>
                             <button onclick="app.showAddFriendModal()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all">
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                                 + Adicionar Amigo
                             </button>
                         </div>
@@ -625,8 +551,8 @@
                     </div>
 
                     <!-- Conteúdo: Pedidos -->
-                    <div id="requests-content" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-600 p-6 hidden">
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Pedidos de Amizade</h2>
+                    <div id="requests-content" class="bg-white rounded-lg shadow-md p-6 hidden">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Pedidos de Amizade</h2>
                         <div id="friend-requests-container" class="space-y-4">
                             <!-- Pedidos serão injetados aqui -->
                         </div>
@@ -636,11 +562,11 @@
                 <!-- VIEW: CONSELHOS -->
                 <!-- VIEW: CONSELHOS -->
                 <div id="advice-view" class="view max-w-4xl mx-auto hidden">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-600 p-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Conselhos do Dia</h2>
+                            <h2 class="text-2xl font-bold text-gray-800">Conselhos do Dia</h2>
                             <button onclick="app.showCreateAdviceModal()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all">
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                                 + Criar Conselho
                             </button>
                         </div>
@@ -650,7 +576,49 @@
                     </div>
                 </div>
 
-                <!-- 
+                <!-- VIEW: CORRESPONDÊNCIAS (MENSAGENS) -->
+                <div id="messages-view" class="view max-w-6xl mx-auto hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-200px)]">
+                        <!-- Lista de Conversas -->
+                        <div class="md:col-span-1 bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="bg-blue-600 text-white p-4">
+                                <h2 class="text-xl font-bold">Conversas</h2>
+                            </div>
+                            <div id="conversations-list" class="overflow-y-auto h-full">
+                                <!-- Conversas serão injetadas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Área de Chat -->
+                        <div class="md:col-span-2 bg-white rounded-lg shadow-md flex flex-col">
+                            <!-- Header do Chat -->
+                            <div id="chat-header" class="hidden bg-blue-600 text-white p-4 flex items-center gap-3">
+                                <img id="chat-user-avatar" src="" alt="" class="w-10 h-10 rounded-full">
+                                <h3 id="chat-user-name" class="font-semibold text-lg"></h3>
+                            </div>
+
+                            <!-- Seleção Inicial -->
+                            <div id="no-chat-selected" class="flex-1 flex items-center justify-center text-gray-400">
+                                <div class="text-center">
+                                    <svg class="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                        </path>
+                                    </svg>
+                                    <p class="text-lg">Selecione uma conversa</p>
+                                    <p class="text-sm mt-2">Escolha um amigo para começar a conversar</p>
+                                </div>
+                            </div>
+
+                            <!-- Mensagens (ver seção de chat mais abaixo) -->
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- 
                 ========================================
                 VISUALIZACAO: CORRESPONDENCIAS (MENSAGENS)
                 ========================================
@@ -658,64 +626,38 @@
             <div id="messages-view" class="view max-w-6xl mx-auto hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-120px)]">
                     <!-- Lista de conversas -->
-                    <div class="md:col-span-1 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col">
-                        <div class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-between">
+                    <div class="md:col-span-1 bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 bg-gradient-to-r from-blue-600 to-purple-600">
                             <h2 class="text-xl font-bold text-white">Conversas</h2>
-                            <button id="new-conversation-btn" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all" title="Nova conversa">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                            </button>
                         </div>
-                        
-                        <!-- Barra de busca -->
-                        <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-                            <input type="text" id="search-conversations" placeholder="Buscar conversas..." 
-                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        
-                        <div id="conversations-list" class="flex-1 overflow-y-auto">
+                        <div id="conversations-list" class="overflow-y-auto h-full">
                             <!-- Conversas serão injetadas aqui -->
                         </div>
                     </div>
 
                     <!-- Área de mensagens -->
-                    <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md flex flex-col">
-                        <div id="chat-header" class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white hidden">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="relative">
-                                        <img id="chat-user-avatar" src="" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-white">
-                                        <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full"></span>
-                                    </div>
-                                    <div>
-                                        <h3 id="chat-user-name" class="font-bold text-lg"></h3>
-                                        <p class="text-xs opacity-90 flex items-center gap-1">
-                                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                            Online
-                                        </p>
-                                    </div>
+                    <div class="md:col-span-2 bg-white rounded-lg shadow-md flex flex-col">
+                        <div id="chat-header"
+                            class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white hidden">
+                            <div class="flex items-center gap-3">
+                                <img id="chat-user-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full">
+                                <div>
+                                    <h3 id="chat-user-name" class="font-bold"></h3>
+                                    <p class="text-xs opacity-80">Online</p>
                                 </div>
-                                <button class="hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all" title="Mais opções">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-                                    </svg>
-                                </button>
                             </div>
                         </div>
 
-                        <div id="messages-container" class="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-                            <div id="no-chat-selected" class="h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <div id="messages-container" class="flex-1 p-4 overflow-y-auto">
+                            <div id="no-chat-selected" class="h-full flex items-center justify-center text-gray-400">
                                 <div class="text-center">
-                                    <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-full flex items-center justify-center">
-                                        <svg class="w-16 h-16 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">Nenhuma conversa selecionada</h3>
-                                    <p class="text-gray-500 dark:text-gray-400">Escolha uma conversa da lista ao lado para começar a conversar</p>
+                                    <svg class="w-24 h-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                        </path>
+                                    </svg>
+                                    <p class="text-lg">Selecione uma conversa</p>
                                 </div>
                             </div>
                             <div id="messages-list" class="space-y-3 hidden">
@@ -723,27 +665,14 @@
                             </div>
                         </div>
 
-                        <div id="message-input-area" class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hidden">
-                            <div class="flex items-center gap-2">
-                                <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all" title="Anexar arquivo">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                                    </svg>
-                                </button>
-                                <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all" title="Emoji">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </button>
+                        <div id="message-input-area" class="p-4 border-t hidden">
+                            <div class="flex gap-2">
                                 <input type="text" id="chat-message-input" placeholder="Digite sua mensagem..."
-                                    class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     onkeypress="if(event.key === 'Enter') app.sendMessage()">
                                 <button onclick="app.sendMessage()"
-                                    class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 font-semibold transition-all transform hover:scale-105 flex items-center gap-2">
-                                    <span>Enviar</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                    </svg>
+                                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                                    Enviar
                                 </button>
                             </div>
                         </div>
@@ -756,66 +685,6 @@
         </div>
 
     </div> <!-- Fim de #main-app -->
-
-    <!-- Modal de Termos e Privacidade -->
-    <div id="terms-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="w-full max-w-2xl max-h-[80vh] p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Termos de Uso e Política de Privacidade</h2>
-                <button id="close-terms-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="space-y-6 text-gray-700 dark:text-gray-300">
-                <section>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">1. Termos de Uso</h3>
-                    <p class="mb-2">Ao utilizar o YourLife, você concorda com os seguintes termos:</p>
-                    <ul class="list-disc list-inside space-y-2 ml-4">
-                        <li>Você é responsável por manter a confidencialidade de sua conta e senha.</li>
-                        <li>Você não deve compartilhar conteúdo ofensivo, ilegal ou prejudicial.</li>
-                        <li>Você concorda em respeitar outros usuários e suas opiniões.</li>
-                        <li>O YourLife pode modificar ou encerrar o serviço a qualquer momento.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">2. Política de Privacidade</h3>
-                    <p class="mb-2">Sua privacidade é importante para nós. Esta política descreve como coletamos e usamos suas informações:</p>
-                    <ul class="list-disc list-inside space-y-2 ml-4">
-                        <li><strong>Informações coletadas:</strong> Nome, email, foto de perfil e conteúdo que você publica.</li>
-                        <li><strong>Uso das informações:</strong> Para fornecer e melhorar nossos serviços.</li>
-                        <li><strong>Compartilhamento:</strong> Não compartilhamos suas informações com terceiros sem seu consentimento.</li>
-                        <li><strong>Segurança:</strong> Utilizamos criptografia e medidas de segurança para proteger seus dados.</li>
-                        <li><strong>Cookies:</strong> Utilizamos cookies para melhorar sua experiência no site.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">3. Seus Direitos</h3>
-                    <ul class="list-disc list-inside space-y-2 ml-4">
-                        <li>Você pode acessar, corrigir ou excluir suas informações pessoais a qualquer momento.</li>
-                        <li>Você pode desativar sua conta permanentemente.</li>
-                        <li>Você pode optar por não receber notificações.</li>
-                    </ul>
-                </section>
-
-                <section class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Última atualização: 17 de novembro de 2025
-                    </p>
-                </section>
-            </div>
-
-            <div class="mt-6 flex justify-end">
-                <button id="close-terms-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Entendi
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Badge de Notificação (oculto) -->
     <span id="notification-badge"

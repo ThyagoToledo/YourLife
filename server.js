@@ -23,8 +23,8 @@ if (!JWT_SECRET) {
 }
 
 // Configurações do Express com CORS mais restritivo
-const allowedOrigins = process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(',') 
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',')
     : ['*'];
 
 app.use(cors({
@@ -386,11 +386,10 @@ app.get('/api/users/search/:query', authenticateToken, async (req, res) => {
     try {
         const query = `%${req.params.query}%`;
 
-        // Buscar usuários apenas pelo nome
         const result = await sql`
             SELECT id, name, email, avatar, bio
             FROM users
-            WHERE name ILIKE ${query}
+            WHERE (name ILIKE ${query} OR email ILIKE ${query})
             AND id != ${req.user.id}
             LIMIT 20
         `;
@@ -399,52 +398,6 @@ app.get('/api/users/search/:query', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar usuários' });
-    }
-});
-
-// Busca global (usuários e postagens)
-app.get('/api/search', authenticateToken, async (req, res) => {
-    try {
-        const searchQuery = req.query.q;
-        
-        if (!searchQuery || searchQuery.trim() === '') {
-            return res.json({ users: [], posts: [] });
-        }
-
-        const query = `%${searchQuery}%`;
-
-        // Buscar usuários apenas pelo nome
-        const usersResult = await sql`
-            SELECT id, name, email, avatar, bio
-            FROM users
-            WHERE name ILIKE ${query}
-            AND id != ${req.user.id}
-            LIMIT 10
-        `;
-
-        // Buscar postagens
-        const postsResult = await sql`
-            SELECT 
-                p.id,
-                p.content,
-                p.created_at,
-                u.id as user_id,
-                u.name as user_name,
-                u.avatar as user_avatar
-            FROM posts p
-            JOIN users u ON p.user_id = u.id
-            WHERE p.content ILIKE ${query}
-            ORDER BY p.created_at DESC
-            LIMIT 10
-        `;
-
-        res.json({
-            users: usersResult.rows,
-            posts: postsResult.rows
-        });
-    } catch (error) {
-        console.error('Erro ao buscar:', error);
-        res.status(500).json({ success: false, error: 'Erro ao realizar busca' });
     }
 });
 
@@ -511,36 +464,6 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Erro ao criar post:', error);
         res.status(500).json({ success: false, error: 'Erro ao criar post' });
-    }
-});
-
-// Deletar post
-app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
-    try {
-        const postId = parseInt(req.params.id);
-
-        // Verifica se o post existe e pertence ao usuário
-        const checkResult = await sql`
-            SELECT user_id FROM posts WHERE id = ${postId}
-        `;
-
-        if (checkResult.rows.length === 0) {
-            return res.status(404).json({ success: false, error: 'Post não encontrado' });
-        }
-
-        if (checkResult.rows[0].user_id !== req.user.id) {
-            return res.status(403).json({ success: false, error: 'Você não pode deletar este post' });
-        }
-
-        // Deleta o post (comentários e likes são deletados automaticamente por CASCADE)
-        await sql`
-            DELETE FROM posts WHERE id = ${postId}
-        `;
-
-        res.json({ success: true, message: 'Post deletado com sucesso' });
-    } catch (error) {
-        console.error('Erro ao deletar post:', error);
-        res.status(500).json({ success: false, error: 'Erro ao deletar post' });
     }
 });
 
@@ -678,126 +601,6 @@ app.post('/api/posts/:id/comments', authenticateToken, async (req, res) => {
     }
 });
 
-// Editar comentário
-app.put('/api/comments/:id', authenticateToken, async (req, res) => {
-    console.log('PUT /api/comments/:id chamado');
-    console.log('Params:', req.params);
-    console.log('Body:', req.body);
-    console.log('User:', req.user);
-    
-    try {
-        const commentId = parseInt(req.params.id);
-        const { content } = req.body;
-
-        console.log('CommentId parseado:', commentId);
-        console.log('Content:', content);
-
-        if (!content || content.trim() === '') {
-            console.log('Conteúdo vazio');
-            return res.status(400).json({ success: false, error: 'Comentário não pode ser vazio' });
-        }
-
-        // Verifica se o comentário existe e pertence ao usuário
-        console.log('Verificando comentário...');
-        const checkResult = await sql`
-            SELECT user_id FROM comments WHERE id = ${commentId}
-        `;
-
-        console.log('CheckResult:', checkResult.rows);
-
-        if (checkResult.rows.length === 0) {
-            console.log('Comentário não encontrado');
-            return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
-        }
-
-        if (checkResult.rows[0].user_id !== req.user.id) {
-            console.log('Usuário não autorizado');
-            return res.status(403).json({ success: false, error: 'Você não pode editar este comentário' });
-        }
-
-        // Atualiza o comentário
-        console.log('Atualizando comentário...');
-        const result = await sql`
-            UPDATE comments 
-            SET content = ${content}
-            WHERE id = ${commentId}
-            RETURNING *
-        `;
-
-        console.log('Resultado da atualização:', result.rows);
-        res.json({ success: true, comment: result.rows[0] });
-    } catch (error) {
-        console.error('Erro completo ao editar comentário:', error);
-        console.error('Stack trace:', error.stack);
-        console.error('Mensagem:', error.message);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Erro ao editar comentário',
-            details: error.message 
-        });
-    }
-});
-
-// Excluir comentário
-app.delete('/api/comments/:id', authenticateToken, async (req, res) => {
-    try {
-        const commentId = parseInt(req.params.id);
-
-        // Verifica se o comentário existe e pertence ao usuário
-        const checkResult = await sql`
-            SELECT user_id FROM comments WHERE id = ${commentId}
-        `;
-
-        if (checkResult.rows.length === 0) {
-            return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
-        }
-
-        if (checkResult.rows[0].user_id !== req.user.id) {
-            return res.status(403).json({ success: false, error: 'Você não pode excluir este comentário' });
-        }
-
-        // Exclui o comentário
-        await sql`
-            DELETE FROM comments WHERE id = ${commentId}
-        `;
-
-        res.json({ success: true, message: 'Comentário excluído com sucesso' });
-    } catch (error) {
-        console.error('Erro ao excluir comentário:', error);
-        res.status(500).json({ success: false, error: 'Erro ao excluir comentário' });
-    }
-});
-
-// Rota alternativa para deletar comentário (compatibilidade)
-app.delete('/api/posts/:postId/comments/:commentId', authenticateToken, async (req, res) => {
-    try {
-        const commentId = parseInt(req.params.commentId);
-
-        // Verifica se o comentário existe e pertence ao usuário
-        const checkResult = await sql`
-            SELECT user_id FROM comments WHERE id = ${commentId}
-        `;
-
-        if (checkResult.rows.length === 0) {
-            return res.status(404).json({ success: false, error: 'Comentário não encontrado' });
-        }
-
-        if (checkResult.rows[0].user_id !== req.user.id) {
-            return res.status(403).json({ success: false, error: 'Você não pode excluir este comentário' });
-        }
-
-        // Exclui o comentário
-        await sql`
-            DELETE FROM comments WHERE id = ${commentId}
-        `;
-
-        res.json({ success: true, message: 'Comentário excluído com sucesso' });
-    } catch (error) {
-        console.error('Erro ao excluir comentário:', error);
-        res.status(500).json({ success: false, error: 'Erro ao excluir comentário' });
-    }
-});
-
 // ============================================
 // ROTAS DE AMIGOS
 // ============================================
@@ -829,7 +632,7 @@ app.get('/api/friends', authenticateToken, async (req, res) => {
 app.get('/api/users/:id/friends', authenticateToken, async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        
+
         const result = await sql`
             SELECT 
                 u.id, u.name, u.email, u.avatar, u.bio

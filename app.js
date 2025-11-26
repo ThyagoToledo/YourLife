@@ -48,7 +48,6 @@ class App {
         this.setupEventListeners();
         this.setupFriendsTabs();
         this.initDarkMode();
-        this.setupConversationsSearch();
         this.checkAuthentication();
         Toast.init();
     }
@@ -259,40 +258,6 @@ class App {
             });
         }
 
-        // Modal de Termos e Privacidade
-        const navTermsBtn = document.getElementById('nav-terms');
-        const termsModal = document.getElementById('terms-modal');
-        const closeTermsModalBtn = document.getElementById('close-terms-modal');
-        const closeTermsBtn = document.getElementById('close-terms-btn');
-
-        if (navTermsBtn && termsModal) {
-            navTermsBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                termsModal.classList.remove('hidden');
-            });
-        }
-
-        if (closeTermsModalBtn && termsModal) {
-            closeTermsModalBtn.addEventListener('click', () => {
-                termsModal.classList.add('hidden');
-            });
-        }
-
-        if (closeTermsBtn && termsModal) {
-            closeTermsBtn.addEventListener('click', () => {
-                termsModal.classList.add('hidden');
-            });
-        }
-
-        // Fechar modal de termos ao clicar fora
-        if (termsModal) {
-            termsModal.addEventListener('click', (e) => {
-                if (e.target === termsModal) {
-                    termsModal.classList.add('hidden');
-                }
-            });
-        }
-
         // Navegação
         if (this.elements.navFeed) {
             this.elements.navFeed.addEventListener('click', (e) => {
@@ -336,14 +301,6 @@ class App {
             });
         }
 
-        // Botão de nova conversa
-        const newConversationBtn = document.getElementById('new-conversation-btn');
-        if (newConversationBtn) {
-            newConversationBtn.addEventListener('click', () => {
-                this.showNewConversationModal();
-            });
-        }
-
         // Nova postagem
         if (this.elements.submitPostButton) {
             this.elements.submitPostButton.addEventListener('click', () => {
@@ -359,39 +316,12 @@ class App {
             });
         }
 
-        // Fechar dropdown de busca ao clicar fora
-        document.addEventListener('click', (e) => {
-            const searchInput = document.getElementById('search');
-            const searchResults = document.getElementById('search-results');
-            
-            if (searchInput && searchResults) {
-                const isClickInsideSearch = searchInput.contains(e.target);
-                const isClickInsideResults = searchResults.contains(e.target);
-                
-                if (!isClickInsideSearch && !isClickInsideResults) {
-                    searchResults.classList.add('hidden');
-                }
-            }
-        });
-
         // Atalhos de teclado
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd + K para focar na busca
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
                 this.elements.searchInput?.focus();
-            }
-            
-            // ESC para fechar dropdown de busca
-            if (e.key === 'Escape') {
-                const searchResults = document.getElementById('search-results');
-                if (searchResults && !searchResults.classList.contains('hidden')) {
-                    searchResults.classList.add('hidden');
-                    const searchInput = document.getElementById('search');
-                    if (searchInput) {
-                        searchInput.value = '';
-                    }
-                }
             }
         });
     }
@@ -852,49 +782,16 @@ class App {
     // Cria elemento de post
     createPostElement(post, friendsList = null) {
         const div = document.createElement('div');
-        div.className = 'p-6 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg hover:shadow-xl transition-shadow';
+        div.className = 'p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md';
         div.dataset.postId = post.id;
 
         const timestamp = DateUtils.formatRelativeTime(post.created_at);
-        const currentUserId = this.state.getState().currentUser?.id;
-        
-        const commentsHTML = (post.comments || []).map(comment => {
-            const isOwnComment = comment.author.id === currentUserId;
-            return `
-                <div class="mt-2 flex items-start gap-2 group" data-comment-id="${comment.id}">
-                    <img src="${comment.author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author.name)}&background=4F46E5&color=fff`}" 
-                         alt="${comment.author.name}" 
-                         class="w-8 h-8 rounded-full flex-shrink-0">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="flex-1">
-                                <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">${Validation.sanitizeHTML(comment.author.name)}</span>
-                                <p class="text-gray-700 dark:text-gray-300 text-sm comment-content-text">${Validation.sanitizeHTML(comment.content)}</p>
-                                <span class="text-xs text-gray-400 dark:text-gray-500">${DateUtils.formatRelativeTime(comment.created_at)}</span>
-                            </div>
-                            ${isOwnComment ? `
-                                <div class="flex items-center gap-1 opacity-50 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                    <button onclick="app.editComment(${post.id}, ${comment.id})" 
-                                            class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" 
-                                            title="Editar comentário">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
-                                    </button>
-                                    <button onclick="app.deleteComment(${post.id}, ${comment.id})" 
-                                            class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
-                                            title="Excluir comentário">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        const commentsHTML = (post.comments || []).map(comment => `
+            <div class="mt-2 flex space-x-2 text-sm">
+                <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(comment.author.name)}:</span>
+                <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(comment.content)}</span>
+            </div>
+        `).join('');
 
         const authorAvatar = post.author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}&background=4F46E5&color=fff&size=128`;
 
@@ -1179,41 +1076,10 @@ class App {
                 if (postElement) {
                     const commentsSection = postElement.querySelector('.comments-section');
                     if (commentsSection) {
-                        const currentUserId = this.state.getState().currentUser?.id;
-                        const isOwnComment = normalizedComment.author.id === currentUserId;
-                        
                         const commentHTML = `
-                            <div class="mt-2 flex items-start gap-2 group" data-comment-id="${normalizedComment.id}">
-                                <img src="${normalizedComment.author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(normalizedComment.author.name)}&background=4F46E5&color=fff`}" 
-                                     alt="${normalizedComment.author.name}" 
-                                     class="w-8 h-8 rounded-full flex-shrink-0">
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="flex-1">
-                                            <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">${Validation.sanitizeHTML(normalizedComment.author.name)}</span>
-                                            <p class="text-gray-700 dark:text-gray-300 text-sm comment-content-text">${Validation.sanitizeHTML(normalizedComment.content)}</p>
-                                            <span class="text-xs text-gray-400 dark:text-gray-500">Agora</span>
-                                        </div>
-                                        ${isOwnComment ? `
-                                            <div class="flex items-center gap-1 opacity-50 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                <button onclick="app.editComment(${postId}, ${normalizedComment.id})" 
-                                                        class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" 
-                                                        title="Editar comentário">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                                    </svg>
-                                                </button>
-                                                <button onclick="app.deleteComment(${postId}, ${normalizedComment.id})" 
-                                                        class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
-                                                        title="Excluir comentário">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
+                            <div class="mt-2 flex space-x-2 text-sm">
+                                <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(normalizedComment.author.name)}:</span>
+                                <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(normalizedComment.content)}</span>
                             </div>
                         `;
                         commentsSection.insertAdjacentHTML('beforeend', commentHTML);
@@ -1228,169 +1094,6 @@ class App {
         }
     }
 
-    // Editar comentário
-    async editComment(postId, commentId) {
-        try {
-            console.log('editComment chamado:', { postId, commentId });
-            
-            const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-            if (!commentElement) {
-                console.error('Elemento do comentário não encontrado');
-                return;
-            }
-
-            const contentText = commentElement.querySelector('.comment-content-text');
-            const currentContent = contentText.textContent;
-
-            console.log('Conteúdo atual:', currentContent);
-
-            // Criar input de edição
-            const editHTML = `
-                <div class="edit-comment-form mt-2">
-                    <textarea class="w-full px-3 py-2 text-sm border border-blue-500 dark:border-blue-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none" 
-                              rows="2">${currentContent}</textarea>
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="app.saveEditComment(${postId}, ${commentId})" 
-                                class="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            Salvar
-                        </button>
-                        <button onclick="app.cancelEditComment(${commentId})" 
-                                class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-white">
-                            Cancelar
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            // Esconde o conteúdo original e mostra o formulário de edição
-            contentText.style.display = 'none';
-            const container = contentText.parentElement;
-            container.insertAdjacentHTML('beforeend', editHTML);
-            
-            console.log('Formulário de edição criado');
-            
-            // Focus no textarea
-            const textarea = container.querySelector('textarea');
-            textarea.focus();
-            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-
-        } catch (error) {
-            console.error('Erro ao editar comentário:', error);
-            Toast.error('Erro ao editar comentário');
-        }
-    }
-
-    // Salvar edição de comentário
-    async saveEditComment(postId, commentId) {
-        try {
-            console.log('saveEditComment chamado:', { postId, commentId });
-            
-            const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-            if (!commentElement) {
-                console.error('Elemento do comentário não encontrado');
-                Toast.error('Elemento do comentário não encontrado');
-                return;
-            }
-
-            const textarea = commentElement.querySelector('textarea');
-            if (!textarea) {
-                console.error('Textarea não encontrado');
-                Toast.error('Textarea não encontrado');
-                return;
-            }
-
-            const newContent = textarea.value.trim();
-            console.log('Novo conteúdo:', newContent);
-
-            if (!newContent) {
-                Toast.warning('O comentário não pode estar vazio');
-                return;
-            }
-
-            Loading.show('Salvando alterações...');
-
-            // Chama a API para atualizar o comentário
-            console.log('Chamando API updateComment...');
-            const response = await this.api.updateComment(commentId, { content: newContent });
-            console.log('Resposta da API:', response);
-
-            // Atualiza o conteúdo no DOM
-            const contentText = commentElement.querySelector('.comment-content-text');
-            contentText.textContent = newContent;
-            contentText.style.display = '';
-
-            // Remove o formulário de edição
-            const editForm = commentElement.querySelector('.edit-comment-form');
-            if (editForm) editForm.remove();
-
-            Toast.success('Comentário atualizado!');
-
-        } catch (error) {
-            console.error('Erro completo ao salvar comentário:', error);
-            Toast.error(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
-        } finally {
-            Loading.hide();
-        }
-    }
-
-    // Cancelar edição de comentário
-    cancelEditComment(commentId) {
-        const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-        if (!commentElement) return;
-
-        const contentText = commentElement.querySelector('.comment-content-text');
-        contentText.style.display = '';
-
-        const editForm = commentElement.querySelector('.edit-comment-form');
-        if (editForm) editForm.remove();
-    }
-
-    // Excluir comentário
-    async deleteComment(postId, commentId) {
-        console.log('Tentando excluir comentário:', { postId, commentId });
-        
-        if (!confirm('Tem certeza que deseja excluir este comentário?')) {
-            return;
-        }
-
-        try {
-            Loading.show('Excluindo comentário...');
-
-            // Chama a API para excluir o comentário (passa postId para compatibilidade)
-            const result = await this.api.deleteComment(commentId, postId);
-            console.log('Resultado da exclusão:', result);
-
-            // Remove o comentário do DOM
-            const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-            if (commentElement) {
-                commentElement.style.opacity = '0';
-                commentElement.style.transition = 'opacity 0.3s';
-                setTimeout(() => commentElement.remove(), 300);
-            }
-
-            // Atualiza o contador de comentários
-            const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-            if (postElement) {
-                const commentCount = postElement.querySelector('.comment-toggle span');
-                if (commentCount) {
-                    const currentCount = parseInt(commentCount.textContent) || 0;
-                    if (currentCount > 0) {
-                        commentCount.textContent = currentCount - 1;
-                    }
-                }
-            }
-
-            Toast.success('Comentário excluído!');
-
-        } catch (error) {
-            console.error('Erro completo ao excluir comentário:', error);
-            const errorMsg = error.message || error.error || 'Tente novamente';
-            Toast.error('Erro ao excluir: ' + errorMsg);
-        } finally {
-            Loading.hide();
-        }
-    }
-
     // Handle dar conselho
     async handleAdvice(postId) {
         // Criar modal para dar conselho
@@ -1400,7 +1103,7 @@ class App {
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold dark:text-white">💡 Dar Conselho</h3>
-                    <button id="close-advice-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Voltar">
+                    <button id="close-advice-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -1427,13 +1130,10 @@ class App {
                         <textarea id="advice-content" rows="5" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="Compartilhe sua sabedoria..." required></textarea>
                     </div>
                     <div class="flex gap-3">
-                        <button type="button" id="cancel-advice" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium inline-flex items-center justify-center gap-2 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                            </svg>
+                        <button type="button" id="cancel-advice" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium">
                             Cancelar
                         </button>
-                        <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors">
+                        <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
                             Publicar Conselho
                         </button>
                     </div>
@@ -1489,149 +1189,16 @@ class App {
 
     // Handle busca
     async handleSearch(query) {
-        const searchResultsContainer = document.getElementById('search-results');
-        
         if (!query || query.length < 2) {
-            if (searchResultsContainer) {
-                searchResultsContainer.classList.add('hidden');
-            }
+            this.state.clearSearchResults();
             return;
         }
 
         try {
-            const results = await this.api.search(query);
-            
-            if (!results) {
-                return;
-            }
-
-            const { users = [], posts = [] } = results;
-            
-            // Mostrar container de resultados
-            if (searchResultsContainer) {
-                searchResultsContainer.classList.remove('hidden');
-                
-                let html = '';
-                
-                // Seção de usuários
-                if (users.length > 0) {
-                    html += `
-                        <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Usuários</h4>
-                        </div>
-                    `;
-                    
-                    users.forEach(user => {
-                        const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff`;
-                        html += `
-                            <a href="#" onclick="app.viewUserProfile(${user.id}); return false;" 
-                               class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <img src="${avatar}" alt="${Validation.sanitizeHTML(user.name)}" 
-                                     class="w-10 h-10 rounded-full">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-white truncate">
-                                        ${Validation.sanitizeHTML(user.name)}
-                                    </p>
-                                </div>
-                            </a>
-                        `;
-                    });
-                }
-                
-                // Seção de postagens
-                if (posts.length > 0) {
-                    html += `
-                        <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Postagens</h4>
-                        </div>
-                    `;
-                    
-                    posts.forEach(post => {
-                        const avatar = post.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user_name)}&background=4F46E5&color=fff`;
-                        const timestamp = DateUtils.formatRelativeTime(post.created_at);
-                        const preview = post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content;
-                        
-                        html += `
-                            <a href="#" onclick="app.scrollToPost(${post.id}); return false;" 
-                               class="block p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <div class="flex items-start gap-2 mb-1">
-                                    <img src="${avatar}" alt="${Validation.sanitizeHTML(post.user_name)}" 
-                                         class="w-8 h-8 rounded-full">
-                                    <div class="flex-1 min-w-0">
-                                        <span class="text-sm font-semibold text-gray-800 dark:text-white">
-                                            ${Validation.sanitizeHTML(post.user_name)}
-                                        </span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                                            ${timestamp}
-                                        </span>
-                                    </div>
-                                </div>
-                                <p class="text-sm text-gray-700 dark:text-gray-300 ml-10">
-                                    ${Validation.sanitizeHTML(preview)}
-                                </p>
-                            </a>
-                        `;
-                    });
-                }
-                
-                // Se não houver resultados
-                if (users.length === 0 && posts.length === 0) {
-                    html = `
-                        <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-                            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <p>Nenhum resultado encontrado</p>
-                        </div>
-                    `;
-                }
-                
-                searchResultsContainer.innerHTML = html;
-            }
-            
+            // Busca funcionalidade em desenvolvimento
         } catch (error) {
             console.error('Erro na busca:', error);
-            Toast.error('Erro ao realizar busca');
         }
-    }
-
-    // Visualizar perfil de outro usuário
-    viewUserProfile(userId) {
-        const searchResultsContainer = document.getElementById('search-results');
-        if (searchResultsContainer) {
-            searchResultsContainer.classList.add('hidden');
-        }
-        const searchInput = document.getElementById('search');
-        if (searchInput) {
-            searchInput.value = '';
-        }
-        
-        this.showView('profile-view');
-        this.loadProfile(userId);
-    }
-
-    // Rolar até uma postagem específica
-    scrollToPost(postId) {
-        const searchResultsContainer = document.getElementById('search-results');
-        if (searchResultsContainer) {
-            searchResultsContainer.classList.add('hidden');
-        }
-        const searchInput = document.getElementById('search');
-        if (searchInput) {
-            searchInput.value = '';
-        }
-        
-        this.showView('feed-view');
-        setTimeout(() => {
-            const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-            if (postElement) {
-                postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                postElement.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50');
-                setTimeout(() => {
-                    postElement.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50');
-                }, 2000);
-            }
-        }, 100);
     }
 
     // Carrega notificações
@@ -2114,7 +1681,7 @@ class App {
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Editar Perfil</h2>
-                        <button id="close-edit-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Voltar">
+                        <button id="close-edit-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -2157,13 +1724,10 @@ class App {
                         </div>
 
                         <div class="flex gap-3 pt-4">
-                            <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                            <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700">
                                 Salvar Alterações
                             </button>
-                            <button type="button" id="cancel-edit" class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                                </svg>
+                            <button type="button" id="cancel-edit" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                                 Cancelar
                             </button>
                         </div>
@@ -2235,7 +1799,7 @@ class App {
             <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Adicionar Amigo</h2>
-                    <button id="close-friend-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Voltar">
+                    <button id="close-friend-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
@@ -2409,9 +1973,9 @@ class App {
             }
 
             container.innerHTML = friends.map(friend => `
-                <div class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl p-4 flex items-center justify-between hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full border-2 border-gray-300 dark:border-gray-600">
+                        <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full">
                         <div>
                             <div class="font-semibold dark:text-white">${friend.name}</div>
                             ${friend.isMutual ? '<span class="text-xs text-green-600 dark:text-green-400">Amizade mútua</span>' : ''}
@@ -2506,7 +2070,7 @@ class App {
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Perfil de ${user.name}</h2>
-                        <button id="close-profile-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Voltar">
+                        <button id="close-profile-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -2695,11 +2259,11 @@ class App {
             }
 
             container.innerHTML = advices.map(advice => `
-                <div class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl p-6 shadow-lg hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500 transition-all">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                     <h3 class="font-bold text-lg mb-2 dark:text-white">${advice.title}</h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3">${advice.content}</p>
                     <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">${advice.category}</span>
+                        <span class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">${advice.category}</span>
                         <span>${DateUtils.formatTimestamp(advice.created_at)}</span>
                     </div>
                 </div>
@@ -2717,7 +2281,7 @@ class App {
             <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Criar Conselho</h2>
-                    <button id="close-advice-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Voltar">
+                    <button id="close-advice-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
@@ -2805,14 +2369,9 @@ class App {
 
             if (!conversations || conversations.length === 0) {
                 container.innerHTML = `
-                    <div class="p-8 text-center text-gray-500 dark:text-gray-400">
-                        <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                            <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                            </svg>
-                        </div>
-                        <p class="font-medium mb-2">Nenhuma conversa ainda</p>
-                        <p class="text-sm">Adicione amigos e comece a conversar!</p>
+                    <div class="p-4 text-center text-gray-500">
+                        <p>Nenhuma conversa ainda</p>
+                        <p class="text-sm mt-2">Adicione amigos e comece a conversar!</p>
                     </div>
                 `;
                 return;
@@ -2832,28 +2391,22 @@ class App {
 
             container.innerHTML = normalizedConversations.map(conv => {
                 totalUnread += conv.unreadCount;
-                const isUnread = conv.unreadCount > 0;
                 return `
-                    <div class="conversation-item p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${isUnread ? 'bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20' : ''}" 
+                    <div class="conversation-item p-4 border-b hover:bg-gray-50 cursor-pointer" 
                          data-user-id="${conv.userId}">
                         <div class="flex items-center gap-3">
-                            <div class="relative">
-                                <img src="${conv.avatar}" alt="${conv.name}" class="w-14 h-14 rounded-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
-                            </div>
+                            <img src="${conv.avatar}" alt="${conv.name}" class="w-12 h-12 rounded-full">
                             <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white truncate ${isUnread ? 'font-bold' : ''}">${conv.name}</h3>
-                                    <span class="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">${DateUtils.formatTimestamp(conv.lastMessageAt)}</span>
-                                </div>
                                 <div class="flex justify-between items-center">
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 truncate ${isUnread ? 'font-medium' : ''}">
-                                        ${conv.isFromMe ? '<span class="text-blue-600 dark:text-blue-400">Você:</span> ' : ''}${conv.lastMessage || 'Sem mensagens'}
-                                    </p>
-                                    ${isUnread ?
-                        `<span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full ml-2">${conv.unreadCount}</span>`
+                                    <h3 class="font-semibold text-gray-800 truncate">${conv.name}</h3>
+                                    ${conv.unreadCount > 0 ?
+                        `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${conv.unreadCount}</span>`
                         : ''}
                                 </div>
+                                <p class="text-sm text-gray-500 truncate">
+                                    ${conv.isFromMe ? 'Você: ' : ''}${conv.lastMessage || 'Sem mensagens'}
+                                </p>
+                                <span class="text-xs text-gray-400">${DateUtils.formatTimestamp(conv.lastMessageAt)}</span>
                             </div>
                         </div>
                     </div>
@@ -2874,11 +2427,6 @@ class App {
             // Event listeners para as conversas
             container.querySelectorAll('.conversation-item').forEach(item => {
                 item.addEventListener('click', () => {
-                    // Remove active de todos os itens
-                    container.querySelectorAll('.conversation-item').forEach(i => i.classList.remove('active'));
-                    // Adiciona active ao item clicado
-                    item.classList.add('active');
-                    
                     const userId = parseInt(item.dataset.userId);
                     this.openChat(userId);
                 });
@@ -2886,120 +2434,6 @@ class App {
         } catch (error) {
             console.error('Erro ao carregar conversas:', error);
             Toast.error('Erro ao carregar conversas');
-        }
-    }
-
-    setupConversationsSearch() {
-        const searchInput = document.getElementById('search-conversations');
-        if (!searchInput) return;
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            const conversations = document.querySelectorAll('.conversation-item');
-
-            conversations.forEach(conv => {
-                const name = conv.querySelector('h3').textContent.toLowerCase();
-                const message = conv.querySelector('p').textContent.toLowerCase();
-                
-                if (name.includes(query) || message.includes(query)) {
-                    conv.style.display = '';
-                } else {
-                    conv.style.display = 'none';
-                }
-            });
-        });
-    }
-
-    async showNewConversationModal() {
-        try {
-            // Busca a lista de amigos
-            const friends = await this.api.getFriends();
-            
-            if (!friends || friends.length === 0) {
-                Toast.info('Você ainda não tem amigos. Adicione amigos primeiro!');
-                return;
-            }
-
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Nova Conversa</h2>
-                        <button id="close-new-conversation-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Fechar">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="mb-4">
-                        <input type="text" id="search-friends-modal" placeholder="Buscar amigo..." 
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div id="friends-list-modal" class="space-y-2 max-h-96 overflow-y-auto">
-                        ${friends.map(friend => `
-                            <div class="friend-item-modal p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" data-user-id="${friend.id}">
-                                <div class="flex items-center gap-3">
-                                    <img src="${friend.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}&background=4F46E5&color=fff`}" 
-                                         alt="${friend.name}" 
-                                         class="w-12 h-12 rounded-full">
-                                    <div class="flex-1">
-                                        <h3 class="font-semibold text-gray-800 dark:text-white">${friend.name}</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Clique para iniciar conversa</p>
-                                    </div>
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-
-            const closeBtn = modal.querySelector('#close-new-conversation-modal');
-            const searchInput = modal.querySelector('#search-friends-modal');
-            const friendItems = modal.querySelectorAll('.friend-item-modal');
-
-            // Fechar modal
-            const closeModal = () => modal.remove();
-            closeBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-
-            // Busca de amigos
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase().trim();
-                friendItems.forEach(item => {
-                    const name = item.querySelector('h3').textContent.toLowerCase();
-                    item.style.display = name.includes(query) ? '' : 'none';
-                });
-            });
-
-            // Click em um amigo para iniciar conversa
-            friendItems.forEach(item => {
-                item.addEventListener('click', async () => {
-                    const userId = parseInt(item.dataset.userId);
-                    closeModal();
-                    
-                    // Muda para a view de mensagens
-                    this.showView('messages-view');
-                    
-                    // Abre o chat com o amigo
-                    await this.openChat(userId);
-                    
-                    Toast.success('Conversa iniciada!');
-                });
-            });
-
-        } catch (error) {
-            console.error('Erro ao abrir modal de nova conversa:', error);
-            Toast.error('Erro ao carregar amigos');
         }
     }
 
@@ -3039,14 +2473,9 @@ class App {
 
             if (!messages || messages.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
-                        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                            </svg>
-                        </div>
-                        <p class="font-medium mb-1">Nenhuma mensagem ainda</p>
-                        <p class="text-sm">Envie a primeira mensagem para começar a conversa!</p>
+                    <div class="text-center text-gray-400 py-8">
+                        <p>Nenhuma mensagem ainda</p>
+                        <p class="text-sm mt-2">Envie a primeira mensagem!</p>
                     </div>
                 `;
                 return;
@@ -3062,38 +2491,25 @@ class App {
                 sender: {
                     id: msg.from_user_id,
                     name: msg.sender_name,
-                    avatar: msg.sender_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.sender_name)}&background=4F46E5&color=fff`
+                    avatar: msg.sender_avatar
                 }
             }));
 
             container.innerHTML = normalizedMessages.map(msg => `
-                <div class="flex ${msg.isFromMe ? 'justify-end' : 'justify-start'} items-end gap-2">
-                    ${!msg.isFromMe ? `
-                        <img src="${msg.sender.avatar}" alt="${msg.sender.name}" 
-                             class="w-8 h-8 rounded-full flex-shrink-0" />
-                    ` : ''}
-                    <div class="flex flex-col ${msg.isFromMe ? 'items-end' : 'items-start'}">
-                        <div class="${msg.isFromMe 
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
-                            : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600'} 
-                                    rounded-2xl px-4 py-2 max-w-xs lg:max-w-md shadow-sm">
-                            <p class="break-words">${msg.content}</p>
-                        </div>
-                        <span class="text-xs text-gray-400 dark:text-gray-500 mt-1 px-2">
+                <div class="flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}">
+                    <div class="${msg.isFromMe ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'} 
+                                rounded-2xl px-4 py-2 max-w-xs lg:max-w-md">
+                        ${!msg.isFromMe ? `<p class="text-xs font-semibold mb-1">${msg.sender.name}</p>` : ''}
+                        <p>${msg.content}</p>
+                        <span class="text-xs ${msg.isFromMe ? 'text-blue-100' : 'text-gray-500'} block mt-1">
                             ${DateUtils.formatTimestamp(msg.createdAt)}
                         </span>
                     </div>
-                    ${msg.isFromMe ? `
-                        <img src="${msg.sender.avatar}" alt="${msg.sender.name}" 
-                             class="w-8 h-8 rounded-full flex-shrink-0" />
-                    ` : ''}
                 </div>
             `).join('');
 
-            // Scroll para o final com animação suave
-            setTimeout(() => {
-                container.scrollTop = container.scrollHeight;
-            }, 100);
+            // Scroll para o final
+            container.scrollTop = container.scrollHeight;
 
             // Marca mensagens como lidas
             await this.api.markMessagesAsRead(userId);

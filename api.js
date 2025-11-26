@@ -83,10 +83,9 @@ class ApiService {
 
                 // Usa o erro do backend se disponível, senão usa mensagem genérica
                 const errorMessage = error.error || error.message || `Erro HTTP ${response.status}: ${response.statusText}`;
-                const errorDetails = error.details ? ` (${error.details})` : '';
-                console.error(`❌ Erro na API:`, errorMessage + errorDetails, error);
+                console.error(`❌ Erro na API:`, errorMessage, error);
 
-                throw new Error(errorMessage + errorDetails);
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -166,11 +165,6 @@ class ApiService {
 
     async searchUsers(query) {
         return await this.request(`/users/search/${encodeURIComponent(query)}`);
-    }
-
-    // Busca global (usuários e postagens)
-    async search(query) {
-        return await this.request(`/search?q=${encodeURIComponent(query)}`);
     }
 
     // ========== AMIGOS ==========
@@ -266,7 +260,7 @@ class ApiService {
     }
 
     async deletePost(postId) {
-        return await this.request(`/api/posts/${postId}`, {
+        return await this.request(`/posts/${postId}`, {
             method: 'DELETE',
         });
     }
@@ -312,39 +306,10 @@ class ApiService {
         });
     }
 
-    async updateComment(commentId, commentData) {
-        console.log('API.updateComment chamado:', { commentId, commentData });
-        const response = await this.request(`/comments/${commentId}`, {
-            method: 'PUT',
-            body: commentData,
+    async deleteComment(postId, commentId) {
+        return await this.request(`/posts/${postId}/comments/${commentId}`, {
+            method: 'DELETE',
         });
-        console.log('API.updateComment resposta:', response);
-        return response;
-    }
-
-    async deleteComment(commentId, postId = null) {
-        // Tenta ambas as rotas para compatibilidade
-        try {
-            if (postId) {
-                return await this.request(`/posts/${postId}/comments/${commentId}`, {
-                    method: 'DELETE',
-                });
-            } else {
-                return await this.request(`/comments/${commentId}`, {
-                    method: 'DELETE',
-                });
-            }
-        } catch (error) {
-            // Se falhar com uma rota, tenta a outra
-            console.warn('Tentando rota alternativa para deletar comentário');
-            if (postId) {
-                return await this.request(`/comments/${commentId}`, {
-                    method: 'DELETE',
-                });
-            } else {
-                throw error;
-            }
-        }
     }
 
     async likeComment(postId, commentId) {
