@@ -258,6 +258,40 @@ class App {
             });
         }
 
+        // Modal de Termos e Privacidade
+        const navTermsBtn = document.getElementById('nav-terms');
+        const termsModal = document.getElementById('terms-modal');
+        const closeTermsModalBtn = document.getElementById('close-terms-modal');
+        const closeTermsBtn = document.getElementById('close-terms-btn');
+
+        if (navTermsBtn && termsModal) {
+            navTermsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                termsModal.classList.remove('hidden');
+            });
+        }
+
+        if (closeTermsModalBtn && termsModal) {
+            closeTermsModalBtn.addEventListener('click', () => {
+                termsModal.classList.add('hidden');
+            });
+        }
+
+        if (closeTermsBtn && termsModal) {
+            closeTermsBtn.addEventListener('click', () => {
+                termsModal.classList.add('hidden');
+            });
+        }
+
+        // Fechar modal de termos ao clicar fora
+        if (termsModal) {
+            termsModal.addEventListener('click', (e) => {
+                if (e.target === termsModal) {
+                    termsModal.classList.add('hidden');
+                }
+            });
+        }
+
         // Navegação
         if (this.elements.navFeed) {
             this.elements.navFeed.addEventListener('click', (e) => {
