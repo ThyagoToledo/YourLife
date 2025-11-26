@@ -849,12 +849,33 @@ class App {
         div.dataset.postId = post.id;
 
         const timestamp = DateUtils.formatRelativeTime(post.created_at);
-        const commentsHTML = (post.comments || []).map(comment => `
-            <div class="mt-2 flex space-x-2 text-sm">
-                <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(comment.author.name)}:</span>
-                <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(comment.content)}</span>
+        const commentsHTML = (post.comments || []).map(comment => {
+            const isCommentOwner = comment.author.id === this.currentUserId;
+            return `
+            <div class="mt-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-comment-id="${comment.id}">
+                <div class="flex justify-between items-start">
+                    <div class="flex space-x-2 text-sm flex-1">
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(comment.author.name)}:</span>
+                        <span class="comment-content text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(comment.content)}</span>
+                    </div>
+                    ${isCommentOwner ? `
+                    <div class="flex space-x-1 ml-2">
+                        <button class="edit-comment-btn p-1 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500 transition-colors" data-comment-id="${comment.id}" data-post-id="${post.id}" title="Editar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button class="delete-comment-btn p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors" data-comment-id="${comment.id}" data-post-id="${post.id}" title="Excluir">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
 
         const authorAvatar = post.author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}&background=4F46E5&color=fff&size=128`;
 
@@ -1014,6 +1035,26 @@ class App {
         if (adviceButton) {
             adviceButton.addEventListener('click', () => this.handleAdvice(post.id));
         }
+
+        // Editar comentário
+        const editCommentButtons = element.querySelectorAll('.edit-comment-btn');
+        editCommentButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const commentId = parseInt(btn.dataset.commentId);
+                const postId = parseInt(btn.dataset.postId);
+                this.handleEditComment(postId, commentId);
+            });
+        });
+
+        // Excluir comentário
+        const deleteCommentButtons = element.querySelectorAll('.delete-comment-btn');
+        deleteCommentButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const commentId = parseInt(btn.dataset.commentId);
+                const postId = parseInt(btn.dataset.postId);
+                this.handleDeleteComment(postId, commentId);
+            });
+        });
     }
 
     // Handle criar post
@@ -1139,13 +1180,49 @@ class App {
                 if (postElement) {
                     const commentsSection = postElement.querySelector('.comments-section');
                     if (commentsSection) {
+                        const isCommentOwner = normalizedComment.author.id === this.currentUserId;
                         const commentHTML = `
-                            <div class="mt-2 flex space-x-2 text-sm">
-                                <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(normalizedComment.author.name)}:</span>
-                                <span class="text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(normalizedComment.content)}</span>
+                            <div class="mt-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-comment-id="${normalizedComment.id}">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex space-x-2 text-sm flex-1">
+                                        <span class="font-semibold text-gray-800 dark:text-gray-200">${Validation.sanitizeHTML(normalizedComment.author.name)}:</span>
+                                        <span class="comment-content text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(normalizedComment.content)}</span>
+                                    </div>
+                                    ${isCommentOwner ? `
+                                    <div class="flex space-x-1 ml-2">
+                                        <button class="edit-comment-btn p-1 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500 transition-colors" data-comment-id="${normalizedComment.id}" data-post-id="${postId}" title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                        <button class="delete-comment-btn p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors" data-comment-id="${normalizedComment.id}" data-post-id="${postId}" title="Excluir">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    ` : ''}
+                                </div>
                             </div>
                         `;
                         commentsSection.insertAdjacentHTML('beforeend', commentHTML);
+                        
+                        // Adiciona event listeners aos novos botões
+                        const newCommentDiv = commentsSection.lastElementChild;
+                        const editBtn = newCommentDiv.querySelector('.edit-comment-btn');
+                        const deleteBtn = newCommentDiv.querySelector('.delete-comment-btn');
+                        
+                        if (editBtn) {
+                            editBtn.addEventListener('click', () => {
+                                this.handleEditComment(postId, normalizedComment.id);
+                            });
+                        }
+                        
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', () => {
+                                this.handleDeleteComment(postId, normalizedComment.id);
+                            });
+                        }
                     }
                 }
 
@@ -1154,6 +1231,95 @@ class App {
         } catch (error) {
             console.error('Erro ao criar comentário:', error);
             Toast.error('Erro ao comentar');
+        }
+    }
+
+    // Handle editar comentário
+    async handleEditComment(postId, commentId) {
+        const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+        if (!commentElement) return;
+
+        const contentSpan = commentElement.querySelector('.comment-content');
+        const currentContent = contentSpan.textContent.trim();
+        const buttonsDiv = commentElement.querySelector('.flex.space-x-1');
+
+        // Cria input de edição
+        const editContainer = document.createElement('div');
+        editContainer.className = 'flex space-x-2 mt-2';
+        editContainer.innerHTML = `
+            <input type="text" class="edit-comment-input flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" value="${Validation.sanitizeHTML(currentContent)}">
+            <button class="save-edit-btn px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">Salvar</button>
+            <button class="cancel-edit-btn px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 text-sm font-medium">Cancelar</button>
+        `;
+
+        // Esconde o conteúdo atual e os botões
+        contentSpan.style.display = 'none';
+        if (buttonsDiv) buttonsDiv.style.display = 'none';
+
+        commentElement.appendChild(editContainer);
+
+        const input = editContainer.querySelector('.edit-comment-input');
+        const saveBtn = editContainer.querySelector('.save-edit-btn');
+        const cancelBtn = editContainer.querySelector('.cancel-edit-btn');
+
+        input.focus();
+        input.select();
+
+        const restoreOriginal = () => {
+            contentSpan.style.display = '';
+            if (buttonsDiv) buttonsDiv.style.display = '';
+            editContainer.remove();
+        };
+
+        const saveEdit = async () => {
+            const newContent = input.value.trim();
+            if (!newContent) {
+                Toast.warning('O comentário não pode estar vazio');
+                return;
+            }
+
+            if (newContent === currentContent) {
+                restoreOriginal();
+                return;
+            }
+
+            try {
+                await this.api.updateComment(postId, commentId, { content: newContent });
+                contentSpan.textContent = newContent;
+                restoreOriginal();
+                Toast.success('Comentário atualizado!');
+            } catch (error) {
+                console.error('Erro ao editar comentário:', error);
+                Toast.error('Erro ao editar comentário');
+            }
+        };
+
+        saveBtn.addEventListener('click', saveEdit);
+        cancelBtn.addEventListener('click', restoreOriginal);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveEdit();
+            if (e.key === 'Escape') restoreOriginal();
+        });
+    }
+
+    // Handle excluir comentário
+    async handleDeleteComment(postId, commentId) {
+        if (!confirm('Tem certeza que deseja excluir este comentário?')) {
+            return;
+        }
+
+        try {
+            await this.api.deleteComment(postId, commentId);
+            
+            const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+            if (commentElement) {
+                commentElement.remove();
+            }
+            
+            Toast.success('Comentário excluído!');
+        } catch (error) {
+            console.error('Erro ao excluir comentário:', error);
+            Toast.error('Erro ao excluir comentário');
         }
     }
 
