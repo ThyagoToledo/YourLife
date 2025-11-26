@@ -588,6 +588,11 @@ class App {
                 this.showMainApp();
                 await this.loadInitialData();
                 Toast.success('Conta criada com sucesso! Bem-vindo!');
+                
+                // Mostrar aviso sobre Termos e Privacidade
+                setTimeout(() => {
+                    Toast.info('Ao usar nossa plataforma, você concorda com nossos Termos de Uso e Política de Privacidade. Consulte-os no menu lateral.', 7000);
+                }, 1000);
             } else {
                 throw new Error('Resposta inválida do servidor');
             }
@@ -648,9 +653,9 @@ class App {
             await this.loadInitialData();
             Toast.success('Login realizado com sucesso!');
             
-            // Mostrar aviso sobre Termos e Privacidade temporariamente
+            // Mostrar aviso sobre Termos e Privacidade
             setTimeout(() => {
-                Toast.info('Ao usar o YourLife, você concorda com nossos Termos de Uso e Política de Privacidade', 5000);
+                Toast.info('Ao usar nossa plataforma, você concorda com nossos Termos de Uso e Política de Privacidade. Consulte-os no menu lateral.', 7000);
             }, 1000);
 
         } catch (error) {

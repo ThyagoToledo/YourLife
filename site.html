@@ -321,7 +321,7 @@
 
         <!-- Header (Barra Superior) -->
         <header
-            class="fixed top-0 left-0 right-0 z-10 flex items-center justify-between h-16 px-4 bg-white dark:bg-gray-800 shadow-md md:px-8 border-b border-gray-200 dark:border-gray-700">
+            class="flex items-center justify-between h-16 px-4 bg-white dark:bg-gray-800 shadow-md md:px-8 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center space-x-3 logo-animate">
                 <!-- Logo Arara -->
                 <img src="Icons/AraraFinal.png" alt="Logo Your Life" class="w-10 h-10 object-contain">
@@ -420,11 +420,11 @@
         </header>
 
         <!-- Conteudo Principal (Layout com Sidebar) -->
-        <div class="flex pt-16">
+        <div class="flex">
 
             <!-- Sidebar (Menu Esquerdo) -->
             <aside
-                class="fixed top-16 left-0 z-0 w-64 h-screen py-8 overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
+                class="w-64 py-8 overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
                 <nav class="px-4">
                     <h3 class="px-4 text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">
                         Menu</h3>
@@ -452,23 +452,20 @@
                             <span id="messages-badge"
                                 class="hidden absolute top-1 right-1 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full">0</span>
                         </a>
-                    </div>
-                    
-                    <!-- Link para Termos e Política -->
-                    <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <!-- Link para Termos e Política -->
                         <a href="#" id="nav-terms"
-                            class="flex items-center px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 group">
+                            class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            Termos e Privacidade
+                            Termos de Uso
                         </a>
                     </div>
                 </nav>
             </aside>
 
             <!-- Area de Conteudo Principal -->
-            <main class="flex-1 p-4 md:pl-72 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+            <main class="flex-1 p-4 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
 
                 <!-- 
                 ========================================
