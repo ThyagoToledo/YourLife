@@ -675,6 +675,177 @@
 
     </div> <!-- Fim de #main-app -->
 
+    <!-- 
+    ==================================================
+    MODAL DE TERMOS DE USO E POLÍTICA DE PRIVACIDADE
+    ================================================== 
+    -->
+    <div id="terms-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Header do Modal -->
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Termos de Uso e Política de Privacidade</h2>
+                <button id="close-terms-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all" title="Fechar">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Conteúdo do Modal -->
+            <div class="p-6 space-y-6 text-gray-700 dark:text-gray-300">
+                
+                <!-- Termos de Uso -->
+                <section>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">📜 Termos de Uso</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">1. Aceitação dos Termos</h4>
+                            <p class="text-sm leading-relaxed">
+                                Ao acessar e usar a plataforma Your Life, você concorda em cumprir e estar vinculado aos seguintes termos e condições de uso. Se você não concordar com qualquer parte destes termos, não deverá usar nossos serviços.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">2. Uso da Plataforma</h4>
+                            <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+                                <li>Você deve ter pelo menos 13 anos de idade para usar esta plataforma.</li>
+                                <li>Você é responsável por manter a confidencialidade de sua conta e senha.</li>
+                                <li>Você concorda em não usar a plataforma para qualquer propósito ilegal ou não autorizado.</li>
+                                <li>Você não deve transmitir vírus, worms ou qualquer código de natureza destrutiva.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">3. Conteúdo do Usuário</h4>
+                            <p class="text-sm leading-relaxed mb-2">
+                                Você mantém todos os direitos sobre o conteúdo que publica na plataforma. No entanto, ao publicar conteúdo, você nos concede uma licença mundial, não exclusiva, isenta de royalties para usar, reproduzir e exibir esse conteúdo.
+                            </p>
+                            <p class="text-sm leading-relaxed">
+                                Você é o único responsável pelo conteúdo que publica e deve garantir que não viola direitos de terceiros ou leis aplicáveis.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">4. Conduta Proibida</h4>
+                            <p class="text-sm leading-relaxed mb-2">Você concorda em não:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+                                <li>Assediar, intimidar ou ameaçar outros usuários.</li>
+                                <li>Publicar conteúdo ofensivo, discriminatório ou ilegal.</li>
+                                <li>Fazer spam ou enviar mensagens não solicitadas.</li>
+                                <li>Tentar obter acesso não autorizado a contas de outros usuários.</li>
+                                <li>Interferir no funcionamento normal da plataforma.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">5. Modificações e Encerramento</h4>
+                            <p class="text-sm leading-relaxed">
+                                Reservamos o direito de modificar ou descontinuar, temporária ou permanentemente, a plataforma com ou sem aviso prévio. Também podemos encerrar ou suspender sua conta a qualquer momento por violação destes termos.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <!-- Política de Privacidade -->
+                <section>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">🔒 Política de Privacidade</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">1. Informações Coletadas</h4>
+                            <p class="text-sm leading-relaxed mb-2">Coletamos as seguintes informações:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+                                <li><strong>Informações de Registro:</strong> Nome, e-mail, senha (criptografada).</li>
+                                <li><strong>Informações de Perfil:</strong> Biografia, foto de perfil, interesses.</li>
+                                <li><strong>Conteúdo:</strong> Postagens, comentários, mensagens e interações na plataforma.</li>
+                                <li><strong>Dados de Uso:</strong> Informações sobre como você usa a plataforma, incluindo endereço IP, tipo de navegador e páginas visitadas.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">2. Como Usamos Suas Informações</h4>
+                            <p class="text-sm leading-relaxed mb-2">Usamos suas informações para:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+                                <li>Fornecer e melhorar nossos serviços.</li>
+                                <li>Personalizar sua experiência na plataforma.</li>
+                                <li>Comunicar-nos com você sobre atualizações e novidades.</li>
+                                <li>Proteger a segurança e integridade da plataforma.</li>
+                                <li>Cumprir obrigações legais.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">3. Compartilhamento de Informações</h4>
+                            <p class="text-sm leading-relaxed">
+                                Não vendemos suas informações pessoais. Podemos compartilhar suas informações apenas nas seguintes circunstâncias:
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+                                <li>Com outros usuários, conforme as configurações de privacidade escolhidas.</li>
+                                <li>Com provedores de serviços terceirizados que nos ajudam a operar a plataforma.</li>
+                                <li>Quando exigido por lei ou para proteger nossos direitos legais.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">4. Segurança dos Dados</h4>
+                            <p class="text-sm leading-relaxed">
+                                Implementamos medidas de segurança técnicas e organizacionais para proteger suas informações contra acesso não autorizado, alteração, divulgação ou destruição. No entanto, nenhum método de transmissão pela Internet é 100% seguro.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">5. Seus Direitos</h4>
+                            <p class="text-sm leading-relaxed mb-2">Você tem o direito de:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+                                <li>Acessar, corrigir ou excluir suas informações pessoais.</li>
+                                <li>Desativar sua conta permanentemente.</li>
+                                <li>Optar por não receber comunicações de marketing.</li>
+                                <li>Solicitar uma cópia de seus dados.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">6. Cookies e Tecnologias Similares</h4>
+                            <p class="text-sm leading-relaxed">
+                                Usamos cookies e tecnologias similares para melhorar sua experiência, analisar o uso da plataforma e fornecer conteúdo personalizado. Você pode gerenciar suas preferências de cookies nas configurações do seu navegador.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">7. Alterações nesta Política</h4>
+                            <p class="text-sm leading-relaxed">
+                                Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos você sobre quaisquer alterações significativas publicando a nova política nesta página e atualizando a data de "Última atualização" abaixo.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <!-- Footer -->
+                <section class="pt-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <strong>Última atualização:</strong> 26 de novembro de 2025
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                        Se você tiver dúvidas sobre estes Termos de Uso ou Política de Privacidade, entre em contato conosco através da plataforma.
+                    </p>
+                </section>
+            </div>
+
+            <!-- Footer do Modal -->
+            <div class="sticky bottom-0 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 px-6 py-4 flex justify-end">
+                <button id="close-terms-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Entendi
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Badge de Notificação (oculto) -->
     <span id="notification-badge"
         class="hidden absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1"></span>
