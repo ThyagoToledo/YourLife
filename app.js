@@ -1246,21 +1246,29 @@ class App {
         // Cria input de edição
         const editContainer = document.createElement('div');
         editContainer.className = 'flex space-x-2 mt-2';
-        editContainer.innerHTML = `
-            <input type="text" class="edit-comment-input flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" value="${Validation.sanitizeHTML(currentContent)}">
-            <button class="save-edit-btn px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">Salvar</button>
-            <button class="cancel-edit-btn px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 text-sm font-medium">Cancelar</button>
-        `;
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'edit-comment-input flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500';
+        input.value = currentContent;
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-edit-btn px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium';
+        saveBtn.textContent = 'Salvar';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'cancel-edit-btn px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 text-sm font-medium';
+        cancelBtn.textContent = 'Cancelar';
+        
+        editContainer.appendChild(input);
+        editContainer.appendChild(saveBtn);
+        editContainer.appendChild(cancelBtn);
 
         // Esconde o conteúdo atual e os botões
         contentSpan.style.display = 'none';
         if (buttonsDiv) buttonsDiv.style.display = 'none';
 
         commentElement.appendChild(editContainer);
-
-        const input = editContainer.querySelector('.edit-comment-input');
-        const saveBtn = editContainer.querySelector('.save-edit-btn');
-        const cancelBtn = editContainer.querySelector('.cancel-edit-btn');
 
         input.focus();
         input.select();
@@ -1296,9 +1304,15 @@ class App {
 
         saveBtn.addEventListener('click', saveEdit);
         cancelBtn.addEventListener('click', restoreOriginal);
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveEdit();
-            if (e.key === 'Escape') restoreOriginal();
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveEdit();
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                restoreOriginal();
+            }
         });
     }
 
