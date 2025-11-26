@@ -2309,7 +2309,7 @@ class App {
             if (!container) return;
 
             if (advices.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum conselho disponível</p>';
+                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">Nenhum conselho disponível</p>';
                 return;
             }
 
@@ -2648,7 +2648,7 @@ class App {
 
             if (!requests || requests.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                         <p>Nenhum pedido de amizade</p>
                     </div>
                 `;
