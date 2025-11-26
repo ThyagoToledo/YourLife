@@ -1237,27 +1237,41 @@ class App {
     // Handle editar comentário
     async handleEditComment(postId, commentId) {
         const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-        if (!commentElement) return;
+        if (!commentElement) {
+            console.error('Elemento do comentário não encontrado:', commentId);
+            return;
+        }
 
         const contentSpan = commentElement.querySelector('.comment-content');
+        if (!contentSpan) {
+            console.error('Span de conteúdo não encontrado');
+            return;
+        }
+
         const currentContent = contentSpan.textContent.trim();
+        const parentDiv = commentElement.querySelector('.flex.justify-between');
         const buttonsDiv = commentElement.querySelector('.flex.space-x-1');
+
+        // Verifica se já está em modo de edição
+        if (commentElement.querySelector('.edit-comment-input')) {
+            return;
+        }
 
         // Cria input de edição
         const editContainer = document.createElement('div');
-        editContainer.className = 'flex space-x-2 mt-2';
+        editContainer.className = 'flex space-x-2 w-full mt-2';
         
         const input = document.createElement('input');
         input.type = 'text';
-        input.className = 'edit-comment-input flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500';
+        input.className = 'edit-comment-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500';
         input.value = currentContent;
         
         const saveBtn = document.createElement('button');
-        saveBtn.className = 'save-edit-btn px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium';
+        saveBtn.className = 'save-edit-btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors';
         saveBtn.textContent = 'Salvar';
         
         const cancelBtn = document.createElement('button');
-        cancelBtn.className = 'cancel-edit-btn px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 text-sm font-medium';
+        cancelBtn.className = 'cancel-edit-btn px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 text-sm font-medium transition-colors';
         cancelBtn.textContent = 'Cancelar';
         
         editContainer.appendChild(input);
@@ -1265,8 +1279,7 @@ class App {
         editContainer.appendChild(cancelBtn);
 
         // Esconde o conteúdo atual e os botões
-        contentSpan.style.display = 'none';
-        if (buttonsDiv) buttonsDiv.style.display = 'none';
+        if (parentDiv) parentDiv.style.display = 'none';
 
         commentElement.appendChild(editContainer);
 
@@ -1274,13 +1287,13 @@ class App {
         input.select();
 
         const restoreOriginal = () => {
-            contentSpan.style.display = '';
-            if (buttonsDiv) buttonsDiv.style.display = '';
+            if (parentDiv) parentDiv.style.display = '';
             editContainer.remove();
         };
 
         const saveEdit = async () => {
             const newContent = input.value.trim();
+            
             if (!newContent) {
                 Toast.warning('O comentário não pode estar vazio');
                 return;
@@ -1292,18 +1305,29 @@ class App {
             }
 
             try {
-                await this.api.updateComment(postId, commentId, { content: newContent });
+                console.log('Salvando comentário:', { postId, commentId, content: newContent });
+                const response = await this.api.updateComment(postId, commentId, { content: newContent });
+                console.log('Resposta da API:', response);
+                
                 contentSpan.textContent = newContent;
                 restoreOriginal();
                 Toast.success('Comentário atualizado!');
             } catch (error) {
                 console.error('Erro ao editar comentário:', error);
-                Toast.error('Erro ao editar comentário');
+                Toast.error(error.message || 'Erro ao editar comentário');
             }
         };
 
-        saveBtn.addEventListener('click', saveEdit);
-        cancelBtn.addEventListener('click', restoreOriginal);
+        saveBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            saveEdit();
+        });
+        
+        cancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            restoreOriginal();
+        });
+        
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
