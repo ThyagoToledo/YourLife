@@ -356,6 +356,14 @@ class App {
             });
         }
 
+        // Botão de nova mensagem
+        const newMessageBtn = document.getElementById('new-message-btn');
+        if (newMessageBtn) {
+            newMessageBtn.addEventListener('click', () => {
+                this.showNewConversationModal();
+            });
+        }
+
         // Nova postagem
         if (this.elements.submitPostButton) {
             this.elements.submitPostButton.addEventListener('click', () => {
@@ -2610,6 +2618,104 @@ class App {
         } catch (error) {
             console.error('Erro ao enviar mensagem:', error);
             Toast.error('Erro ao enviar mensagem');
+        }
+    }
+
+    async showNewConversationModal() {
+        try {
+            // Busca lista de amigos
+            const friends = await this.api.getFriends();
+
+            if (!friends || friends.length === 0) {
+                Toast.info('Você ainda não tem amigos. Adicione amigos primeiro!');
+                return;
+            }
+
+            // Cria o modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Nova Mensagem</h2>
+                        <button id="close-new-conversation-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mb-4">
+                        <input type="text" id="search-friends-modal" placeholder="Buscar amigos..." 
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div id="friends-list-modal" class="flex-1 overflow-y-auto space-y-2">
+                        ${friends.map(friend => `
+                            <button onclick="app.startConversationWithFriend(${friend.id})" 
+                                    class="friend-item-modal w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
+                                    data-friend-name="${friend.name.toLowerCase()}">
+                                <img src="${friend.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}&background=4F46E5&color=fff`}" 
+                                     alt="${friend.name}" 
+                                     class="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-600">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">${friend.name}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Clique para enviar mensagem</p>
+                                </div>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Event listeners
+            document.getElementById('close-new-conversation-modal').addEventListener('click', () => {
+                modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+
+            // Busca de amigos
+            const searchInput = document.getElementById('search-friends-modal');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const friendItems = document.querySelectorAll('.friend-item-modal');
+                
+                friendItems.forEach(item => {
+                    const name = item.dataset.friendName;
+                    if (name.includes(query)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+        } catch (error) {
+            console.error('Erro ao abrir modal de nova conversa:', error);
+            Toast.error('Erro ao carregar amigos');
+        }
+    }
+
+    async startConversationWithFriend(friendId) {
+        try {
+            // Fecha o modal
+            const modal = document.querySelector('.fixed.inset-0');
+            if (modal) modal.remove();
+
+            // Abre o chat com o amigo
+            await this.openChat(friendId);
+            
+            Toast.success('Conversa iniciada!');
+        } catch (error) {
+            console.error('Erro ao iniciar conversa:', error);
+            Toast.error('Erro ao abrir conversa');
         }
     }
 
