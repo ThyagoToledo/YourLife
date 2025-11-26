@@ -92,6 +92,39 @@
         .animate-fade-in {
             animation: fadeIn 0.3s ease-out;
         }
+
+        /* Customização da scrollbar para mensagens */
+        #messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #messages-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark #messages-container::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        #messages-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark #messages-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Garantir que o container de mensagens tenha scroll suave */
+        #messages-container {
+            scroll-behavior: smooth;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
     </style>
 </head>
 
@@ -570,8 +603,8 @@
                 VISUALIZACAO: CORRESPONDÊNCIAS (MENSAGENS) - Estilo Instagram
                 ========================================
                 -->
-                <div id="messages-view" class="view mx-auto hidden">
-                    <div class="flex h-[calc(100vh-120px)] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div id="messages-view" class="view mx-auto hidden h-[calc(100vh-120px)]">
+                    <div class="flex h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                         
                         <!-- Sidebar de Conversas -->
                         <div class="w-full md:w-96 border-r border-gray-200 dark:border-gray-700 flex flex-col">
@@ -631,9 +664,9 @@
                             </div>
 
                             <!-- Chat ativo (inicialmente oculto) -->
-                            <div id="active-chat" class="hidden flex-1 flex flex-col">
+                            <div id="active-chat" class="hidden flex-1 flex flex-col h-full overflow-hidden">
                                 <!-- Header do Chat -->
-                                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
                                     <div class="flex items-center gap-3">
                                         <img id="chat-user-avatar" src="" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-600">
                                         <div class="flex-1">
@@ -649,14 +682,14 @@
                                 </div>
 
                                 <!-- Container de Mensagens -->
-                                <div id="messages-container" class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
-                                    <div id="messages-list" class="space-y-4">
+                                <div id="messages-container" class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900" style="max-height: calc(100vh - 280px);">
+                                    <div id="messages-list" class="space-y-4 min-h-full">
                                         <!-- Mensagens serão injetadas aqui via JavaScript -->
                                     </div>
                                 </div>
 
                                 <!-- Input de Mensagem -->
-                                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
                                     <div class="flex items-center gap-3">
                                         <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" title="Adicionar emoji">
                                             <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
