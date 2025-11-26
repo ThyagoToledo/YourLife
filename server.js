@@ -601,6 +601,84 @@ app.post('/api/posts/:id/comments', authenticateToken, async (req, res) => {
     }
 });
 
+// Editar comentário
+app.put('/api/posts/:postId/comments/:commentId', authenticateToken, async (req, res) => {
+    try {
+        const postId = parseInt(req.params.postId);
+        const commentId = parseInt(req.params.commentId);
+        const { content } = req.body;
+
+        if (!content || content.trim() === '') {
+            return res.status(400).json({ success: false, error: 'Comentário não pode ser vazio' });
+        }
+
+        // Verifica se o comentário existe e pertence ao usuário
+        const checkResult = await sql`
+            SELECT * FROM comments 
+            WHERE id = ${commentId} AND post_id = ${postId} AND user_id = ${req.user.id}
+        `;
+
+        if (checkResult.rows.length === 0) {
+            return res.status(403).json({ success: false, error: 'Você não tem permissão para editar este comentário' });
+        }
+
+        // Atualiza o comentário
+        const result = await sql`
+            UPDATE comments 
+            SET content = ${content}, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${commentId} AND user_id = ${req.user.id}
+            RETURNING *
+        `;
+
+        const comment = result.rows[0];
+
+        const userResult = await sql`
+            SELECT name, avatar FROM users WHERE id = ${req.user.id}
+        `;
+        const user = userResult.rows[0];
+
+        const commentWithUser = {
+            ...comment,
+            user_name: user.name,
+            user_avatar: user.avatar
+        };
+
+        res.json({ success: true, comment: commentWithUser });
+    } catch (error) {
+        console.error('Erro ao editar comentário:', error);
+        res.status(500).json({ success: false, error: 'Erro ao editar comentário' });
+    }
+});
+
+// Excluir comentário
+app.delete('/api/posts/:postId/comments/:commentId', authenticateToken, async (req, res) => {
+    try {
+        const postId = parseInt(req.params.postId);
+        const commentId = parseInt(req.params.commentId);
+
+        // Verifica se o comentário existe e pertence ao usuário
+        const checkResult = await sql`
+            SELECT * FROM comments 
+            WHERE id = ${commentId} AND post_id = ${postId} AND user_id = ${req.user.id}
+        `;
+
+        if (checkResult.rows.length === 0) {
+            return res.status(403).json({ success: false, error: 'Você não tem permissão para excluir este comentário' });
+        }
+
+        // Exclui o comentário
+        await sql`
+            DELETE FROM comments 
+            WHERE id = ${commentId} AND user_id = ${req.user.id}
+        `;
+
+        res.json({ success: true, message: 'Comentário excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir comentário:', error);
+        res.status(500).json({ success: false, error: 'Erro ao excluir comentário' });
+    }
+});
+
 // ============================================
 // ROTAS DE AMIGOS
 // ============================================
