@@ -48,6 +48,7 @@ class App {
         this.setupEventListeners();
         this.setupFriendsTabs();
         this.initDarkMode();
+        this.setupConversationsSearch();
         this.checkAuthentication();
         Toast.init();
     }
@@ -193,6 +194,26 @@ class App {
                 friendsContent.classList.add('hidden');
 
                 this.loadFriendRequests();
+            });
+        }
+    }
+
+    // Configura busca de conversas
+    setupConversationsSearch() {
+        const searchInput = document.getElementById('search-conversations');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const conversations = document.querySelectorAll('.conversation-item');
+                
+                conversations.forEach(conv => {
+                    const name = conv.querySelector('h3')?.textContent.toLowerCase() || '';
+                    if (name.includes(query)) {
+                        conv.style.display = '';
+                    } else {
+                        conv.style.display = 'none';
+                    }
+                });
             });
         }
     }
@@ -2403,9 +2424,12 @@ class App {
 
             if (!conversations || conversations.length === 0) {
                 container.innerHTML = `
-                    <div class="p-4 text-center text-gray-500">
-                        <p>Nenhuma conversa ainda</p>
-                        <p class="text-sm mt-2">Adicione amigos e comece a conversar!</p>
+                    <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+                        <svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <p class="text-sm">Nenhuma conversa ainda</p>
+                        <p class="text-xs mt-1">Envie uma mensagem para começar</p>
                     </div>
                 `;
                 return;
@@ -2420,27 +2444,27 @@ class App {
                 lastMessage: conv.last_message,
                 lastMessageAt: conv.last_message_time,
                 unreadCount: parseInt(conv.unread_count) || 0,
-                isFromMe: false // Pode ser ajustado se necessário
+                isFromMe: false
             }));
 
             container.innerHTML = normalizedConversations.map(conv => {
                 totalUnread += conv.unreadCount;
                 return `
-                    <div class="conversation-item p-4 border-b hover:bg-gray-50 cursor-pointer" 
+                    <div class="conversation-item px-6 py-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" 
                          data-user-id="${conv.userId}">
                         <div class="flex items-center gap-3">
-                            <img src="${conv.avatar}" alt="${conv.name}" class="w-12 h-12 rounded-full">
+                            <div class="relative">
+                                <img src="${conv.avatar}" alt="${conv.name}" class="w-14 h-14 rounded-full object-cover">
+                                ${conv.unreadCount > 0 ? `<span class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs flex items-center justify-center rounded-full font-semibold">${conv.unreadCount}</span>` : ''}
+                            </div>
                             <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-center">
-                                    <h3 class="font-semibold text-gray-800 truncate">${conv.name}</h3>
-                                    ${conv.unreadCount > 0 ?
-                        `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${conv.unreadCount}</span>`
-                        : ''}
+                                <div class="flex justify-between items-baseline mb-1">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white truncate">${conv.name}</h3>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">${DateUtils.formatTimestamp(conv.lastMessageAt)}</span>
                                 </div>
-                                <p class="text-sm text-gray-500 truncate">
-                                    ${conv.isFromMe ? 'Você: ' : ''}${conv.lastMessage || 'Sem mensagens'}
+                                <p class="text-sm ${conv.unreadCount > 0 ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'} truncate">
+                                    ${conv.isFromMe ? 'Você: ' : ''}${conv.lastMessage || 'Envie uma mensagem'}
                                 </p>
-                                <span class="text-xs text-gray-400">${DateUtils.formatTimestamp(conv.lastMessageAt)}</span>
                             </div>
                         </div>
                     </div>
@@ -2478,19 +2502,27 @@ class App {
             // Busca informações do usuário
             const user = await this.api.getUser(userId);
 
-            // Mostra o header do chat
-            const chatHeader = document.getElementById('chat-header');
+            // Atualiza header do chat
             const chatUserAvatar = document.getElementById('chat-user-avatar');
             const chatUserName = document.getElementById('chat-user-name');
+            const chatUserStatus = document.getElementById('chat-user-status');
 
             chatUserAvatar.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4F46E5&color=fff`;
             chatUserName.textContent = user.name;
-            chatHeader.classList.remove('hidden');
+            if (chatUserStatus) chatUserStatus.textContent = 'Online';
 
-            // Mostra a área de mensagens
+            // Mostra o chat ativo e esconde a tela inicial
             document.getElementById('no-chat-selected').classList.add('hidden');
-            document.getElementById('messages-list').classList.remove('hidden');
-            document.getElementById('message-input-area').classList.remove('hidden');
+            document.getElementById('active-chat').classList.remove('hidden');
+
+            // Marca conversa como ativa
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active', 'bg-blue-50', 'dark:bg-blue-900');
+            });
+            const activeItem = document.querySelector(`.conversation-item[data-user-id="${userId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active', 'bg-blue-50', 'dark:bg-blue-900');
+            }
 
             // Carrega as mensagens
             await this.loadChatMessages(userId);
@@ -2530,12 +2562,11 @@ class App {
             }));
 
             container.innerHTML = normalizedMessages.map(msg => `
-                <div class="flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}">
-                    <div class="${msg.isFromMe ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'} 
-                                rounded-2xl px-4 py-2 max-w-xs lg:max-w-md">
-                        ${!msg.isFromMe ? `<p class="text-xs font-semibold mb-1">${msg.sender.name}</p>` : ''}
-                        <p>${msg.content}</p>
-                        <span class="text-xs ${msg.isFromMe ? 'text-blue-100' : 'text-gray-500'} block mt-1">
+                <div class="flex ${msg.isFromMe ? 'justify-end' : 'justify-start'} mb-2">
+                    <div class="${msg.isFromMe ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'} 
+                                rounded-2xl px-4 py-2 max-w-xs lg:max-w-md shadow-sm">
+                        <p class="break-words">${msg.content}</p>
+                        <span class="text-xs ${msg.isFromMe ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'} block mt-1">
                             ${DateUtils.formatTimestamp(msg.createdAt)}
                         </span>
                     </div>
@@ -2543,7 +2574,12 @@ class App {
             `).join('');
 
             // Scroll para o final
-            container.scrollTop = container.scrollHeight;
+            setTimeout(() => {
+                const messagesContainer = document.getElementById('messages-container');
+                if (messagesContainer) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            }, 100);
 
             // Marca mensagens como lidas
             await this.api.markMessagesAsRead(userId);
@@ -2556,8 +2592,8 @@ class App {
     }
 
     async sendMessage() {
-        const input = document.getElementById('chat-message-input');
-        const content = input.value.trim();
+        const input = document.getElementById('message-input');
+        const content = input?.value?.trim();
 
         if (!content || !this.currentChatUserId) {
             return;
