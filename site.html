@@ -24,6 +24,19 @@
         /* Estilo base com a fonte Inter */
         body {
             font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Remove qualquer espaço em branco no HTML */
+        html {
+            margin: 0;
+            padding: 0;
+            background-color: #1f2937;
+        }
+
+        html.dark {
+            background-color: #1f2937;
         }
 
         /* Transição suave para dark mode */
@@ -82,7 +95,7 @@
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-900 dark:bg-gray-900 m-0 p-0">
 
     <!-- 
     ==================================================
