@@ -2028,21 +2028,21 @@ class App {
             }
 
             container.innerHTML = friends.map(friend => `
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center justify-between">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-4">
-                        <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full">
+                        <img src="${friend.avatar}" alt="${friend.name}" class="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-600">
                         <div>
-                            <div class="font-semibold dark:text-white">${friend.name}</div>
-                            ${friend.isMutual ? '<span class="text-xs text-green-600 dark:text-green-400">Amizade mútua</span>' : ''}
+                            <div class="font-semibold text-gray-900 dark:text-white">${friend.name}</div>
+                            ${friend.isMutual ? '<span class="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded-full">Amizade mútua</span>' : ''}
                         </div>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="app.viewUserProfile(${friend.id})" 
-                                class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                                class="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors">
                             Ver Perfil
                         </button>
                         <button onclick="app.removeFriend(${friend.id})" 
-                                class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+                                class="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors">
                             Remover
                         </button>
                     </div>
@@ -2314,12 +2314,12 @@ class App {
             }
 
             container.innerHTML = advices.map(advice => `
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-                    <h3 class="font-bold text-lg mb-2 dark:text-white">${advice.title}</h3>
-                    <p class="text-gray-700 dark:text-gray-300 mb-3">${advice.content}</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">${advice.category}</span>
-                        <span>${DateUtils.formatTimestamp(advice.created_at)}</span>
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">${advice.title}</h3>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">${advice.content}</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium border border-blue-200 dark:border-blue-800">${advice.category}</span>
+                        <span class="text-gray-500 dark:text-gray-400">${DateUtils.formatTimestamp(advice.created_at)}</span>
                     </div>
                 </div>
             `).join('');
@@ -2450,12 +2450,12 @@ class App {
             container.innerHTML = normalizedConversations.map(conv => {
                 totalUnread += conv.unreadCount;
                 return `
-                    <div class="conversation-item px-6 py-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" 
+                    <div class="conversation-item px-6 py-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all" 
                          data-user-id="${conv.userId}">
                         <div class="flex items-center gap-3">
                             <div class="relative">
-                                <img src="${conv.avatar}" alt="${conv.name}" class="w-14 h-14 rounded-full object-cover">
-                                ${conv.unreadCount > 0 ? `<span class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs flex items-center justify-center rounded-full font-semibold">${conv.unreadCount}</span>` : ''}
+                                <img src="${conv.avatar}" alt="${conv.name}" class="w-14 h-14 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600">
+                                ${conv.unreadCount > 0 ? `<span class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs flex items-center justify-center rounded-full font-semibold shadow-md">${conv.unreadCount}</span>` : ''}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-baseline mb-1">
@@ -2664,17 +2664,17 @@ class App {
             }));
 
             container.innerHTML = normalizedRequests.map(request => `
-                <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
-                        <img src="${request.avatar}" alt="${request.name}" class="w-12 h-12 rounded-full">
+                        <img src="${request.avatar}" alt="${request.name}" class="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-600">
                         <div>
-                            <h3 class="font-semibold text-gray-800 dark:text-white">${request.name}</h3>
+                            <h3 class="font-semibold text-gray-900 dark:text-white">${request.name}</h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400">${DateUtils.formatTimestamp(request.requestedAt)}</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="app.acceptFriendRequest(${request.requesterId})" 
-                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-sm">
                             Aceitar
                         </button>
                         <button onclick="app.rejectFriendRequest(${request.requesterId})" 
