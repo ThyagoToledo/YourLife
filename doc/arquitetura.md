@@ -21,12 +21,23 @@ Este documento descreve os detalhes de engenharia, stack tecnológica, fluxo de 
 
 O YourLife é construído sobre uma arquitetura estática no frontend consumindo microsserviços serverless no backend:
 
-* **Frontend**: HTML5, Tailwind CSS (utilizado via CDN oficial) e JavaScript puro (ES6+) para renderização dinâmica baseada no DOM.
-* **Backend**: Node.js (versão 18+) utilizando a framework Express para roteamento de endpoints da API REST.
-* **Banco de Dados**: Neon PostgreSQL (versão 15+), um banco de dados serverless na nuvem com escalabilidade dinâmica.
-* **Driver de Conexão**: `@vercel/postgres` (versão 0.10.0) integrado nativamente.
-* **Segurança e Autenticação**: JWT (JSON Web Tokens) e criptografia de senhas com `bcryptjs` (salt rounds: 10).
-* **Hospedagem e Infraestrutura**: Vercel Serverless Functions com deploy contínuo integrado ao GitHub.
+* **Frontend**:
+  * <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5" /> **HTML5**
+  * <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" /> **Tailwind CSS** (utilizado via CDN oficial)
+  * <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript" /> **JavaScript puro (ES6+)** para renderização dinâmica baseada no DOM.
+* **Backend**:
+  * <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" /> **Node.js** (versão 18+)
+  * <img src="https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white" alt="Express.js" /> **Express.js** para roteamento de endpoints da API REST.
+* **Banco de Dados**:
+  * <img src="https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" /> **PostgreSQL** (versão 15+)
+  * <img src="https://img.shields.io/badge/Neon-00E599?style=flat-square&logo=neon&logoColor=black" alt="Neon" /> **Neon PostgreSQL** serverless com escalabilidade dinâmica.
+* **Driver de Conexão**:
+  * **@vercel/postgres** (versão 0.10.0) integrado nativamente para Vercel Postgres Serverless.
+* **Segurança e Autenticação**:
+  * <img src="https://img.shields.io/badge/JSON_Web_Tokens-000000?style=flat-square&logo=json-web-tokens&logoColor=white" alt="JWT" /> **JWT (JSON Web Tokens)**
+  * **bcryptjs** para criptografia de senhas (salt rounds: 10).
+* **Hospedagem e Infraestrutura**:
+  * <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" /> **Vercel Serverless Functions** com deploy contínuo integrado ao GitHub.
 
 ---
 
