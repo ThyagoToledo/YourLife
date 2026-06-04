@@ -1,38 +1,57 @@
-# YOUR LIFE - Rede Social
+# YOUR LIFE - REDE SOCIAL
 
-> Conecte-se com quem importa
+<p align="center">
+  <img src="Icons/AraraFinal.png" alt="YourLife Logo" width="120px" style="border-radius: 24px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);" />
+</p>
 
-**Versão:** 3.0.0 | **Atualizado em:** 2 de Novembro 2025 | **Status:**  Em Produção
+<p align="center">
+  <strong>Conecte-se com quem importa</strong>
+</p>
 
-** Acesso ao Site:** https://your-life-gamma.vercel.app
+<p align="center">
+  <strong>Versão:</strong> 3.0.1 | <strong>Atualizado em:</strong> 2 de Novembro 2025 | <strong>Status:</strong> Em Produção
+</p>
 
----
-
-##  ÍNDICE
-
-1. [ Deploy e Acesso](#-deploy-e-acesso)
-2. [ Funcionalidades](#-funcionalidades)
-3. [ Tecnologias](#️-tecnologias)
-4. [ Desenvolvimento Local](#-desenvolvimento-local)
-5. [ Variáveis de Ambiente](#-variáveis-de-ambiente)
-6. [ Banco de Dados](#️-banco-de-dados)
-7. [ API Reference](#-api-reference)
-8. [ Solução de Problemas](#-solução-de-problemas)
-9. [ Changelog](#-changelog)
+<p align="center">
+  <strong>Acesso ao Site:</strong> <a href="https://your-life-gamma.vercel.app">https://your-life-gamma.vercel.app</a>
+</p>
 
 ---
 
-##  DEPLOY E ACESSO
+## Índice de Tópicos
 
-###  Status da Aplicação
+* [Deploy e Acesso](#deploy-e-acesso)
+* [Funcionalidades](#funcionalidades)
+* [Regras de Design](#regras-de-design)
+* [Novidades v2.0.0](#novidades-v200)
+* [Início Rápido](#inicio-rapido)
+* [Arquitetura](#arquitetura)
+* [API Reference](#api-reference)
+* [Banco de Dados](#banco-de-dados)
+* [Variáveis de Ambiente](#variáveis-de-ambiente)
+* [Desenvolvimento Local](#desenvolvimento-local)
+* [Solução de Problemas](#solução-de-problemas)
+* [Changelog](#changelog)
+* [Notas Técnicas](#notas-técnicas)
+* [Próximas Versões](#próximas-versões)
+* [Contribuindo](#contribuindo)
+* [Licença](#licença)
+* [Autor](#autor)
+* [Agradecimentos](#agradecimentos)
 
-**URL Produção:** https://your-life-gamma.vercel.app  
-**Repositório:** https://github.com/ThyagoToledo/YourLife  
-**Banco de Dados:** Neon PostgreSQL (Serverless)  
-**Hospedagem:** Vercel (Serverless Functions)  
-**Status:**  Online
+---
 
-###  Deploy Automático
+## Deploy e Acesso
+
+### Status da Aplicação
+
+* **URL Produção**: https://your-life-gamma.vercel.app  
+* **Repositório**: https://github.com/ThyagoToledo/YourLife  
+* **Banco de Dados**: Neon PostgreSQL (Serverless)  
+* **Hospedagem**: Vercel (Serverless Functions)  
+* **Status**: Online
+
+### Deploy Automático
 
 Este projeto está configurado com **deploy automático**:
 
@@ -48,13 +67,13 @@ git push origin main
 ```
 
 **Monitorar Deploy:**
-- Dashboard Vercel: https://vercel.com/dashboard
-- Logs em tempo real durante o deploy
-- Notificações por email quando deploy termina
+* Dashboard Vercel: https://vercel.com/dashboard
+* Logs em tempo real durante o deploy
+* Notificações por email quando o deploy termina
 
-###  Novo Projeto (Fork/Clone)
+### Novo Projeto (Fork/Clone)
 
-**Se você quer criar sua própria versão:**
+Se você quer criar sua própria versão:
 
 **Passo 1: Fork no GitHub**
 ```bash
@@ -80,13 +99,13 @@ git push -u origin main
 2. Clique em "Create Database"
 3. Escolha "Neon" (PostgreSQL serverless)
 4. Clique em "Connect"
-5. Variáveis serão adicionadas automaticamente
+5. As variáveis serão adicionadas automaticamente
 
 **Passo 4: Criar Tabelas no Banco**
 1. Acesse: https://console.neon.tech/
 2. Selecione seu banco de dados
 3. Vá em "SQL Editor"
-4. Execute o script SQL (ver seção [Banco de Dados](#️-banco-de-dados))
+4. Execute o script SQL (ver seção [Banco de Dados](#banco-de-dados))
 
 **Gerar JWT_SECRET:**
 ```bash
@@ -95,72 +114,72 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ---
 
-##  FUNCIONALIDADES
+## Funcionalidades
 
-###  Interface v3.0.0
+### Interface v3.0.0
 
-**Tela de Login**
-- Design centralizado e minimalista
-- Logo circular no centro
-- Nome "Your Life" em destaque
-- Formulário de login abaixo
-- Fundo roxo em gradiente (blue-600 -> purple-600 -> purple-700)
+* **Tela de Login**
+  * Design centralizado e minimalista
+  * Logo circular no centro
+  * Nome "Your Life" em destaque
+  * Formulário de login abaixo
+  * Fundo roxo em gradiente (blue-600 -> purple-600 -> purple-700)
 
-**Tema Escuro (Dark Mode)**
-- Ativacao: Botao no menu do usuario (canto superior direito)
-- Persistencia: Salva preferencia no navegador
-- Cobertura completa: Posts, modais, formularios, notificacoes
-- Paleta Dark:
-  - Backgrounds: gray-800, gray-700
-  - Textos: white, gray-300, gray-400
-  - Bordas: gray-700, gray-600
+* **Tema Escuro (Dark Mode)**
+  * Ativação: Botão no menu do usuário (canto superior direito)
+  * Persistência: Salva a preferência no navegador
+  * Cobertura completa: Posts, modais, formulários, notificações
+  * Paleta Dark:
+    * Backgrounds: gray-800, gray-700
+    * Textos: white, gray-300, gray-400
+    * Bordas: gray-700, gray-600
 
-**Dropdown de Notificacoes**
-- Localizacao: Icone de sino no header
-- Funcionalidade: Clique para abrir/fechar
-- Historico: Mostra todas as notificacoes recentes
-- Marcacao: Indica notificacoes nao lidas
-- Auto-close: Fecha ao clicar fora
+* **Dropdown de Notificações**
+  * Localização: Ícone de sino no header
+  * Funcionalidade: Clique para abrir/fechar
+  * Histórico: Mostra todas as notificações recentes
+  * Marcação: Indica notificações não lidas
+  * Auto-close: Fecha ao clicar fora
 
-### Menu do Usuario
-- **Localizacao**: Foto e nome no header (direita)
-- **Opcoes**:
-  - Alternar Tema Escuro/Claro
-  - Deslogar da conta
-- **Auto-close**: Fecha ao clicar fora
+### Menu do Usuário
+* **Localização**: Foto e nome no header (direita)
+* **Opções**:
+  * Alternar Tema Escuro/Claro
+  * Deslogar da conta
+* **Auto-close**: Fecha ao clicar fora
 
 ### Branding
-- **Nome**: "Your Life"
-- **Slogan**: "Conecte-se com quem importa"
-- **Logo**: Arara azul estilizada (preparada para customizacao)
+* **Nome**: "Your Life"
+* **Slogan**: "Conecte-se com quem importa"
+* **Logo**: Arara azul estilizada (preparada para customização)
 
 ---
 
-## REGRAS DE DESIGN
+## Regras de Design
 
-### Simbolos ASCII vs Unicode Emojis
+### Símbolos ASCII vs Unicode Emojis
 
-**OBRIGATORIO**: Usar apenas simbolos ASCII de texto, NAO usar emojis Unicode.
+**OBRIGATÓRIO**: Usar apenas símbolos ASCII de texto, NÃO usar emojis Unicode.
 
-#### Razao
-- Consistencia visual em todas as plataformas
-- Melhor acessibilidade (screen readers)
-- Estetica minimalista e profissional
-- Evita problemas de renderizacao
+#### Razão
+* Consistência visual em todas as plataformas
+* Melhor acessibilidade (screen readers)
+* Estética minimalista e profissional
+* Evita problemas de renderização
 
-#### Mapeamento de Simbolos
+#### Mapeamento de Símbolos
 
-| Funcao | Unicode (X) | ASCII (OK) |
+| Função | Unicode (X) | ASCII (OK) |
 |--------|-------------|-----------|
 | Adicionar | Unicode | + |
 | Pendente/Aguardando | Unicode | ... |
 | Confirmado/Sucesso | Unicode | [OK] |
 | Erro/Recusar | Unicode | [X] |
-| Notificacao | Unicode | (!) |
+| Notificação | Unicode | (!) |
 | Mensagem | Unicode | [msg] |
-| Usuario/Pessoa | Unicode | [@] |
+| Usuário/Pessoa | Unicode | [@] |
 | Curtir/Amor | Unicode | <3 |
-| Comentario | Unicode | [...] |
+| Comentário | Unicode | [...] |
 | Post/Documento | Unicode | [#] |
 | Amigos/Grupo | Unicode | [@] |
 
@@ -177,105 +196,105 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ---
 
-## NOVIDADES v2.0.0
+## Novidades v2.0.0
 
 ### Sistema de Pedidos de Amizade
 
-#### Botao nos Posts
-- **Localizacao**: Ao lado do nome do autor em cada postagem
-- **Funcionalidade**: Clique no botao "+ Adicionar" para enviar pedido instantaneamente
-- **Visual**: Muda para "... Pendente" apos envio
-- **Inteligencia**: So aparece para usuarios que nao sao voce
+#### Botão nos Posts
+* **Localização**: Ao lado do nome do autor em cada postagem
+* **Funcionalidade**: Clique no botão "+ Adicionar" para enviar o pedido instantaneamente
+* **Visual**: Muda para "... Pendente" após o envio
+* **Inteligência**: Só aparece para usuários que não são você
 
 #### Categoria Pedidos
-- **Localizacao**: Dentro da aba "Amigos" no menu lateral
-- **Tabs**: 
-  - "Amigos" → Lista de amigos aceitos
-  - "Pedidos" → Lista de pedidos pendentes recebidos
-- **Badge Vermelho**: Contador de pedidos pendentes
-- **Acoes**:
-  - [OK] Aceitar - Confirma amizade (reciprocamente)
-  - [X] Recusar - Remove o pedido
+* **Localização**: Dentro da aba "Amigos" no menu lateral
+* **Abas**: 
+  * "Amigos" -> Lista de amigos aceitos
+  * "Pedidos" -> Lista de pedidos pendentes recebidos
+* **Badge Vermelho**: Contador de pedidos pendentes
+* **Ações**:
+  * [OK] Aceitar - Confirma a amizade (reciprocamente)
+  * [X] Recusar - Remove o pedido
 
-#### Notificacoes
-- (!) Quando **recebe** pedido de amizade
-- (!) Quando seu pedido e **aceito**
-- Aparecem no sino do header com badge
+#### Notificações
+* (!) Quando recebe pedido de amizade
+* (!) Quando seu pedido é aceito
+* Aparecem no sino do header com badge indicador
 
-### Correspondencias (Mensagens Privadas)
+### Correspondências (Mensagens Privadas)
 
 #### Nova Aba no Menu
-- **Nome**: "Correspondencias"
-- **Badge**: Contador de mensagens nao lidas
-- **Interface**: Estilo WhatsApp/Telegram
+* **Nome**: "Correspondências"
+* **Badge**: Contador de mensagens não lidas
+* **Interface**: Estilo WhatsApp/Telegram
 
-#### 3 Areas Principais
+#### 3 Áreas Principais
 
-**1. Lista de Conversas**
-- Todos os amigos com quem voce ja conversou
-- Ultima mensagem de cada conversa
-- Badge vermelho com mensagens nao lidas
-- Timestamp da ultima mensagem
+1. **Lista de Conversas**
+   * Todos os amigos com quem você já conversou
+   * Última mensagem de cada conversa
+   * Badge vermelho com mensagens não lidas
+   * Timestamp da última mensagem
 
-**2. Area de Chat**
-- Header com avatar e nome do amigo
-- Suas mensagens: fundo azul (direita)
-- Mensagens do amigo: fundo cinza (esquerda)
-- Scroll automatico para ultima mensagem
-- Timestamp em cada mensagem
+2. **Área de Chat**
+   * Header com avatar e nome do amigo
+   * Suas mensagens: fundo azul (direita)
+   * Mensagens do amigo: fundo cinza (esquerda)
+   * Scroll automático para a última mensagem
+   * Timestamp em cada mensagem
 
-**3. Input de Mensagem**
-- Campo de texto arredondado
-- Botao "Enviar" azul
-- Atalho: **Enter** para enviar rapido
+3. **Input de Mensagem**
+   * Campo de texto arredondado
+   * Botão "Enviar" azul
+   * Atalho: **Enter** para enviar rápido
 
-#### Seguranca
-- [OK] So funciona entre **amigos aceitos**
-- [OK] Validacao automatica no backend
-- [OK] Marcacao automatica de leitura
+#### Segurança
+* [OK] Só funciona entre **amigos aceitos**
+* [OK] Validação automática no backend
+* [OK] Marcação automática de leitura
 
-### Sistema de Notificacoes Aprimorado
-- Notificacoes para pedidos de amizade
-- Notificacoes para mensagens novas
-- Notificacoes quando pedidos sao aceitos
-- Badges com contadores em tempo real
+### Sistema de Notificações Aprimorado
+* Notificações para pedidos de amizade
+* Notificações para mensagens novas
+* Notificações quando pedidos são aceitos
+* Badges com contadores em tempo real
 
 ### Como Usar
 
 **Para Enviar Pedido de Amizade:**
-1. Veja uma postagem no feed
-2. Clique em "+ Adicionar" ao lado do nome
-3. Aguarde "Pedido de amizade enviado!"
-4. O botao mudara para "... Pendente"
+1. Veja uma postagem no feed.
+2. Clique em "+ Adicionar" ao lado do nome.
+3. Aguarde "Pedido de amizade enviado!".
+4. O botão mudará para "... Pendente".
 
 **Para Gerenciar Pedidos:**
-1. Menu → "Amigos"
-2. Clique na tab "Pedidos"
-3. Clique em "[OK] Aceitar" ou "[X] Recusar"
+1. Menu -> "Amigos".
+2. Clique na aba "Pedidos".
+3. Clique em "[OK] Aceitar" ou "[X] Recusar".
 
 **Para Enviar Mensagens:**
-1. Menu → "Correspondencias"
-2. Clique em uma conversa existente
-3. Digite e pressione Enter ou "Enviar"
-4. *Nota: So funciona com amigos aceitos*
+1. Menu -> "Correspondências".
+2. Clique em uma conversa existente.
+3. Digite e pressione Enter ou "Enviar".
+*Nota: Só funciona com amigos aceitos.*
 
 **Para Ativar Tema Escuro:**
-1. Clique na sua foto/nome (canto superior direito)
-2. Clique em "Alternar Tema"
-3. Preferencia e salva automaticamente
+1. Clique na sua foto/nome (canto superior direito).
+2. Clique em "Alternar Tema".
+3. A preferência é salva automaticamente no navegador.
 
 ---
 
-## INICIO RAPIDO
+## Início Rápido
 
 ### Requisitos
-- Node.js >= 18.0
-- Python3 >= 3.8
+* Node.js >= 18.0
+* Python3 >= 3.8
 
-### Instalacao
+### Instalação
 
 ```bash
-# 1. Instalar dependencias
+# 1. Instalar dependências
 npm install
 
 # 2. Inicializar banco de dados
@@ -286,74 +305,74 @@ npm run init-db
 ```
 
 **Acesso:**
-- Local: http://localhost:8000/site.html
-- Rede: http://SEU-IP:8000/site.html
+* Local: http://localhost:8000/site.html
+* Rede: http://SEU-IP:8000/site.html
 
-### Comandos Uteis
+### Comandos Úteis
 
 ```bash
-npm start              # Inicia apenas backend
-npm run init-db        # Recria banco de dados
+npm start              # Inicia apenas o backend
+npm run init-db        # Recria o banco de dados
 ./iniciar.sh           # Inicia backend + frontend
-./expor-internet.sh    # Expoe na internet (ngrok)
+./expor-internet.sh    # Expõe na internet (ngrok)
 ```
 
 ---
 
-## FUNCIONALIDADES
+## Funcionalidades Detalhadas
 
-### Autenticacao
-- [OK] Login e registro com JWT
-- [OK] Senha criptografada (bcrypt)
-- [OK] Token valido por 7 dias
+### Autenticação
+* [OK] Login e registro com JWT
+* [OK] Senha criptografada (bcrypt)
+* [OK] Token válido por 7 dias
 
 ### Feed e Posts
-- [OK] Criar postagens
-- [OK] Curtir/descurtir
-- [OK] Comentar
-- [OK] Feed em tempo real
+* [OK] Criar postagens
+* [OK] Curtir/descurtir
+* [OK] Comentar
+* [OK] Feed em tempo real
 
 ### Perfil
-- [OK] Editar perfil (nome, bio, avatar, interesses)
-- [OK] Ver perfil de outros usuarios
-- [OK] Estatisticas (posts, amigos, likes)
+* [OK] Editar perfil (nome, bio, avatar, interesses)
+* [OK] Ver perfil de outros usuários
+* [OK] Estatísticas (posts, amigos, likes)
 
 ### Amigos
-- [OK] Sistema de pedidos de amizade (enviar/aceitar/recusar)
-- [OK] Botao de adicionar amigo nos posts
-- [OK] Categoria "Pedidos" com contador
-- [OK] Buscar usuarios
-- [OK] Ver lista de amigos
-- [OK] Indicador de amizade mutua
-- [OK] Notificacoes de pedidos
+* [OK] Sistema de pedidos de amizade (enviar/aceitar/recusar)
+* [OK] Botão de adicionar amigo nos posts
+* [OK] Categoria "Pedidos" com contador
+* [OK] Buscar usuários
+* [OK] Ver lista de amigos
+* [OK] Indicador de amizade mútua
+* [OK] Notificações de pedidos
 
-### Correspondencias (Mensagens)
-- [OK] Chat privado com amigos
-- [OK] Lista de conversas
-- [OK] Badge de mensagens nao lidas
-- [OK] Historico completo de mensagens
-- [OK] Interface intuitiva tipo WhatsApp
-- [OK] Notificacoes de novas mensagens
+### Correspondências (Mensagens)
+* [OK] Chat privado com amigos
+* [OK] Lista de conversas
+* [OK] Badge de mensagens não lidas
+* [OK] Histórico completo de mensagens
+* [OK] Interface intuitiva tipo WhatsApp
+* [OK] Notificações de novas mensagens
 
 ### Conselhos
-- [OK] Criar conselhos
-- [OK] Ver conselhos do dia
-- [OK] Categorias (saude, carreira, relacionamentos, etc)
+* [OK] Criar conselhos
+* [OK] Ver conselhos do dia
+* [OK] Categorias (saúde, carreira, relacionamentos, etc.)
 
 ### Interface (v3.0.0)
-- [OK] Tema escuro/claro com persistencia
-- [OK] Dropdowns de notificacoes e menu
-- [OK] Design minimalista
-- [OK] Simbolos ASCII consistentes
+* [OK] Tema escuro/claro com persistência
+* [OK] Dropdowns de notificações e menu
+* [OK] Design minimalista
+* [OK] Símbolos ASCII consistentes
 
-### Atualizacoes em Tempo Real
-- [OK] Polling a cada 10 segundos
-- [OK] Notificacoes de likes e comentarios
-- [OK] Atualizacao automatica do feed
+### Atualizações em Tempo Real
+* [OK] Polling a cada 10 segundos
+* [OK] Notificações de likes e comentários
+* [OK] Atualização automática do feed
 
 ---
 
-##  ARQUITETURA
+## Arquitetura
 
 ### Stack Tecnológico
 ```
@@ -366,7 +385,7 @@ Deploy:      Vercel Serverless Functions
 Repository:  GitHub (Deploy Automático)
 ```
 
-###  Estrutura de Arquivos
+### Estrutura de Arquivos
 ```
 YourLife/
 ├── server.js              # Backend Express (API Routes)
@@ -383,7 +402,7 @@ YourLife/
 └── README.md              # Esta documentação
 ```
 
-###  Fluxo de Dados (Produção)
+### Fluxo de Dados (Produção)
 ```
 1. Usuário acessa https://your-life-gamma.vercel.app
 2. Vercel serve index.html estático
@@ -424,13 +443,13 @@ DateUtils.formatRelativeTime(post.created_at);  // Funciona corretamente
 ```
 
 **Áreas Normalizadas:**
-- Posts: `created_at`, `user_id`, `user_name`, `user_avatar`
-- Conversas: `friend_id`, `friend_name`, `last_message_time`, `unread_count`
-- Mensagens: `from_user_id`, `created_at`, `sender_name`, `sender_avatar`
-- Pedidos: `id` -> `requesterId`, `created_at` -> `requestedAt`
-- Comentários: `user_id`, `created_at`, `user_name`, `user_avatar`
+* Posts: `created_at`, `user_id`, `user_name`, `user_avatar`
+* Conversas: `friend_id`, `friend_name`, `last_message_time`, `unread_count`
+* Mensagens: `from_user_id`, `created_at`, `sender_name`, `sender_avatar`
+* Pedidos: `id` -> `requesterId`, `created_at` -> `requestedAt`
+* Comentários: `user_id`, `created_at`, `user_name`, `user_avatar`
 
-###  Arquitetura Serverless
+### Arquitetura Serverless
 ```
 Vercel Edge Network
     ↓
@@ -443,7 +462,7 @@ Neon PostgreSQL (Connection Pool)
 
 ---
 
-##  API REFERENCE
+## API Reference
 
 **Base URL (Produção):** `https://your-life-gamma.vercel.app/api`  
 **Base URL (Local):** `http://localhost:3000/api`
@@ -451,8 +470,8 @@ Neon PostgreSQL (Connection Pool)
 **Autenticação:** Header `Authorization: Bearer {token}`
 
 **Formato de Resposta:**
-- Sucesso: Retorna array ou objeto diretamente
-- Erro: `{ success: false, error: "mensagem" }`
+* Sucesso: Retorna array ou objeto diretamente
+* Erro: `{ success: false, error: "mensagem" }`
 
 ### Autenticação
 
@@ -507,7 +526,7 @@ Response: { "success": true, "token": "jwt...", "user": {...} }
 | GET | /api/messages/conversations | Lista de conversas |
 | GET | /api/messages/:userId | Mensagens com usuário |
 | POST | /api/messages | Enviar (body: {to_user_id, content}) |
-| PUT | /api/messages/:userId/read | Marcar como lidas |
+| PUT | /api/messages/:userId/read | Marcar como ladas |
 
 ### Conselhos
 
@@ -544,18 +563,18 @@ Response: { "success": true, "token": "jwt...", "user": {...} }
 
 ---
 
-##  BANCO DE DADOS
+## Banco de Dados
 
-###  Provedor: Neon PostgreSQL
+### Provedor: Neon PostgreSQL
 
-**Console:** https://console.neon.tech/  
-**Tipo:** PostgreSQL 15+ (Serverless)  
-**Conexão:** Automática via `@vercel/postgres`  
-**Variáveis:** Configuradas automaticamente pelo Vercel
+* **Console**: https://console.neon.tech/  
+* **Tipo**: PostgreSQL 15+ (Serverless)  
+* **Conexão**: Automática via `@vercel/postgres`  
+* **Variáveis**: Configuradas automaticamente pelo Vercel
 
 ### Schema - 9 Tabelas
 
-#### 1 users - Usuários
+#### 1. users - Usuários
 ```sql
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -569,7 +588,7 @@ CREATE TABLE users (
 );
 ```
 
-#### 2️ posts - Postagens
+#### 2. posts - Postagens
 ```sql
 CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
@@ -579,7 +598,7 @@ CREATE TABLE posts (
 );
 ```
 
-#### 3️ likes - Curtidas
+#### 3. likes - Curtidas
 ```sql
 CREATE TABLE likes (
     id SERIAL PRIMARY KEY,
@@ -590,7 +609,7 @@ CREATE TABLE likes (
 );
 ```
 
-#### 4️ comments - Comentários
+#### 4. comments - Comentários
 ```sql
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
@@ -601,7 +620,7 @@ CREATE TABLE comments (
 );
 ```
 
-#### 5️ followers - Sistema de Amizade
+#### 5. followers - Sistema de Amizade
 ```sql
 CREATE TABLE followers (
     id SERIAL PRIMARY KEY,
@@ -613,7 +632,7 @@ CREATE TABLE followers (
 );
 ```
 
-#### 6️ user_interests - Interesses
+#### 6. user_interests - Interesses
 ```sql
 CREATE TABLE user_interests (
     id SERIAL PRIMARY KEY,
@@ -622,7 +641,7 @@ CREATE TABLE user_interests (
 );
 ```
 
-#### 7️ advices - Conselhos
+#### 7. advices - Conselhos
 ```sql
 CREATE TABLE advices (
     id SERIAL PRIMARY KEY,
@@ -634,7 +653,7 @@ CREATE TABLE advices (
 );
 ```
 
-#### 8️ notifications - Notificações
+#### 8. notifications - Notificações
 ```sql
 CREATE TABLE notifications (
     id SERIAL PRIMARY KEY,
@@ -647,7 +666,7 @@ CREATE TABLE notifications (
 );
 ```
 
-#### 9️ messages - Mensagens Privadas
+#### 9. messages - Mensagens Privadas
 ```sql
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
@@ -688,27 +707,27 @@ Se você está fazendo deploy pela primeira vez:
 
 ---
 
-## VARIÁVEIS DE AMBIENTE
+## Variáveis de Ambiente
 
 ### Produção (Vercel Dashboard)
 
 **Configuradas automaticamente:**
-- `POSTGRES_URL` - Connection string completa (Neon)
-- `POSTGRES_PRISMA_URL` - Para uso com Prisma
-- `POSTGRES_URL_NON_POOLING` - Sem connection pool
-- `POSTGRES_USER` - Usuário do banco
-- `POSTGRES_HOST` - Host do servidor Neon
-- `POSTGRES_PASSWORD` - Senha do banco
-- `POSTGRES_DATABASE` - Nome do banco
+* `POSTGRES_URL` - Connection string completa (Neon)
+* `POSTGRES_PRISMA_URL` - Para uso com Prisma
+* `POSTGRES_URL_NON_POOLING` - Sem connection pool
+* `POSTGRES_USER` - Usuário do banco
+* `POSTGRES_HOST` - Host do servidor Neon
+* `POSTGRES_PASSWORD` - Senha do banco
+* `POSTGRES_DATABASE` - Nome do banco
 
 **Configurar manualmente:**
 1. Acesse: https://vercel.com/dashboard
 2. Selecione seu projeto
-3. Settings → Environment Variables
+3. Settings -> Environment Variables
 4. Adicione:
-   - `JWT_SECRET` = (gere com comando abaixo)
-   - `NODE_ENV` = `production`
-   - `CORS_ORIGIN` = `*` (ou seu domínio específico)
+   * `JWT_SECRET` = (gere com o comando abaixo)
+   * `NODE_ENV` = `production`
+   * `CORS_ORIGIN` = `*` (ou seu domínio específico)
 
 ### Desenvolvimento Local
 
@@ -728,7 +747,7 @@ CORS_ORIGIN=*
 POSTGRES_URL=postgresql://usuario:senha@host:5432/banco
 ```
 
-**⚠️ IMPORTANTE: Gere um JWT_SECRET único e seguro:**
+**IMPORTANTE: Gere um JWT_SECRET único e seguro:**
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
@@ -737,34 +756,34 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ### Segurança
 
-**⚠️ CHECKLIST DE SEGURANÇA:**
+**CHECKLIST DE SEGURANÇA:**
 
 1. **JWT_SECRET:**
-   - ✅ NUNCA use o exemplo do README em produção
-   - ✅ Gere uma chave única com: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-   - ✅ Use chaves diferentes para desenvolvimento e produção
-   - ✅ Mantenha o JWT_SECRET secreto (não compartilhe)
-   - ✅ Se exposto, REGENERE imediatamente
+   * NUNCA use o exemplo do README em produção
+   * Gere uma chave única com: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   * Use chaves diferentes para desenvolvimento e produção
+   * Mantenha o JWT_SECRET secreto (não compartilhe)
+   * Se exposto, REGENERE imediatamente
 
 2. **Arquivo .env:**
-   - ✅ Nunca comite `.env` no Git
-   - ✅ Arquivo já está no `.gitignore`
-   - ✅ Use `.env.example` para documentar variáveis necessárias
+   * Nunca comite `.env` no Git
+   * O arquivo já está no `.gitignore`
+   * Use `.env.example` para documentar as variáveis necessárias
 
 3. **CORS (Produção):**
-   - ⚠️ Atualmente configurado como `*` (aceita todas as origens)
-   - ✅ Para produção, configure um domínio específico:
+   * CORS atualmente configurado como `*` (aceita todas as origens)
+   * Para produção, configure um domínio específico:
      ```env
      CORS_ORIGIN=https://seu-dominio.com
      ```
-   - ✅ No Vercel: Settings → Environment Variables → Adicione `CORS_ORIGIN`
+   * No Vercel: Settings -> Environment Variables -> Adicione `CORS_ORIGIN`
 
 4. **Validações Implementadas:**
-   - ✅ Servidor não inicia se JWT_SECRET não estiver configurado
-   - ✅ Senhas hasheadas com bcrypt (salt rounds: 10)
-   - ✅ Queries parametrizadas (previne SQL Injection)
-   - ✅ Middleware de autenticação em rotas protegidas
-   - ✅ Tokens JWT expiram em 7 dias
+   * O servidor não inicia se JWT_SECRET não estiver configurado
+   * Senhas hasheadas com bcrypt (salt rounds: 10)
+   * Queries parametrizadas (previne SQL Injection)
+   * Middleware de autenticação em rotas protegidas
+   * Tokens JWT expiram em 7 dias
 
 5. **Verificar Exposição:**
    ```bash
@@ -779,12 +798,12 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ---
 
-## DESENVOLVIMENTO LOCAL
+## Desenvolvimento Local
 
 ### Requisitos
-- Node.js >= 18.0
-- npm >= 9.0
-- Conta no Neon (ou PostgreSQL local)
+* Node.js >= 18.0
+* npm >= 9.0
+* Conta no Neon (ou PostgreSQL local)
 
 ### Setup Inicial
 
@@ -808,13 +827,13 @@ npm start
 ```
 
 **Acesso Local:**
-- Backend: http://localhost:3000/api
-- Frontend: Abra `index.html` no navegador
+* Backend: http://localhost:3000/api
+* Frontend: Abra `index.html` no navegador
 
 ### Scripts Disponíveis
 
 ```bash
-npm start              # Inicia servidor backend
+npm start              # Inicia o servidor backend
 npm run dev            # Modo desenvolvimento com auto-reload
 npm test               # Executa testes (se configurado)
 ```
@@ -831,17 +850,17 @@ nodemon server.js
 
 ---
 
-## SOLUÇÃO DE PROBLEMAS
+## Solução de Problemas
 
 ### Erro: "NaNa atrás" ou "Data inválida"
 
-**Causa:** Inconsistência entre nomes de campos do backend (snake_case) e frontend (camelCase)
+**Causa:** Inconsistência entre nomes de campos do backend (snake_case) e frontend (camelCase).
 
 **Solução:**
-- Já corrigido na versão 3.0.1
-- Se persistir: `git pull origin main` e redesploy
-- Verifique no console do navegador se há erros relacionados a timestamps
-- Limpe o cache: `Ctrl+Shift+R` (ou `Cmd+Shift+R` no Mac)
+* Já corrigido na versão 3.0.1
+* Se persistir: `git pull origin main` e redesploy
+* Verifique no console do navegador se há erros relacionados a timestamps
+* Limpe o cache: `Ctrl+Shift+R` (ou `Cmd+Shift+R` no Mac)
 
 **Campos Afetados e Correções:**
 ```javascript
@@ -860,28 +879,28 @@ request.requestedAt -> request.created_at (normalizado) ✓
 
 ### Erro: "relation does not exist"
 
-**Causa:** Tabelas não criadas no banco de dados
+**Causa:** Tabelas não criadas no banco de dados.
 
 **Solução:**
 1. Acesse https://console.neon.tech/
-2. Execute o script SQL completo (seção [Banco de Dados](#️-banco-de-dados))
+2. Execute o script SQL completo (seção [Banco de Dados](#banco-de-dados))
 3. Verifique: `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';`
 
 ### Erro: "missing_connection_string"
 
-**Causa:** Variáveis do banco não configuradas
+**Causa:** Variáveis do banco não configuradas.
 
 **Solução:**
-1. Vercel: Reconecte o banco em Storage → Neon
+1. Vercel: Reconecte o banco em Storage -> Neon
 2. Local: Adicione `POSTGRES_URL` no `.env`
 
 ### Frontend mostra "Object" ao invés de dados
 
-**Causa:** API retornando objeto wrapper ao invés de array
+**Causa:** API retornando objeto wrapper ao invés de array.
 
 **Solução:**
-- Já corrigido na versão atual (commit 65afa2e)
-- Se persistir: `git pull origin main` e redesploy
+* Já corrigido na versão atual (commit 65afa2e)
+* Se persistir: `git pull origin main` e redesploy
 
 ### Token inválido / Não autenticado
 
@@ -895,17 +914,17 @@ localStorage.clear()
 ### CORS bloqueado em produção
 
 **Solução:**
-1. Vercel Dashboard → Settings → Environment Variables
+1. Vercel Dashboard -> Settings -> Environment Variables
 2. Adicione/verifique: `CORS_ORIGIN=*`
 3. Ou restrinja: `CORS_ORIGIN=https://seu-dominio.com`
 
 ### Deploy falha no Vercel
 
 **Passos:**
-1. Vercel Dashboard → Deployments → Ver logs
+1. Vercel Dashboard -> Deployments -> Ver logs
 2. Verifique erros de build
 3. Confirme que `package.json` tem todas as dependências
-4. Verifique `vercel.json` está correto
+4. Verifique se `vercel.json` está correto
 
 ### Logs de Produção
 
@@ -933,22 +952,22 @@ SELECT 'messages', COUNT(*) FROM messages;
 
 ---
 
-## CHANGELOG
+## Changelog
 
 ### [3.0.1] - 02/11/2025
 
 **Correções de Bugs Críticos:**
-- [CORRIGIDO] Bug "NaNa atrás" em posts - Campo `post.timestamp` não existia, alterado para `post.created_at`
-- [CORRIGIDO] Bug "NaNa atrás" em conversas - Campo `lastMessageAt` inconsistente, normalizado de `last_message_time`
-- [CORRIGIDO] Bug "NaNa atrás" em mensagens - Campo `createdAt` inconsistente, normalizado de `created_at`
-- [CORRIGIDO] Bug "NaNa atrás" em pedidos de amizade - Campo `requestedAt` inconsistente, normalizado de `created_at`
-- [MELHORADO] Validação de datas em `formatRelativeTime()` - Adicionado `isNaN()` check e tratamento de valores nulos
-- [MELHORADO] Proteção contra arrays vazios - Adicionado fallback `|| []` em `post.comments.map()`
+* [CORRIGIDO] Bug "NaNa atrás" em posts - Campo `post.timestamp` não existia, alterado para `post.created_at`
+* [CORRIGIDO] Bug "NaNa atrás" em conversas - Campo `lastMessageAt` inconsistente, normalizado de `last_message_time`
+* [CORRIGIDO] Bug "NaNa atrás" em mensagens - Campo `createdAt` inconsistente, normalizado de `created_at`
+* [CORRIGIDO] Bug "NaNa atrás" em pedidos de amizade - Campo `requestedAt` inconsistente, normalizado de `created_at`
+* [MELHORADO] Validação de datas em `formatRelativeTime()` - Adicionado `isNaN()` check e tratamento de valores nulos
+* [MELHORADO] Proteção contra arrays vazios - Adicionado fallback `|| []` em `post.comments.map()`
 
 **Impacto:**
-- Timestamps agora exibem corretamente em todas as áreas (posts, mensagens, conversas, notificações, pedidos)
-- Formato correto: "2h atrás", "5min atrás", "1d atrás", etc.
-- Eliminado completamente o erro "NaNa atrás"
+* Timestamps agora exibem corretamente em todas as áreas (posts, mensagens, conversas, notificações, pedidos)
+* Formato correto: "2h atrás", "5min atrás", "1d atrás", etc.
+* Eliminado completamente o erro "NaNa atrás"
 
 **Normalização de Dados:**
 ```javascript
@@ -974,19 +993,19 @@ created_at -> requestedAt
 ### [3.0.0] - 02/11/2025
 
 **Deploy em Produção:**
--  Migrado de SQLite para Neon PostgreSQL
--  Deploy no Vercel com serverless functions
--  URL pública: https://your-life-gamma.vercel.app
--  Deploy automático via GitHub
--  Banco de dados em nuvem (Neon)
+* Migrado de SQLite para Neon PostgreSQL
+* Deploy no Vercel com serverless functions
+* URL pública: https://your-life-gamma.vercel.app
+* Deploy automático via GitHub
+* Banco de dados em nuvem (Neon)
 
 **Mudanças Técnicas:**
-- Removido: `sqlite3`, `init-database.js`, `database.sqlite`
-- Adicionado: `@vercel/postgres` driver
-- Reescrito: Todas as queries para usar tagged templates
-- Configurado: `vercel.json` para serverless + static files
-- Corrigido: APIs retornavam objetos ao invés de arrays
-- Corrigido: Query SQL problemática em `/api/messages/conversations`
+* Removido: `sqlite3`, `init-database.js`, `database.sqlite`
+* Adicionado: `@vercel/postgres` driver
+* Reescrito: Todas as queries para usar tagged templates
+* Configurado: `vercel.json` para serverless + static files
+* Corrigido: APIs retornavam objetos ao invés de arrays
+* Corrigido: Query SQL problemática em `/api/messages/conversations`
 
 **Dependências:**
 ```json
@@ -1002,70 +1021,70 @@ created_at -> requestedAt
 ```
 
 **Banco de Dados:**
-- Provider: Neon PostgreSQL 15+
-- Conexão: Via `@vercel/postgres` com POSTGRES_URL
-- Schema: 9 tabelas (users, posts, likes, comments, followers, user_interests, advices, notifications, messages)
-- Região: Auto-selecionada pelo Neon
+* Provider: Neon PostgreSQL 15+
+* Conexão: Via `@vercel/postgres` com POSTGRES_URL
+* Schema: 9 tabelas (users, posts, likes, comments, followers, user_interests, advices, notifications, messages)
+* Região: Auto-selecionada pelo Neon
 
 ### [2.0.0] - 30/10/2025
 
 **Novidades Principais:**
-- **Sistema de Pedidos de Amizade**
-  - Botao "Adicionar" em cada post
-  - Categoria "Pedidos" na aba Amigos
-  - Aceitar/recusar pedidos
-  - Notificacoes automaticas
-  - Badge contador de pedidos pendentes
+* **Sistema de Pedidos de Amizade**
+  * Botão "Adicionar" em cada post
+  * Categoria "Pedidos" na aba Amigos
+  * Aceitar/recusar pedidos
+  * Notificações automáticas
+  * Badge contador de pedidos pendentes
   
-- **Correspondencias (Mensagens Privadas)**
-  - Chat privado entre amigos
-  - Lista de conversas com ultimas mensagens
-  - Badge de mensagens nao lidas
-  - Interface moderna tipo WhatsApp
-  - Historico completo de mensagens
+* **Correspondências (Mensagens Privadas)**
+  * Chat privado entre amigos
+  * Lista de conversas com últimas mensagens
+  * Badge de mensagens não lidas
+  * Interface moderna tipo WhatsApp
+  * Histórico completo de mensagens
   
-- **Melhorias nas Notificacoes**
-  - Notificacoes para pedidos de amizade
-  - Notificacoes para novas mensagens
-  - Notificacoes quando pedidos sao aceitos
-  - Sistema de badges visuais
+* **Melhorias nas Notificações**
+  * Notificações para pedidos de amizade
+  * Notificações para novas mensagens
+  * Notificações quando pedidos são aceitos
+  * Sistema de badges visuais
 
-**Mudancas Tecnicas:**
-- Nova tabela `messages` no banco de dados
-- Coluna `status` na tabela `followers` (pending/accepted)
-- Coluna `related_user_id` na tabela `notifications`
-- 8 novas rotas de API para mensagens
-- 5 novas rotas de API para pedidos de amizade
-- Metodo `sendFriendRequest()` no frontend
-- Metodos `loadConversations()` e `openChat()` no frontend
+**Mudanças Técnicas:**
+* Nova tabela `messages` no banco de dados
+* Coluna `status` na tabela `followers` (pending/accepted)
+* Coluna `related_user_id` na tabela `notifications`
+* 8 novas rotas de API para mensagens
+* 5 novas rotas de API para pedidos de amizade
+* Método `sendFriendRequest()` no frontend
+* Métodos `loadConversations()` e `openChat()` no frontend
 
 ### [1.0.0] - 30/10/2025
 
 **Implementado:**
-- Sistema completo de autenticacao (JWT + bcrypt)
-- Feed de postagens com likes e comentarios
-- Perfis editaveis com interesses
-- Sistema de amigos basico (adicionar/remover/buscar)
-- Conselhos do dia com categorias
-- Notificacoes em tempo real (polling 10s)
-- Busca de usuarios
-- Acesso externo (rede local + internet)
-- Scripts de automacao (iniciar.sh, expor-internet.sh)
+* Sistema completo de autenticação (JWT + bcrypt)
+* Feed de postagens com likes e comentários
+* Perfis editáveis com interesses
+* Sistema de amigos básico (adicionar/remover/buscar)
+* Conselhos do dia com categorias
+* Notificações em tempo real (polling 10s)
+* Busca de usuários
+* Acesso externo (rede local + internet)
+* Scripts de automação (iniciar.sh, expor-internet.sh)
 
 **Tecnologias:**
-- Backend: Node.js 18 + Express 4.18 + SQLite 5.1
-- Frontend: HTML5 + Tailwind CSS + JavaScript ES6+
-- Auth: JWT 9.0 + bcryptjs 2.4
+* Backend: Node.js 18 + Express 4.18 + SQLite 5.1
+* Frontend: HTML5 + Tailwind CSS + JavaScript ES6+
+* Auth: JWT 9.0 + bcryptjs 2.4
 
 **Corrigido:**
-- Erro ao carregar perfil de outros usuarios
-- CORS bloqueando requisicoes externas
-- TypeScript moduleResolution deprecated
-- Problemas com portas ocupadas
+* Erro ao carregar perfil de outros usuários
+* CORS bloqueando requisições externas
+* TypeScript moduleResolution deprecated
+* Problemas com portas ocupadas
 
 ---
 
-## NOTAS TÉCNICAS
+## Notas Técnicas
 
 ### Estrutura do Código
 
@@ -1139,79 +1158,79 @@ POST   /api/messages
 ### Segurança
 
 **Implementado:**
-- Senhas hasheadas com bcrypt (salt rounds: 10)
-- JWT para autenticação stateless
-- Token expira em 7 dias
-- Prepared statements via `@vercel/postgres` (previne SQL injection)
-- CORS configurado
-- Middleware de autenticação em todas as rotas protegidas
-- Validação de entrada nos endpoints
-- Validação de tipos de dados (parseInt, isNaN)
-- Proteção contra valores nulos/undefined em operações críticas
+* Senhas hasheadas com bcrypt (salt rounds: 10)
+* JWT para autenticação stateless
+* Token expira em 7 dias
+* Prepared statements via `@vercel/postgres` (previne SQL injection)
+* CORS configurado
+* Middleware de autenticação em todas as rotas protegidas
+* Validação de entrada nos endpoints
+* Validação de tipos de dados (parseInt, isNaN)
+* Proteção contra valores nulos/undefined em operações críticas
 
 **Recomendações Produção:**
-- Usar HTTPS (Vercel já fornece)
-- JWT_SECRET forte e único
-- Considerar rate limiting (Express Rate Limit)
-- Implementar refresh tokens
-- Adicionar logs de auditoria
-- Configurar CORS específico: `CORS_ORIGIN=https://seu-dominio.com`
-- Implementar validação de entrada mais rigorosa (Joi/Zod)
-- Adicionar sanitização de HTML em inputs do usuário
+* Usar HTTPS (Vercel já fornece)
+* JWT_SECRET forte e único
+* Considerar rate limiting (Express Rate Limit)
+* Implementar refresh tokens
+* Adicionar logs de auditoria
+* Configurar CORS específico: `CORS_ORIGIN=https://seu-dominio.com`
+* Implementar validação de entrada mais rigorosa (Joi/Zod)
+* Adicionar sanitização de HTML em inputs do usuário
 
 ### Performance
 
 **Otimizações implementadas:**
-- Connection pooling automático (Neon)
-- Queries indexadas por primary/foreign keys
-- Limite de 50 posts no feed
-- Limite de 20 conselhos por categoria
-- Polling inteligente (só busca se há updates)
-- Normalização de dados em lote (map operations)
-- Validação de tipos eficiente (parseInt, isNaN)
-- Proteção contra erros de renderização (|| [] fallbacks)
+* Connection pooling automático (Neon)
+* Queries indexadas por primary/foreign keys
+* Limite de 50 posts no feed
+* Limite de 20 conselhos por categoria
+* Polling inteligente (só busca se há updates)
+* Normalização de dados em lote (map operations)
+* Validação de tipos eficiente (parseInt, isNaN)
+* Proteção contra erros de renderização (|| [] fallbacks)
 
 **Melhorias futuras:**
-- Cache Redis para queries frequentes
-- Paginação infinita no feed
-- Compressão de imagens
-- CDN para assets estáticos
-- WebSocket para chat em tempo real
-- Lazy loading de componentes
-- Memoização de formatação de datas
+* Cache Redis para queries frequentes
+* Paginação infinita no feed
+* Compressão de imagens
+* CDN para assets estáticos
+* WebSocket para chat em tempo real
+* Lazy loading de componentes
+* Memoização de formatação de datas
 
 ### Boas Práticas
 
 **Aprendizados da v3.0.1:**
 
 1. **Consistência de Nomenclatura:**
-   - Backend e Frontend devem usar mesma convenção (ou normalizar na camada de API)
-   - Documentar mapeamento de campos
-   - Considerar usar TypeScript para type safety
+   * Backend e Frontend devem usar mesma convenção (ou normalizar na camada de API)
+   * Documentar mapeamento de campos
+   * Considerar usar TypeScript para type safety
 
 2. **Validação de Dados:**
-   - Sempre validar antes de operações matemáticas (`isNaN()`)
-   - Usar fallbacks para arrays (`|| []`)
-   - Validar existência de propriedades antes de acessar (`?.` operator)
+   * Sempre validar antes de operações matemáticas (`isNaN()`)
+   * Usar fallbacks para arrays (`|| []`)
+   * Validar existência de propriedades antes de acessar (`?.` operator)
 
 3. **Formatação de Datas:**
-   - Validar timestamps antes de formatar
-   - Tratar casos especiais (null, undefined, datas futuras)
-   - Usar formato consistente em todo o sistema
+   * Validar timestamps antes de formatar
+   * Tratar casos especiais (null, undefined, datas futuras)
+   * Usar formato consistente em todo o sistema
 
 4. **Debugging:**
-   - Adicionar logs estratégicos (`console.log`, `console.error`)
-   - Verificar estrutura de dados recebidos do backend
-   - Testar em ambiente de produção após deploy
+   * Adicionar logs estratégicos (`console.log`, `console.error`)
+   * Verificar estrutura de dados recebidos do backend
+   * Testar em ambiente de produção após deploy
 
 5. **Code Review:**
-   - Revisar queries SQL e estrutura de dados
-   - Verificar nomenclatura de campos
-   - Testar fluxos completos (backend → frontend → renderização)
+   * Revisar queries SQL e estrutura de dados
+   * Verificar nomenclatura de campos
+   * Testar fluxos completos (backend -> frontend -> renderização)
 
 ---
 
-## PRÓXIMAS VERSÕES
+## Próximas Versões
 
 ### Planejado para v3.1.0
 - [ ] Editar/deletar posts
@@ -1233,15 +1252,15 @@ POST   /api/messages
 
 ---
 
-## CONTRIBUINDO
+## Contribuindo
 
 ### Como Contribuir
 
-1. Fork o projeto
-2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
-3. Commit suas mudanças: `git commit -m 'feat: adicionar nova funcionalidade'`
-4. Push para a branch: `git push origin feature/nova-funcionalidade`
-5. Abra um Pull Request
+1. Faça um Fork do projeto.
+2. Crie uma branch para sua modificação: `git checkout -b feature/nova-funcionalidade`.
+3. Commit suas mudanças: `git commit -m 'feat: adicionar nova funcionalidade'`.
+4. Envie para o seu repositório: `git push origin feature/nova-funcionalidade`.
+5. Abra um Pull Request.
 
 ### Padrão de Commits
 
@@ -1257,32 +1276,40 @@ chore: tarefas de manutenção
 
 ---
 
-## LICENÇA
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
 
-##  AUTOR
+## Autor
 
-**Thyago Toledo**  
-GitHub: [@ThyagoToledo](https://github.com/ThyagoToledo)  
-Projeto: [YourLife](https://github.com/ThyagoToledo/YourLife)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/ThyagoToledo">
+        <img src="https://github.com/ThyagoToledo.png" width="100px;" alt="Thyago Toledo"/>
+        <br />
+        <sub><b>Thyago Toledo</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ---
 
-## AGRADECIMENTOS
+## Agradecimentos
 
-- Vercel pela hospedagem serverless
-- Neon pela infraestrutura PostgreSQL
-- Tailwind CSS pelo framework CSS
-- Comunidade open-source
+* Vercel pela hospedagem serverless
+* Neon pela infraestrutura PostgreSQL
+* Tailwind CSS pelo framework CSS
+* Comunidade open-source
 
 ---
 
 **Última atualização:** 2 de novembro de 2025  
 **Versão:** 3.0.1  
-**Status:**  Em Produção
+**Status:** Em Produção
 
 ---
 
