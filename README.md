@@ -38,6 +38,7 @@ Para facilitar a navegação e manter o repositório organizado, dividimos a doc
 * **[Guia de Desenvolvimento e Deploy](doc/desenvolvimento.md)**: Passo a passo para configurar o ambiente de desenvolvimento local, gerenciamento das variáveis de ambiente (`.env` vs Vercel) e roteiro de publicação na nuvem.
 * **[Funcionalidades e Regras de Design](doc/funcionalidades.md)**: Detalhamento de todas as telas (Autenticação, Feed, Amigos, Chat privado) e as regras rígidas do padrão estético ASCII (sem emojis) para a interface do usuário.
 * **[Solução de Problemas (Troubleshooting)](doc/solucao_problemas.md)**: Resolução de falhas comuns (como o bug "NaNa atrás" em timestamps), monitoramento de logs de produção e o histórico de alterações (Changelog) de todas as versões lançadas.
+* **[Padrões de Documentação e Estilo](doc/readme_standards.md)**: Manual de estilo sobre estrutura de arquivos, regras de logo, badges e autor no repositório.
 
 ---
 
