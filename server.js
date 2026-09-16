@@ -15,8 +15,8 @@ const { createSocialRouter } = require('./routes/social');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const TERMS_VERSION = '2026-09-16';
-const PRIVACY_VERSION = '2026-09-16';
+const TERMS_VERSION = '2026-09-16-study-v2';
+const PRIVACY_VERSION = '2026-09-16-study-v2';
 
 // Validação obrigatória do JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET;
