@@ -71,23 +71,35 @@ O fluxo de publicação é `feature -> master -> main`. Consulte o [guia de cont
 
 ## Próximas Versões
 
-As próximas entregas devem ser validadas em homologação antes de chegar à produção:
+Esta lista representa o estado confirmado da `master` e o que ainda pretendemos colocar. Os itens marcados foram implementados no código e seguem para validação em homologação antes de chegar à produção.
 
-### Planejado para v3.1.0
-- [ ] **Editar/deletar posts**: Funcionalidade no feed para permitir que usuários editem ou apaguem suas próprias publicações (atualmente apenas comentários suportam edição/exclusão).
-- [ ] **Upload de imagens**: Integração com serviços de armazenamento (Cloudinary ou AWS S3) para permitir postagens e fotos de perfil reais no banco de dados.
-- [ ] **Busca avançada de usuários**: Filtros finos na pesquisa de usuários baseados em interesses em comum e status de proximidade.
-- [ ] **Sistema de hashtags**: Indexação de postagens por tags arcanas no feed.
-- [ ] **Menções (@usuario)**: Marcação e vinculação de usuários nas postagens e comentários.
-- [ ] **Migração de convenção de dados**: Mapear de forma consistente todo o fluxo para camelCase ou snake_case nativo.
-- [ ] **Camada centralizada de transformadores**: Substituir a normalização pontual das requisições por um middleware centralizador de dados.
+### Base social e perfil
 
-### Planejado para v4.0.0
-- [ ] **Chat em tempo real**: Migrar o polling assíncrono atual de 10s para conexões bidirecionais contínuas via WebSocket (Socket.io).
-- [ ] **Chamadas de vídeo**: Integração ponto a ponto via WebRTC.
-- [ ] **Stories**: Conteúdo temporário com expiração em 24 horas.
-- [ ] **Grupos e Comunidades**: Criação de canais públicos e privados por interesses.
-- [ ] **Testes automatizados**: Cobertura de testes de integração e unitários integrados via Jest/Vitest.
+- [x] **Editar e excluir posts**: o autor pode alterar ou remover as próprias publicações.
+- [x] **Upload de fotos de perfil e capa**: arquivo enviado para o Vercel Blob, convertido em URL e associado ao perfil após moderação.
+- [x] **Upload moderado em posts, mensagens e comunidades**: arquivos passam por validação de tipo, tamanho e status de aprovação.
+- [ ] **Busca avançada de usuários**: filtros por interesses em comum, proximidade e status de amizade.
+- [ ] **Sistema de hashtags**: indexação e descoberta de publicações por tags.
+- [ ] **Menções (@usuario)**: marcação de pessoas em posts, comentários e mensagens.
+- [ ] **Stories**: conteúdo temporário com expiração configurável, inicialmente em 24 horas.
+
+### Chat, chamadas e comunidades
+
+- [x] **Chat com Markdown sanitizado**: formatação de texto, anexos, recibos de leitura e idempotência de envio.
+- [x] **Atualizações em tempo real**: sinais via Ably com reconciliação por polling quando necessário.
+- [x] **Grupos**: criação, membros, papéis, limite de participantes e administração do proprietário.
+- [x] **Chamadas de áudio e vídeo**: LiveKit com câmera, microfone, seleção de dispositivos e compartilhamento de tela.
+- [x] **Comunidades**: espaços públicos ou privados, canais, convites e papéis de membro.
+- [ ] **Threads e respostas avançadas**: organização de conversas longas dentro de canais e grupos.
+- [ ] **Presença e notificações aprimoradas**: status online, silenciamento por conversa e notificações configuráveis.
+
+### Qualidade e evolução técnica
+
+- [x] **Testes automatizados da API social**: seis testes Node.js cobrindo moderação, uploads e regras de conversa.
+- [x] **Migração social aditiva**: tabelas para mídia, conversas, comunidades e chamadas sem apagar o modelo legado.
+- [ ] **Migração completa de dados legados**: backfill idempotente de mensagens antigas e cutover acompanhado.
+- [ ] **Camada centralizada de transformadores**: padronização completa entre DTOs camelCase e banco snake_case.
+- [ ] **Busca, hashtags, menções e stories**: pacote de descoberta e publicação temporária após a estabilização do chat.
 
 ---
 
