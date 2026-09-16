@@ -2,6 +2,12 @@
 // APP.JS - APLICAÇÃO PRINCIPAL
 // ============================================
 
+function escapeHTMLSafe(value) {
+    const node = document.createElement('span');
+    node.textContent = value == null ? '' : String(value);
+    return node.innerHTML;
+}
+
 class App {
     constructor() {
         this.api = apiService;
@@ -51,6 +57,10 @@ class App {
         this.setupConversationsSearch();
         this.checkAuthentication();
         Toast.init();
+        fetch(`${this.api.baseUrl}/legal/documents`).then((response) => response.json()).then((legal) => {
+            const contact = document.getElementById('privacy-contact');
+            if (contact && legal.privacyContactEmail) contact.textContent = legal.privacyContactEmail;
+        }).catch(() => {});
     }
 
     // Configura os dropdowns de notificações e menu do usuário
@@ -292,6 +302,10 @@ class App {
             });
         }
 
+        ['register-terms-link', 'register-privacy-link'].forEach((id) => {
+            document.getElementById(id)?.addEventListener('click', () => termsModal?.classList.remove('hidden'));
+        });
+
         if (closeTermsModalBtn && termsModal) {
             closeTermsModalBtn.addEventListener('click', () => {
                 termsModal.classList.add('hidden');
@@ -312,6 +326,33 @@ class App {
                 }
             });
         }
+
+        const privacyCenter = document.getElementById('privacy-center-modal');
+        document.getElementById('privacy-center-button')?.addEventListener('click', () => {
+            privacyCenter?.classList.remove('hidden');
+            privacyCenter?.classList.add('flex');
+            this.loadPrivacyCenter();
+        });
+        document.getElementById('close-privacy-center')?.addEventListener('click', () => {
+            privacyCenter?.classList.add('hidden');
+            privacyCenter?.classList.remove('flex');
+        });
+        document.getElementById('export-my-data')?.addEventListener('click', () => this.exportMyData());
+        document.getElementById('marketing-consent-toggle')?.addEventListener('change', async (event) => {
+            try {
+                await this.api.request('/privacy/marketing', { method: 'PUT', body: { granted: event.target.checked } });
+                Toast.success('Preferência atualizada.');
+            } catch (error) { Toast.error(error.message); }
+        });
+        document.getElementById('privacy-request-form')?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            try {
+                await this.api.request('/privacy/requests', { method: 'POST', body: { requestType: document.getElementById('privacy-request-type').value, details: document.getElementById('privacy-request-details').value } });
+                document.getElementById('privacy-request-details').value = '';
+                Toast.success('Solicitação registrada.');
+                await this.loadPrivacyCenter();
+            } catch (error) { Toast.error(error.message); }
+        });
 
         // Navegação
         if (this.elements.navFeed) {
@@ -560,6 +601,34 @@ class App {
         }, 100);
     }
 
+    async loadPrivacyCenter() {
+        try {
+            const [consentData, requests] = await Promise.all([
+                this.api.request('/privacy/consents'),
+                this.api.request('/privacy/requests')
+            ]);
+            const marketing = consentData.consents.find((item) => item.purpose === 'marketing' && !item.revokedAt);
+            const toggle = document.getElementById('marketing-consent-toggle');
+            if (toggle) toggle.checked = marketing?.granted === true;
+            const list = document.getElementById('privacy-requests-list');
+            if (list) list.innerHTML = requests.length ? requests.map((request) => `<article class="rounded-lg border border-gray-200 p-3 dark:border-gray-600"><div class="flex justify-between gap-2"><strong class="dark:text-white">${escapeHTMLSafe(request.requestType)}</strong><span class="text-gray-500">${escapeHTMLSafe(request.status)}</span></div><p class="mt-1 text-gray-500">${new Date(request.createdAt).toLocaleString('pt-BR')}</p></article>`).join('') : '<p class="text-gray-500">Nenhuma solicitação registrada.</p>';
+        } catch (error) { Toast.error(error.message); }
+    }
+
+    async exportMyData() {
+        try {
+            const response = await fetch(`${this.api.baseUrl}/privacy/export`, { headers: { Authorization: `Bearer ${this.api.getToken()}` } });
+            if (!response.ok) throw new Error('Não foi possível exportar seus dados');
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'yourlife-meus-dados.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (error) { Toast.error(error.message); }
+    }
+
     // Handle registro
     async handleRegister(e) {
         e.preventDefault();
@@ -569,6 +638,10 @@ class App {
         const email = formData.get('email');
         const password = formData.get('password');
         const confirmPassword = formData.get('confirmPassword');
+        const termsAccepted = formData.get('termsAccepted') === 'on';
+        const privacyAcknowledged = formData.get('privacyAcknowledged') === 'on';
+        const ageConfirmed = formData.get('ageConfirmed') === 'on';
+        const marketingConsent = formData.get('marketingConsent') === 'on';
 
         const validation = Validation.validateRegisterForm(name, email, password, confirmPassword);
 
@@ -582,7 +655,10 @@ class App {
         try {
             Loading.show('Criando conta...');
 
-            const response = await this.api.register({ name, email, password });
+            const response = await this.api.register({
+                name, email, password, termsAccepted, privacyAcknowledged, ageConfirmed, marketingConsent,
+                termsVersion: '2026-09-16', privacyVersion: '2026-09-16'
+            });
 
             if (response && response.user) {
                 this.currentUserId = response.user.id;
@@ -601,11 +677,6 @@ class App {
                 await this.loadInitialData();
                 window.YourLifeSocial?.connectRealtime?.();
                 Toast.success('Conta criada com sucesso! Bem-vindo!');
-                
-                // Mostrar aviso sobre Termos e Privacidade
-                setTimeout(() => {
-                    Toast.info('Ao usar nossa plataforma, você concorda com nossos Termos de Uso e Política de Privacidade. Consulte-os no menu lateral.', 7000);
-                }, 1000);
             } else {
                 throw new Error('Resposta inválida do servidor');
             }

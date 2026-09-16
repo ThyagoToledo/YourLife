@@ -65,6 +65,10 @@ Acesse a aplicação local em: http://localhost:3000/site.html
 
 A branch `master` reúne a atualização social em homologação: chat com grupos e Markdown sanitizado, chamadas com áudio, câmera e compartilhamento de tela, comunidades, upload moderado por Vercel Blob e edição autorizada de posts. O CI executa testes, checagem de tipos, auditoria e validação estrutural do servidor; a integração Git da Vercel cria apenas um Preview para esta branch.
 
+### Privacidade e LGPD
+
+O cadastro exige aceite versionado dos Termos de Uso, ciência do Aviso de Privacidade e confirmação de idade mínima. O consentimento de marketing é opcional e revogável. Usuários autenticados podem exportar seus dados e abrir solicitações de acesso, correção, portabilidade, revogação ou eliminação pela Central de Privacidade. Configure `PRIVACY_CONTACT_EMAIL` para publicar o canal do encarregado/controlador antes de colocar o serviço em produção.
+
 O fluxo de publicação é `feature -> master -> main`. Consulte o [guia de contribuição](CONTRIBUTING.md) para os critérios de validação. A produção permanece vinculada à `main`.
 
 ---
