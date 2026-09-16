@@ -424,6 +424,86 @@ function createSocialRouter({ db, authenticateToken }) {
         } catch (error) { next(error); }
     });
 
+    router.get('/conversations/:id/topics', async (req, res, next) => {
+        try {
+            if (!(await conversationMembership(req.params.id, req.user.id))) return res.status(403).json({ success: false, error: 'Sem acesso à conversa' });
+            const result = await query(
+                `SELECT t.id, t.title, t.body, t.status, t.created_by AS "createdBy", u.name AS "createdByName", t.created_at AS "createdAt",
+                        COUNT(tc.id)::int AS "commentCount"
+                 FROM conversation_topics t JOIN users u ON u.id = t.created_by
+                 LEFT JOIN topic_comments tc ON tc.topic_id = t.id AND tc.deleted_at IS NULL
+                 WHERE t.conversation_id = $1
+                 GROUP BY t.id, u.name ORDER BY t.created_at DESC LIMIT 100`,
+                [req.params.id]
+            );
+            res.json(result.rows);
+        } catch (error) { next(error); }
+    });
+
+    router.post('/conversations/:id/topics', async (req, res, next) => {
+        try {
+            if (!(await conversationMembership(req.params.id, req.user.id))) return res.status(403).json({ success: false, error: 'Sem acesso à conversa' });
+            const title = String(req.body.title || '').trim();
+            const body = String(req.body.body || '').trim();
+            if (title.length < 2 || title.length > 120 || body.length > 8000) return res.status(400).json({ success: false, error: 'Tópico inválido' });
+            const id = uuid();
+            const result = await query(
+                `INSERT INTO conversation_topics (id, conversation_id, created_by, title, body) VALUES ($1, $2, $3, $4, $5)
+                 RETURNING id, conversation_id AS "conversationId", title, body, status, created_at AS "createdAt"`,
+                [id, req.params.id, req.user.id, title, body]
+            );
+            res.status(201).json(result.rows[0]);
+        } catch (error) { next(error); }
+    });
+
+    router.get('/topics/:id/comments', async (req, res, next) => {
+        try {
+            const result = await query(
+                `SELECT tc.id, tc.author_id AS "authorId", u.name AS "authorName", tc.content, tc.created_at AS "createdAt"
+                 FROM topic_comments tc JOIN users u ON u.id = tc.author_id
+                 JOIN conversation_topics t ON t.id = tc.topic_id
+                 WHERE tc.topic_id = $1 AND tc.deleted_at IS NULL
+                   AND EXISTS (SELECT 1 FROM conversation_members cm WHERE cm.conversation_id = t.conversation_id AND cm.user_id = $2 AND cm.left_at IS NULL)
+                 ORDER BY tc.created_at ASC`,
+                [req.params.id, req.user.id]
+            );
+            res.json(result.rows);
+        } catch (error) { next(error); }
+    });
+
+    router.post('/topics/:id/comments', async (req, res, next) => {
+        try {
+            const content = String(req.body.content || '').trim();
+            if (!content || content.length > MAX_MESSAGE_LENGTH) return res.status(400).json({ success: false, error: 'Comentário inválido' });
+            const result = await query(
+                `INSERT INTO topic_comments (id, topic_id, author_id, content)
+                 SELECT $1, t.id, $2, $3 FROM conversation_topics t
+                 JOIN conversation_members cm ON cm.conversation_id = t.conversation_id AND cm.user_id = $2 AND cm.left_at IS NULL
+                 WHERE t.id = $4 AND t.status = 'open'
+                 RETURNING id, topic_id AS "topicId", author_id AS "authorId", content, created_at AS "createdAt"`,
+                [uuid(), req.user.id, content, req.params.id]
+            );
+            if (!result.rows[0]) return res.status(403).json({ success: false, error: 'Tópico indisponível' });
+            res.status(201).json(result.rows[0]);
+        } catch (error) { next(error); }
+    });
+
+    router.patch('/topics/:id', async (req, res, next) => {
+        try {
+            const status = String(req.body.status || '');
+            if (!['open', 'closed', 'archived'].includes(status)) return res.status(400).json({ success: false, error: 'Status inválido' });
+            const result = await query(
+                `UPDATE conversation_topics t SET status = $2, closed_at = CASE WHEN $2 = 'open' THEN NULL ELSE COALESCE(closed_at, NOW()) END
+                 WHERE t.id = $1 AND EXISTS (
+                    SELECT 1 FROM conversation_members cm WHERE cm.conversation_id = t.conversation_id AND cm.user_id = $3 AND cm.left_at IS NULL AND cm.role IN ('owner', 'admin')
+                 ) RETURNING id, status`,
+                [req.params.id, status, req.user.id]
+            );
+            if (!result.rows[0]) return res.status(403).json({ success: false, error: 'Sem permissão para alterar o tópico' });
+            res.json(result.rows[0]);
+        } catch (error) { next(error); }
+    });
+
     router.patch('/messages/:id', async (req, res, next) => {
         try {
             const content = String(req.body.content || '').trim();
@@ -543,23 +623,37 @@ function createSocialRouter({ db, authenticateToken }) {
 
     router.post('/calls', async (req, res, next) => {
         try {
-            if (!(await conversationMembership(req.body.conversationId, req.user.id))) return res.status(403).json({ success: false, error: 'Sem acesso à conversa' });
+            const membership = await conversationMembership(req.body.conversationId, req.user.id);
+            if (!membership) return res.status(403).json({ success: false, error: 'Sem acesso à conversa' });
+            const topicId = req.body.topicId || null;
+            if (topicId) {
+                const topic = await query(`SELECT id FROM conversation_topics WHERE id = $1 AND conversation_id = $2 AND status = 'open'`, [topicId, req.body.conversationId]);
+                if (!topic.rows[0]) return res.status(404).json({ success: false, error: 'Tópico não encontrado ou fechado' });
+            }
             const callId = uuid();
             const roomId = `yourlife-${callId}`;
-            await query(`INSERT INTO calls (id, conversation_id, created_by, provider_room_id) VALUES ($1, $2, $3, $4)`, [callId, req.body.conversationId, req.user.id, roomId]);
+            try {
+                await query(`INSERT INTO calls (id, conversation_id, topic_id, created_by, provider_room_id) VALUES ($1, $2, $3, $4, $5)`, [callId, req.body.conversationId, topicId, req.user.id, roomId]);
+            } catch (error) {
+                if (error.code === '23505') return res.status(409).json({ success: false, error: 'Já existe uma ligação ativa neste tópico' });
+                throw error;
+            }
             const members = await query(`SELECT user_id FROM conversation_members WHERE conversation_id = $1 AND left_at IS NULL`, [req.body.conversationId]);
             for (const member of members.rows) await query(`INSERT INTO call_participants (call_id, user_id, state) VALUES ($1, $2, $3)`, [callId, member.user_id, member.user_id === req.user.id ? 'joined' : 'invited']);
             await Promise.all(members.rows.filter((member) => member.user_id !== req.user.id).map((member) => publishSignal(`user:${member.user_id}`, 'call.invited', { callId })));
-            res.status(201).json({ id: callId, conversationId: req.body.conversationId, state: 'ringing' });
+            res.status(201).json({ id: callId, conversationId: req.body.conversationId, topicId, state: 'ringing' });
         } catch (error) { next(error); }
     });
 
     router.get('/calls', async (req, res, next) => {
         try {
             const result = await query(
-                `SELECT c.id, c.conversation_id AS "conversationId", c.state, c.created_at AS "createdAt",
+                `SELECT c.id, c.conversation_id AS "conversationId", c.topic_id AS "topicId", c.state, c.created_at AS "createdAt",
+                        conv.title, conv.kind, topics.title AS "topicTitle",
                         c.started_at AS "startedAt", c.ended_at AS "endedAt", cp.state AS "participantState"
                  FROM call_participants cp JOIN calls c ON c.id = cp.call_id
+                 JOIN conversations conv ON conv.id = c.conversation_id
+                 LEFT JOIN conversation_topics topics ON topics.id = c.topic_id
                  WHERE cp.user_id = $1 ORDER BY c.created_at DESC LIMIT 50`,
                 [req.user.id]
             );

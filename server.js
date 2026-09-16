@@ -31,14 +31,14 @@ const allowedOrigins = process.env.CORS_ORIGIN
 app.use(cors({
     origin: allowedOrigins.includes('*') ? '*' : allowedOrigins,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 const publicFiles = new Set([
-    'index.html', 'site.html', 'config.html',
+    'index.html', 'site.html', 'config.html', 'admin.html', 'moderation.html',
     'app.js', 'api.js', 'state.js', 'utils.js', 'social.js'
 ]);
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -68,9 +68,16 @@ async function initializeDatabase() {
                 avatar TEXT,
                 bio TEXT,
                 cover_image TEXT,
+                is_admin BOOLEAN NOT NULL DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE`;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS platform_role TEXT NOT NULL DEFAULT 'member'`;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS account_status TEXT NOT NULL DEFAULT 'active'`;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS suspended_until TIMESTAMPTZ`;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ`;
+        await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_reason TEXT`;
 
         // Criar tabela posts
         await sql`
@@ -191,16 +198,195 @@ function authenticateToken(req, res, next) {
         return res.status(401).json({ success: false, error: 'Token não fornecido' });
     }
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ success: false, error: 'Token inválido' });
+    let user;
+    try {
+        user = jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+        return res.status(403).json({ success: false, error: 'Token inválido' });
+    }
+    sql`SELECT platform_role, account_status, suspended_until FROM users WHERE id = ${user.id}`
+        .then((result) => {
+            const account = result.rows[0];
+            if (!account) return res.status(401).json({ success: false, error: 'Usuário não encontrado' });
+            if (account.account_status === 'banned') return res.status(403).json({ success: false, error: 'Conta banida' });
+            if (account.account_status === 'suspended' && account.suspended_until && new Date(account.suspended_until) > new Date()) {
+                return res.status(403).json({ success: false, error: 'Conta temporariamente suspensa' });
+            }
+            req.user = { ...user, platformRole: account.platform_role };
+            next();
+        })
+        .catch((error) => {
+            console.error('Erro ao validar o estado da conta:', error);
+            res.status(500).json({ success: false, error: 'Não foi possível validar a sessão' });
+        });
+}
+
+async function requireAdmin(req, res, next) {
+    try {
+        const result = await sql`
+            SELECT id, is_admin
+            FROM users
+            WHERE id = ${req.user.id}
+        `;
+        if (!result.rows[0]?.is_admin) {
+            return res.status(403).json({ success: false, error: 'Acesso restrito ao administrador' });
         }
-        req.user = user;
+        req.admin = { id: result.rows[0].id };
         next();
-    });
+    } catch (error) {
+        console.error('Erro ao validar acesso administrativo:', error);
+        res.status(500).json({ success: false, error: 'Não foi possível validar o acesso' });
+    }
+}
+
+async function requireModerator(req, res, next) {
+    try {
+        const result = await sql`SELECT platform_role FROM users WHERE id = ${req.user.id}`;
+        if (!['admin', 'moderator'].includes(result.rows[0]?.platform_role)) {
+            return res.status(403).json({ success: false, error: 'Acesso restrito à moderação' });
+        }
+        req.moderator = { id: req.user.id, role: result.rows[0].platform_role };
+        next();
+    } catch (error) {
+        console.error('Erro ao validar acesso de moderação:', error);
+        res.status(500).json({ success: false, error: 'Não foi possível validar o acesso' });
+    }
 }
 
 app.use('/api/v2', createSocialRouter({ db: sql, authenticateToken }));
+
+// Rotas administrativas: JWT + papel persistido no banco, sem confiar no frontend.
+app.get('/api/admin/me', authenticateToken, requireAdmin, async (req, res) => {
+    res.json({ success: true, isAdmin: true, userId: req.admin.id });
+});
+
+app.get('/api/admin/overview', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const [users, communities, conversations, openReports] = await Promise.all([
+            sql`SELECT COUNT(*)::int AS count FROM users`,
+            sql`SELECT COUNT(*)::int AS count FROM communities`,
+            sql`SELECT COUNT(*)::int AS count FROM conversations`,
+            sql`SELECT COUNT(*)::int AS count FROM reports WHERE status IN ('open', 'reviewing')`
+        ]);
+        res.json({ users: users.rows[0].count, communities: communities.rows[0].count, conversations: conversations.rows[0].count, openReports: openReports.rows[0].count });
+    } catch (error) {
+        console.error('Erro ao carregar painel administrativo:', error);
+        res.status(500).json({ success: false, error: 'Erro ao carregar painel' });
+    }
+});
+
+app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await sql`
+            SELECT id, name, email, platform_role AS "platformRole", account_status AS "accountStatus",
+                   is_admin AS "isAdmin", created_at AS "createdAt"
+            FROM users ORDER BY created_at DESC, id DESC LIMIT 100
+        `;
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao listar usuários administrativos:', error);
+        res.status(500).json({ success: false, error: 'Erro ao listar usuários' });
+    }
+});
+
+async function recordAudit(actorId, action, targetType, targetId, metadata = {}) {
+    await sql`
+        INSERT INTO admin_audit_log (id, actor_id, action, target_type, target_id, metadata)
+        VALUES (${require('node:crypto').randomUUID()}, ${actorId}, ${action}, ${targetType}, ${String(targetId)}, ${JSON.stringify(metadata)}::jsonb)
+    `;
+}
+
+app.post('/api/admin/users/:id/role', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const targetId = Number(req.params.id);
+        const role = String(req.body.role || '');
+        if (!Number.isInteger(targetId) || !['member', 'moderator'].includes(role)) {
+            return res.status(400).json({ success: false, error: 'Cargo inválido' });
+        }
+        const target = await sql`SELECT id, platform_role FROM users WHERE id = ${targetId}`;
+        if (!target.rows[0]) return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
+        if (target.rows[0].platform_role === 'admin' || targetId === req.admin.id) {
+            return res.status(403).json({ success: false, error: 'O administrador principal não pode ser rebaixado' });
+        }
+        await sql`UPDATE users SET platform_role = ${role}, is_admin = FALSE WHERE id = ${targetId}`;
+        await recordAudit(req.admin.id, `role:${role}`, 'user', targetId, { previousRole: target.rows[0].platform_role });
+        res.json({ success: true, id: targetId, platformRole: role });
+    } catch (error) {
+        console.error('Erro ao alterar cargo:', error);
+        res.status(500).json({ success: false, error: 'Erro ao alterar cargo' });
+    }
+});
+
+app.get('/api/moderation/reports', authenticateToken, requireModerator, async (req, res) => {
+    try {
+        const result = await sql`
+            SELECT r.id, r.reporter_id AS "reporterId", r.target_type AS "targetType", r.target_id AS "targetId",
+                   r.reason, r.status, r.created_at AS "createdAt"
+            FROM reports r
+            WHERE r.status IN ('open', 'reviewing')
+            ORDER BY r.created_at DESC LIMIT 100
+        `;
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao carregar denúncias:', error);
+        res.status(500).json({ success: false, error: 'Erro ao carregar denúncias' });
+    }
+});
+
+app.post('/api/moderation/actions', authenticateToken, requireModerator, async (req, res) => {
+    try {
+        const targetType = String(req.body.targetType || '');
+        const action = String(req.body.action || '');
+        const targetId = String(req.body.targetId || '').trim();
+        const reason = String(req.body.reason || '').trim().slice(0, 500);
+        if (!['user', 'message', 'post', 'comment', 'call'].includes(targetType) || !['warn', 'delete', 'suspend', 'ban', 'unban', 'close_call'].includes(action) || !targetId || reason.length < 3) {
+            return res.status(400).json({ success: false, error: 'Ação de moderação inválida' });
+        }
+        if (['ban', 'unban'].includes(action) && req.moderator.role !== 'admin') return res.status(403).json({ success: false, error: 'Somente administrador pode banir ou desbanir contas' });
+        if (['suspend', 'ban', 'unban', 'warn'].includes(action) && targetType !== 'user') return res.status(400).json({ success: false, error: 'Ação incompatível com o alvo' });
+        if (action === 'delete' && !['message', 'post', 'comment'].includes(targetType)) return res.status(400).json({ success: false, error: 'Ação incompatível com o alvo' });
+        if (action === 'close_call' && targetType !== 'call') return res.status(400).json({ success: false, error: 'Ação incompatível com o alvo' });
+
+        let expiresAt = null;
+        if (targetType === 'user') {
+            const targetUserId = Number(targetId);
+            const target = await sql`SELECT id, platform_role FROM users WHERE id = ${targetUserId}`;
+            if (!target.rows[0]) return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
+            if (target.rows[0].platform_role === 'admin') return res.status(403).json({ success: false, error: 'A conta do administrador é protegida' });
+            if (req.moderator.role === 'moderator' && target.rows[0].platform_role !== 'member') return res.status(403).json({ success: false, error: 'Moderadores só podem punir membros' });
+            if (action === 'suspend') {
+                const hours = Math.min(Math.max(Number(req.body.durationHours) || 24, 1), 720);
+                expiresAt = new Date(Date.now() + hours * 3600000);
+                await sql`UPDATE users SET account_status = 'suspended', suspended_until = ${expiresAt}, banned_at = NULL, banned_reason = NULL WHERE id = ${targetUserId}`;
+            } else if (action === 'ban') {
+                await sql`UPDATE users SET account_status = 'banned', banned_at = NOW(), banned_reason = ${reason}, suspended_until = NULL WHERE id = ${targetUserId}`;
+            } else if (action === 'unban') {
+                await sql`UPDATE users SET account_status = 'active', banned_at = NULL, banned_reason = NULL, suspended_until = NULL WHERE id = ${targetUserId}`;
+            }
+        } else if (action === 'delete') {
+            let updated;
+            if (targetType === 'message') {
+                const owner = await sql`SELECT u.platform_role FROM chat_messages m JOIN users u ON u.id = m.sender_id WHERE m.id = ${targetId}`;
+                if (owner.rows[0]?.platform_role === 'admin') return res.status(403).json({ success: false, error: 'Conteúdo do administrador é protegido' });
+                updated = await sql`UPDATE chat_messages SET content = '', deleted_at = NOW() WHERE id = ${targetId} AND deleted_at IS NULL`;
+            } else if (targetType === 'post') {
+                updated = await sql`UPDATE posts SET content = '[Conteúdo removido pela moderação]' WHERE id = ${Number(targetId)}`;
+            } else {
+                updated = await sql`UPDATE comments SET content = '[Conteúdo removido pela moderação]' WHERE id = ${Number(targetId)}`;
+            }
+            if (!updated.rowCount) return res.status(404).json({ success: false, error: 'Conteúdo não encontrado' });
+        } else if (action === 'close_call') {
+            const updated = await sql`UPDATE calls SET state = 'ended', ended_at = COALESCE(ended_at, NOW()) WHERE id = ${targetId} AND state IN ('ringing', 'accepted', 'active')`;
+            if (!updated.rowCount) return res.status(404).json({ success: false, error: 'Chamada ativa não encontrada' });
+        }
+        await sql`INSERT INTO moderation_actions (id, actor_id, target_type, target_id, action, reason, expires_at) VALUES (${require('node:crypto').randomUUID()}, ${req.moderator.id}, ${targetType}, ${targetId}, ${action}, ${reason}, ${expiresAt})`;
+        await recordAudit(req.moderator.id, `moderation:${action}`, targetType, targetId, { reason, expiresAt });
+        res.json({ success: true, action, targetType, targetId, expiresAt });
+    } catch (error) {
+        console.error('Erro ao executar ação de moderação:', error);
+        res.status(500).json({ success: false, error: 'Erro ao executar ação de moderação' });
+    }
+});
 
 // ============================================
 // ROTAS DE AUTENTICAÇÃO
@@ -289,7 +475,8 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/users/me', authenticateToken, async (req, res) => {
     try {
         const result = await sql`
-            SELECT id, name, email, avatar, bio, cover_image, created_at
+            SELECT id, name, email, avatar, bio, cover_image, is_admin AS "isAdmin",
+                   platform_role AS "platformRole", account_status AS "accountStatus", created_at
             FROM users
             WHERE id = ${req.user.id}
         `;

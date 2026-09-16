@@ -128,8 +128,8 @@ CREATE TABLE IF NOT EXISTS calls (
     ended_at TIMESTAMPTZ
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS calls_one_open_per_conversation_idx
-    ON calls(conversation_id) WHERE state IN ('ringing', 'accepted', 'active');
+CREATE INDEX IF NOT EXISTS calls_conversation_state_idx
+    ON calls(conversation_id, state);
 
 CREATE TABLE IF NOT EXISTS call_participants (
     call_id UUID NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
