@@ -61,6 +61,12 @@ npm start
 
 Acesse a aplicação local em: http://localhost:3000/site.html
 
+### Portfólio público e branches
+
+A branch `main` é a vitrine pública do projeto e não possui login, cadastro ou acesso às funcionalidades sociais privadas. Ela exibe apenas conteúdo demonstrativo.
+
+A branch `master` continua sendo a homologação da aplicação social completa. A branch `local-full` é destinada ao desenvolvimento local com banco e dados fictícios. O plano de separação e o fluxo futuro de aprovação manual estão em [doc/portfolio-architecture.md](doc/portfolio-architecture.md).
+
 ### Estado da master
 
 A branch `master` reúne a atualização social em homologação: chat com grupos e Markdown sanitizado, chamadas com áudio, câmera e compartilhamento de tela, comunidades, upload moderado por Vercel Blob e edição autorizada de posts. O CI executa testes, checagem de tipos, auditoria e validação estrutural do servidor; a integração Git da Vercel cria apenas um Preview para esta branch.
