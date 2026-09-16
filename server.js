@@ -781,15 +781,27 @@ app.get('/api/feed', authenticateToken, async (req, res) => {
 // Criar post
 app.post('/api/posts', authenticateToken, async (req, res) => {
     try {
-        const { content } = req.body;
+        const content = String(req.body.content || '').trim();
+        const mediaAssetId = req.body.mediaAssetId || null;
 
-        if (!content || content.trim() === '') {
-            return res.status(400).json({ success: false, error: 'Conteúdo não pode ser vazio' });
+        if (!content && !mediaAssetId) {
+            return res.status(400).json({ success: false, error: 'Adicione um texto ou uma imagem' });
+        }
+        if (content.length > 5000) {
+            return res.status(400).json({ success: false, error: 'A publicação excede 5.000 caracteres' });
+        }
+        if (mediaAssetId) {
+            const asset = await sql`
+                SELECT id FROM media_assets
+                WHERE id = ${mediaAssetId} AND owner_id = ${req.user.id}
+                  AND purpose = 'post' AND status = 'approved'
+            `;
+            if (!asset.rows[0]) return res.status(409).json({ success: false, error: 'A imagem ainda não foi aprovada' });
         }
 
         const result = await sql`
-            INSERT INTO posts (user_id, content)
-            VALUES (${req.user.id}, ${content})
+            INSERT INTO posts (user_id, content, media_asset_id)
+            VALUES (${req.user.id}, ${content}, ${mediaAssetId})
             RETURNING *
         `;
 

@@ -117,7 +117,7 @@ function createSocialRouter({ db, authenticateToken }) {
     router.post('/media/uploads', async (req, res, next) => {
         try {
             const { purpose, fileName, contentType, contextId = null } = req.body;
-            if (!['avatar', 'cover', 'post', 'message', 'community'].includes(purpose)) {
+            if (!['avatar', 'cover', 'post', 'message', 'community', 'wallpaper'].includes(purpose)) {
                 return res.status(400).json({ success: false, code: 'INVALID_PURPOSE', error: 'Finalidade de mídia inválida' });
             }
             if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
@@ -174,7 +174,7 @@ function createSocialRouter({ db, authenticateToken }) {
             }
 
             let publicUrl = null;
-            if (status === 'approved' && ['avatar', 'cover', 'post', 'community'].includes(media.purpose)) {
+            if (status === 'approved' && ['avatar', 'cover', 'post', 'community', 'wallpaper'].includes(media.purpose)) {
                 const approvedBlob = await put(`approved/${media.owner_id}/${media.id}/${safeName}`, req.body, {
                     access: 'public',
                     contentType,
@@ -218,7 +218,7 @@ function createSocialRouter({ db, authenticateToken }) {
                         JOIN chat_messages m ON m.id = a.message_id
                         JOIN conversation_members cm ON cm.conversation_id = m.conversation_id
                         WHERE a.asset_id = ma.id AND cm.user_id = $2 AND cm.left_at IS NULL
-                    )
+                    ) OR EXISTS (SELECT 1 FROM posts p WHERE p.media_asset_id = ma.id)
                  )`,
                 [req.params.id, req.user.id]
             );
@@ -258,10 +258,18 @@ function createSocialRouter({ db, authenticateToken }) {
     router.get('/conversations', async (req, res, next) => {
         try {
             const result = await query(
-                `SELECT c.id, c.kind, c.title, c.community_id AS "communityId", cm.role,
+                `SELECT c.id, c.kind,
+                        COALESCE(c.title, direct_user.name, CASE WHEN c.kind = 'channel' THEN 'Canal' ELSE 'Conversa' END) AS title,
+                        direct_user.avatar, c.community_id AS "communityId", cm.role,
                         lm.id AS "lastMessageId", lm.content AS "lastMessage", lm.created_at AS "lastMessageAt"
                  FROM conversation_members cm
                  JOIN conversations c ON c.id = cm.conversation_id
+                 LEFT JOIN LATERAL (
+                    SELECT u.name, u.avatar FROM conversation_members other
+                    JOIN users u ON u.id = other.user_id
+                    WHERE other.conversation_id = c.id AND other.user_id <> $1 AND other.left_at IS NULL
+                    ORDER BY other.joined_at LIMIT 1
+                 ) direct_user ON c.kind = 'direct'
                  LEFT JOIN LATERAL (
                     SELECT id, content, created_at FROM chat_messages
                     WHERE conversation_id = c.id AND deleted_at IS NULL
@@ -272,6 +280,46 @@ function createSocialRouter({ db, authenticateToken }) {
                 [req.user.id]
             );
             res.json(result.rows);
+        } catch (error) { next(error); }
+    });
+
+    router.get('/conversations/:id/wallpaper', async (req, res, next) => {
+        try {
+            if (!(await conversationMembership(req.params.id, req.user.id))) return res.status(403).json({ success: false, error: 'Sem acesso à conversa' });
+            const result = await query(
+                `SELECT cp.use_global_wallpaper AS "useGlobal", cp.wallpaper_asset_id AS "conversationAssetId",
+                        us.global_wallpaper_asset_id AS "globalAssetId"
+                 FROM user_settings us
+                 LEFT JOIN conversation_preferences cp ON cp.user_id = us.user_id AND cp.conversation_id = $2
+                 WHERE us.user_id = $1`,
+                [req.user.id, req.params.id]
+            );
+            const settings = result.rows[0] || { useGlobal: true };
+            settings.assetId = settings.useGlobal !== false ? settings.globalAssetId : settings.conversationAssetId;
+            res.json(settings);
+        } catch (error) { next(error); }
+    });
+
+    router.put('/conversations/:id/wallpaper', async (req, res, next) => {
+        try {
+            if (!(await conversationMembership(req.params.id, req.user.id))) return res.status(403).json({ success: false, error: 'Sem acesso à conversa' });
+            const assetId = req.body.assetId || null;
+            const scope = req.body.scope === 'global' ? 'global' : 'conversation';
+            if (assetId) {
+                const asset = await query(`SELECT 1 FROM media_assets WHERE id = $1 AND owner_id = $2 AND purpose = 'wallpaper' AND status = 'approved'`, [assetId, req.user.id]);
+                if (!asset.rows[0]) return res.status(409).json({ success: false, error: 'Papel de parede ainda não aprovado' });
+            }
+            await query(`INSERT INTO user_settings (user_id) VALUES ($1) ON CONFLICT DO NOTHING`, [req.user.id]);
+            if (scope === 'global') {
+                await query(`UPDATE user_settings SET global_wallpaper_asset_id = $2, updated_at = NOW() WHERE user_id = $1`, [req.user.id, assetId]);
+                await query(`INSERT INTO conversation_preferences (conversation_id, user_id, use_global_wallpaper) VALUES ($1, $2, TRUE)
+                             ON CONFLICT (conversation_id, user_id) DO UPDATE SET use_global_wallpaper = TRUE, updated_at = NOW()`, [req.params.id, req.user.id]);
+            } else {
+                await query(`INSERT INTO conversation_preferences (conversation_id, user_id, wallpaper_asset_id, use_global_wallpaper)
+                             VALUES ($1, $2, $3, FALSE)
+                             ON CONFLICT (conversation_id, user_id) DO UPDATE SET wallpaper_asset_id = EXCLUDED.wallpaper_asset_id, use_global_wallpaper = FALSE, updated_at = NOW()`, [req.params.id, req.user.id, assetId]);
+            }
+            res.json({ success: true, assetId, scope });
         } catch (error) { next(error); }
     });
 
@@ -413,11 +461,19 @@ function createSocialRouter({ db, authenticateToken }) {
                 `INSERT INTO chat_messages (id, conversation_id, sender_id, content, format, client_message_id, reply_to_id)
                  VALUES ($1, $2, $3, $4, $5, $6, $7)
                  ON CONFLICT (sender_id, client_message_id) DO UPDATE SET client_message_id = EXCLUDED.client_message_id
-                 RETURNING id, conversation_id AS "conversationId", sender_id AS "senderId", content, format, created_at AS "createdAt"`,
+                 RETURNING id, conversation_id AS "conversationId", sender_id AS "senderId", content, format,
+                           created_at AS "createdAt", (xmax = 0) AS inserted`,
                 [id, req.params.id, req.user.id, content, format, clientMessageId, req.body.replyToId || null]
             );
             for (const assetId of attachmentIds) {
                 await query(`INSERT INTO message_attachments (message_id, asset_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, [result.rows[0].id, assetId]);
+            }
+            if (result.rows[0].inserted) {
+                const recipients = await query(`SELECT user_id FROM conversation_members WHERE conversation_id = $1 AND user_id <> $2 AND left_at IS NULL`, [req.params.id, req.user.id]);
+                const sender = await query(`SELECT name FROM users WHERE id = $1`, [req.user.id]);
+                for (const recipient of recipients.rows) {
+                    await query(`INSERT INTO notifications (user_id, type, content, related_user_id) VALUES ($1, 'new_message', $2, $3)`, [recipient.user_id, `${sender.rows[0]?.name || 'Alguém'} enviou uma mensagem`, req.user.id]);
+                }
             }
             await publishSignal(`conversation:${req.params.id}`, 'message.created', { id: result.rows[0].id });
             res.status(201).json(result.rows[0]);
