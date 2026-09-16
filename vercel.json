@@ -5,22 +5,9 @@
             "src": "server.js",
             "use": "@vercel/node"
         },
-        {
-            "src": "*.html",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "app.js|api.js|state.js|utils.js|social.js",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "*.css",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "Icons/**",
-            "use": "@vercel/static"
-        }
+        { "src": "index.html", "use": "@vercel/static" },
+        { "src": "portfolio.html", "use": "@vercel/static" },
+        { "src": "Icons/**", "use": "@vercel/static" }
     ],
     "routes": [
         {
@@ -33,6 +20,10 @@
         },
         {
             "src": "/",
+            "dest": "/index.html"
+        },
+        {
+            "src": "/(site|admin|moderation|config)\\.html",
             "dest": "/index.html"
         },
         {
