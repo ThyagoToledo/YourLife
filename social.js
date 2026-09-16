@@ -97,7 +97,7 @@
     }
 
     async function loadConversations() {
-        const list = document.getElementById('social-conversation-list');
+        const list = document.getElementById('conversations-list');
         if (!list) return;
         try {
             const conversations = await socialRequest('/conversations');
@@ -106,33 +106,35 @@
                 return;
             }
             list.innerHTML = conversations.map((conversation) => `
-                <button data-conversation-id="${escapeHTML(conversation.id)}" data-title="${escapeHTML(conversation.title || (conversation.kind === 'direct' ? 'Conversa direta' : 'Conversa'))}"
+                <button data-conversation-id="${escapeHTML(conversation.id)}" data-title="${escapeHTML(conversation.title || 'Conversa')}" data-avatar="${escapeHTML(conversation.avatar || '')}"
                     class="social-conversation w-full text-left p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 flex gap-3">
                     <span class="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400">${socialIcon(conversation.kind === 'direct' ? 'chat' : conversation.kind === 'channel' ? 'chat' : 'group')}</span>
-                    <span class="min-w-0"><span class="block font-medium text-gray-900 dark:text-white">${escapeHTML(conversation.title || (conversation.kind === 'direct' ? 'Conversa direta' : 'Conversa'))}</span>
+                    <span class="min-w-0"><span class="block font-medium text-gray-900 dark:text-white">${escapeHTML(conversation.title || 'Conversa')}</span>
                     <span class="block text-xs text-gray-500 truncate">${escapeHTML(conversation.lastMessage || 'Sem mensagens')}</span>
                     </span>
                 </button>
             `).join('');
             list.querySelectorAll('.social-conversation').forEach((button) => {
-                button.addEventListener('click', () => selectConversation(button.dataset.conversationId, button.dataset.title));
+                button.addEventListener('click', () => selectConversation(button.dataset.conversationId, button.dataset.title, button.dataset.avatar));
             });
         } catch (error) {
             list.innerHTML = `<p class="p-6 text-red-600">${escapeHTML(error.message)}</p>`;
         }
     }
 
-    async function selectConversation(id, title) {
+    async function selectConversation(id, title, avatar = '') {
         socialState.conversationId = id;
         socialState.conversationTitle = title;
         socialState.topicId = null;
-        document.getElementById('social-chat-title').textContent = title;
-        document.getElementById('social-chat-status').textContent = 'Tópico protegido · Markdown e anexos moderados';
-        document.getElementById('social-send-btn').disabled = false;
-        document.getElementById('social-audio-call-btn').disabled = false;
-        document.getElementById('social-video-call-btn').disabled = false;
-        document.getElementById('social-chat-panel').classList.remove('hidden');
-        document.getElementById('social-chat-panel').classList.add('flex');
+        document.getElementById('chat-user-name').textContent = title;
+        document.getElementById('chat-user-status').textContent = 'Conversa protegida · anexos moderados';
+        document.getElementById('chat-user-avatar').src = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=4F46E5&color=fff`;
+        document.getElementById('message-send-btn').disabled = false;
+        document.getElementById('message-audio-call-btn').disabled = false;
+        document.getElementById('message-video-call-btn').disabled = false;
+        document.getElementById('no-chat-selected').classList.add('hidden');
+        document.getElementById('active-chat').classList.remove('hidden');
+        await applyWallpaper();
         await loadTopics();
         await loadMessages();
         subscribeConversation(id);
@@ -174,7 +176,7 @@
 
     async function loadMessages() {
         if (!socialState.conversationId) return;
-        const container = document.getElementById('social-messages');
+        const container = document.getElementById('messages-list');
         try {
             const result = await socialRequest(`/conversations/${socialState.conversationId}/messages?limit=100`);
             const currentUserId = Number(window.app?.state?.getState()?.currentUser?.id);
@@ -189,12 +191,13 @@
                         ${mine ? '' : `<p class="text-xs font-semibold opacity-70">${escapeHTML(message.senderName)}</p>`}
                         <div class="chat-markdown break-words">${renderMessage(message.content, message.format)}</div>
                         ${(message.attachments || []).map((attachment) => `<img data-private-media="${escapeHTML(attachment.id)}" alt="${escapeHTML(attachment.fileName)}" class="mt-2 max-h-80 max-w-full rounded bg-gray-200">`).join('')}
-                        <p class="text-[11px] opacity-60 mt-1">${new Date(message.createdAt).toLocaleString('pt-BR')}${message.editedAt ? ' · editada' : ''}</p>
+                        <div class="flex items-center justify-end gap-2 mt-1"><p class="text-[11px] opacity-60">${new Date(message.createdAt).toLocaleString('pt-BR')}${message.editedAt ? ' · editada' : ''}</p><button class="report-message text-[11px] opacity-60 hover:opacity-100" data-message-id="${escapeHTML(message.id)}" title="Denunciar mensagem">Denunciar</button></div>
                     </div>
                 </article>`;
             }).join('') : '<p class="text-center text-gray-500">Envie a primeira mensagem.</p>';
             container.scrollTop = container.scrollHeight;
             await hydratePrivateImages(container);
+            container.querySelectorAll('.report-message').forEach((button) => button.addEventListener('click', () => reportContent('message', button.dataset.messageId)));
             const last = result.messages.at(-1);
             if (last) await socialRequest(`/conversations/${socialState.conversationId}/read`, { method: 'PUT', body: { messageId: last.id } });
         } catch (error) {
@@ -220,10 +223,10 @@
     }
 
     async function sendMessage() {
-        const input = document.getElementById('social-message-input');
+        const input = document.getElementById('message-input');
         const content = input.value.trim();
         if (!socialState.conversationId || (!content && !socialState.attachmentIds.length)) return;
-        const button = document.getElementById('social-send-btn');
+        const button = document.getElementById('message-send-btn');
         button.disabled = true;
         try {
             await socialRequest(`/conversations/${socialState.conversationId}/messages`, {
@@ -237,8 +240,8 @@
             });
             input.value = '';
             socialState.attachmentIds = [];
-            document.getElementById('social-upload-status').textContent = '';
-            document.getElementById('markdown-preview').classList.add('hidden');
+            document.getElementById('message-upload-status').textContent = '';
+            document.getElementById('markdown-preview')?.classList.add('hidden');
             await Promise.all([loadMessages(), loadConversations()]);
         } catch (error) {
             window.Toast?.error(error.message);
@@ -265,7 +268,7 @@
     }
 
     async function handleAttachment(file) {
-        const status = document.getElementById('social-upload-status');
+        const status = document.getElementById('message-upload-status');
         status.textContent = 'Analisando...';
         try {
             const result = await uploadImage(file, 'message', socialState.conversationId);
@@ -283,8 +286,10 @@
     async function createGroup() {
         const title = prompt('Nome do grupo:');
         if (!title) return;
-        const ids = prompt('IDs dos amigos separados por vírgula:');
-        const memberIds = String(ids || '').split(',').map((id) => Number(id.trim())).filter(Number.isInteger);
+        const friends = await window.apiService.getFriends();
+        const choices = friends.map((friend, index) => `${index + 1}. ${friend.name}`).join('\n');
+        const selected = prompt(`Escolha os amigos pelos números, separados por vírgula:\n${choices}`);
+        const memberIds = [...new Set(String(selected || '').split(',').map((value) => friends[Number(value.trim()) - 1]?.id).filter(Boolean))];
         if (!memberIds.length) return;
         try {
             const conversation = await socialRequest('/conversations', { method: 'POST', body: { kind: 'group', title, memberIds } });
@@ -294,7 +299,7 @@
     }
 
     async function loadTopics() {
-        const select = document.getElementById('social-topic-select');
+        const select = document.getElementById('message-topic-select');
         if (!select || !socialState.conversationId) return;
         try {
             const topics = await socialRequest(`/conversations/${socialState.conversationId}/topics`);
@@ -312,7 +317,7 @@
             const topic = await socialRequest(`/conversations/${socialState.conversationId}/topics`, { method: 'POST', body: { title, body } });
             socialState.topicId = topic.id;
             await loadTopics();
-            document.getElementById('social-topic-select').value = topic.id;
+            document.getElementById('message-topic-select').value = topic.id;
         } catch (error) { window.Toast?.error(error.message); }
     }
 
@@ -322,10 +327,69 @@
                 method: 'POST',
                 body: { kind: 'direct', memberIds: [Number(userId)] }
             });
-            showSocialView('social-chat-view');
+            window.app?.showView('messages-view');
             await loadConversations();
-            await selectConversation(conversation.id, conversation.title || 'Conversa direta');
+            const user = await window.apiService.getUser(userId);
+            await selectConversation(conversation.id, user.name || 'Conversa', user.avatar || '');
         } catch (error) { window.Toast?.error(error.message); }
+    }
+
+    async function reportContent(targetType, targetId) {
+        const reason = prompt('Descreva o motivo da denúncia (mínimo de 3 caracteres):');
+        if (!reason || reason.trim().length < 3) return;
+        try {
+            await socialRequest('/reports', { method: 'POST', body: { targetType, targetId, reason: reason.trim() } });
+            window.Toast?.success('Denúncia enviada à moderação');
+        } catch (error) { window.Toast?.error(error.message); }
+    }
+
+    async function applyWallpaper() {
+        const container = document.getElementById('messages-container');
+        if (!container || !socialState.conversationId) return;
+        container.style.backgroundImage = '';
+        try {
+            const settings = await socialRequest(`/conversations/${socialState.conversationId}/wallpaper`);
+            if (!settings.assetId) return;
+            const token = window.apiService?.getToken();
+            const response = await fetch(`${window.BACKEND_URL}/v2/media/${settings.assetId}/content`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+            if (!response.ok) return;
+            const url = URL.createObjectURL(await response.blob());
+            container.style.backgroundImage = `linear-gradient(rgb(15 23 42 / .55), rgb(15 23 42 / .55)), url("${url}")`;
+            container.style.backgroundSize = 'cover';
+            container.style.backgroundPosition = 'center';
+        } catch (error) { console.warn('Papel de parede indisponível:', error.message); }
+    }
+
+    async function chooseWallpaper() {
+        if (!socialState.conversationId) return;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/jpeg,image/png,image/webp';
+        input.addEventListener('change', async () => {
+            try {
+                const uploaded = await uploadImage(input.files[0], 'wallpaper', socialState.conversationId);
+                if (uploaded.status !== 'approved') return window.Toast?.info('A imagem foi enviada para revisão');
+                const scope = confirm('Usar este papel de parede em todas as conversas?') ? 'global' : 'conversation';
+                await socialRequest(`/conversations/${socialState.conversationId}/wallpaper`, { method: 'PUT', body: { assetId: uploaded.id, scope } });
+                await applyWallpaper();
+            } catch (error) { window.Toast?.error(error.message); }
+        }, { once: true });
+        input.click();
+    }
+
+    function setupEmojiPicker() {
+        const picker = document.getElementById('message-emoji-picker');
+        const button = document.getElementById('message-emoji-btn');
+        const input = document.getElementById('message-input');
+        if (!picker || !button || !input) return;
+        const emojis = ['😀','😂','🥰','😍','😊','😎','🤔','😢','😭','😡','👍','👎','👏','🙏','❤️','💙','🔥','🎉','✨','✅','👀','💬','📷','🚀'];
+        picker.innerHTML = emojis.map((emoji) => `<button type="button" class="emoji-choice text-xl hover:scale-125" data-emoji="${emoji}">${emoji}</button>`).join('');
+        button.addEventListener('click', () => picker.classList.toggle('hidden'));
+        picker.querySelectorAll('.emoji-choice').forEach((choice) => choice.addEventListener('click', () => {
+            input.setRangeText(choice.dataset.emoji, input.selectionStart, input.selectionEnd, 'end');
+            input.focus();
+            picker.classList.add('hidden');
+        }));
     }
 
     async function loadCommunities() {
@@ -404,7 +468,7 @@
         socialState.callId = callId;
         document.getElementById('active-call-bar').classList.remove('hidden');
         document.getElementById('active-call-bar').classList.add('flex');
-        showSocialView('calls-view');
+        document.getElementById('calls-view')?.classList.remove('hidden');
         attachLocalTracks();
         await loadCalls();
     }
@@ -433,6 +497,7 @@
         socialState.callId = null;
         document.getElementById('call-videos').replaceChildren();
         document.getElementById('active-call-bar').classList.add('hidden');
+        document.getElementById('calls-view')?.classList.add('hidden');
         await loadCalls();
     }
 
@@ -489,11 +554,8 @@
     }
 
     function bindNavigation() {
-        document.getElementById('nav-social-chat')?.addEventListener('click', async (event) => {
-            event.preventDefault(); showSocialView('social-chat-view'); await loadConversations();
-        });
-        document.getElementById('nav-calls')?.addEventListener('click', async (event) => {
-            event.preventDefault(); showSocialView('calls-view'); await Promise.all([loadCalls(), enumerateDevices(false)]);
+        document.getElementById('nav-messages')?.addEventListener('click', async (event) => {
+            event.preventDefault(); window.app?.showView('messages-view'); await loadConversations();
         });
         document.getElementById('nav-communities')?.addEventListener('click', async (event) => {
             event.preventDefault(); showSocialView('communities-view'); await loadCommunities();
@@ -501,8 +563,8 @@
     }
 
     function bindActions() {
-        document.getElementById('social-send-btn')?.addEventListener('click', sendMessage);
-        document.getElementById('social-message-input')?.addEventListener('keydown', (event) => {
+        document.getElementById('message-send-btn')?.addEventListener('click', sendMessage);
+        document.getElementById('message-input')?.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.shiftKey && socialState.settings.enterToSend) { event.preventDefault(); sendMessage(); }
         });
         document.getElementById('toggle-preview-btn')?.addEventListener('click', () => {
@@ -512,17 +574,18 @@
         });
         document.querySelectorAll('.markdown-tool').forEach((button) => button.addEventListener('click', () => wrapSelection(button.dataset.md)));
         document.querySelectorAll('.markdown-prefix').forEach((button) => button.addEventListener('click', () => prefixSelection(button.dataset.prefix)));
-        document.getElementById('social-attachment')?.addEventListener('change', (event) => handleAttachment(event.target.files[0]));
-        document.getElementById('create-group-btn')?.addEventListener('click', createGroup);
+        document.getElementById('message-attachment')?.addEventListener('change', (event) => handleAttachment(event.target.files[0]));
+        document.getElementById('message-create-group-btn')?.addEventListener('click', createGroup);
         document.getElementById('create-community-btn')?.addEventListener('click', createCommunity);
-        document.getElementById('chat-settings-btn')?.addEventListener('click', openSettings);
-        document.getElementById('create-topic-btn')?.addEventListener('click', createTopic);
-        document.getElementById('social-topic-select')?.addEventListener('change', (event) => {
+        document.getElementById('message-settings-btn')?.addEventListener('click', openSettings);
+        document.getElementById('chat-wallpaper-btn')?.addEventListener('click', chooseWallpaper);
+        document.getElementById('message-create-topic-btn')?.addEventListener('click', createTopic);
+        document.getElementById('message-topic-select')?.addEventListener('change', (event) => {
             socialState.topicId = event.target.value || null;
-            document.getElementById('social-chat-status').textContent = socialState.topicId ? 'Tópico protegido · chamada vinculada a este tópico' : 'Tópico geral · Markdown e anexos moderados';
+            document.getElementById('chat-user-status').textContent = socialState.topicId ? 'Tópico protegido · chamada vinculada' : 'Conversa protegida · anexos moderados';
         });
-        document.getElementById('social-audio-call-btn')?.addEventListener('click', () => startCall(false));
-        document.getElementById('social-video-call-btn')?.addEventListener('click', () => startCall(true));
+        document.getElementById('message-audio-call-btn')?.addEventListener('click', () => startCall(false));
+        document.getElementById('message-video-call-btn')?.addEventListener('click', () => startCall(true));
         document.getElementById('test-devices-btn')?.addEventListener('click', () => enumerateDevices(true).catch((error) => window.Toast?.error(error.message)));
         document.getElementById('microphone-select')?.addEventListener('change', applyDeviceSelections);
         document.getElementById('camera-select')?.addEventListener('change', applyDeviceSelections);
@@ -558,11 +621,12 @@
         setTimeout(async () => {
             bindNavigation();
             bindActions();
+            setupEmojiPicker();
             patchLegacyMessageSafety();
             if (window.apiService?.getToken()) await loadSettings();
             setupRealtime();
         }, 0);
     });
 
-    window.YourLifeSocial = { uploadImage, loadConversations, loadCommunities, loadCalls, openDirectConversation, connectRealtime: setupRealtime };
+    window.YourLifeSocial = { uploadImage, loadConversations, loadCommunities, loadCalls, openDirectConversation, reportContent, sendMessage, connectRealtime: setupRealtime };
 })();

@@ -411,6 +411,20 @@ class App {
                 this.handleCreatePost();
             });
         }
+        document.getElementById('new-post-image')?.addEventListener('change', (event) => {
+            const file = event.target.files?.[0];
+            const preview = document.getElementById('post-image-preview');
+            if (!file || !preview) return;
+            const url = URL.createObjectURL(file);
+            preview.innerHTML = `<img src="${url}" alt="Prévia da imagem" class="max-h-72 w-full object-cover rounded-lg"><button type="button" id="remove-post-image" class="absolute top-2 right-2 px-3 py-1 bg-black/70 text-white rounded-full">Remover</button>`;
+            preview.classList.remove('hidden');
+            preview.querySelector('#remove-post-image').addEventListener('click', () => {
+                event.target.value = '';
+                preview.replaceChildren();
+                preview.classList.add('hidden');
+                URL.revokeObjectURL(url);
+            });
+        });
 
         // Busca com debounce
         if (this.elements.searchInput) {
@@ -486,7 +500,7 @@ class App {
                 const icon = iconMap[notif.type] || '(!)';
 
                 return `
-                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${notif.is_read ? 'opacity-60' : ''}">
+                    <button type="button" data-notification-id="${notif.id}" class="notification-item w-full text-left p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${notif.is_read ? 'opacity-60' : ''}">
                         <div class="flex items-start gap-3">
                             <span class="text-2xl">${icon}</span>
                             <div class="flex-1">
@@ -495,9 +509,18 @@ class App {
                             </div>
                             ${!notif.is_read ? '<span class="w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
                         </div>
-                    </div>
+                    </button>
                 `;
             }).join('');
+
+            container.querySelectorAll('.notification-item').forEach((item) => item.addEventListener('click', async () => {
+                if (!item.classList.contains('opacity-60')) {
+                    await this.api.markNotificationAsRead(item.dataset.notificationId);
+                    item.classList.add('opacity-60');
+                    item.querySelector('.bg-blue-500')?.remove();
+                    await this.loadNotificationsDropdown();
+                }
+            }));
 
             // Atualiza badge
             const unreadCount = notifications.filter(n => !n.is_read).length;
@@ -821,6 +844,7 @@ class App {
                 const normalizedPost = {
                     id: post.id,
                     content: post.content,
+                    mediaAssetId: post.media_asset_id,
                     created_at: post.created_at,
                     author: {
                         id: post.user_id,
@@ -982,7 +1006,8 @@ class App {
                 ${this.renderPostActionButton(post.author, friendsList)}
             </div>
             
-            <p class="mt-4 text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(post.content)}</p>
+            ${post.content ? `<p class="mt-4 text-gray-700 dark:text-gray-300">${Validation.sanitizeHTML(post.content)}</p>` : ''}
+            ${post.mediaAssetId ? `<img data-post-media="${post.mediaAssetId}" alt="Imagem da publicação" class="mt-4 w-full max-h-[36rem] object-cover rounded-xl bg-gray-100 dark:bg-gray-700">` : ''}
             
             <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex space-x-6">
@@ -1005,6 +1030,9 @@ class App {
                         </svg>
                         <span>Dar Conselho</span>
                     </button>
+                    <button class="report-post flex items-center space-x-1 text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors" data-post-id="${post.id}" title="Denunciar publicação">
+                        <span>Denunciar</span>
+                    </button>
                 </div>
             </div>
             
@@ -1025,8 +1053,20 @@ class App {
 
         // Event listeners para o post
         this.attachPostEventListeners(div, post);
+        this.hydratePostImages(div);
 
         return div;
+    }
+
+    async hydratePostImages(container) {
+        const token = this.api.getToken();
+        await Promise.all([...container.querySelectorAll('[data-post-media]')].map(async (image) => {
+            try {
+                const response = await fetch(`${this.api.baseUrl}/v2/media/${image.dataset.postMedia}/content`, { headers: { Authorization: `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Imagem indisponível');
+                image.src = URL.createObjectURL(await response.blob());
+            } catch (error) { image.remove(); }
+        }));
     }
 
     // Anexa event listeners ao post
@@ -1108,6 +1148,7 @@ class App {
         if (likeButton) {
             likeButton.addEventListener('click', () => this.handleLikePost(post.id));
         }
+        element.querySelector('.report-post')?.addEventListener('click', () => window.YourLifeSocial?.reportContent('post', post.id));
 
         // Toggle comentários
         const commentToggle = element.querySelector('.comment-toggle');
@@ -1167,23 +1208,33 @@ class App {
     // Handle criar post
     async handleCreatePost() {
         const content = this.elements.newPostContent?.value?.trim();
+        const imageInput = document.getElementById('new-post-image');
+        const image = imageInput?.files?.[0];
 
-        if (!content) {
-            Toast.warning('Digite algo antes de postar');
+        if (!content && !image) {
+            Toast.warning('Adicione um texto ou uma imagem');
             return;
         }
 
         try {
             Loading.show('Criando postagem...');
 
-            // MODO REAL - Backend ativo
-            const response = await this.api.createPost({ content });
+            let mediaAssetId = null;
+            if (image) {
+                const status = document.getElementById('post-upload-status');
+                if (status) status.textContent = 'Enviando e analisando imagem...';
+                const upload = await window.YourLifeSocial.uploadImage(image, 'post');
+                if (upload.status !== 'approved') throw new Error(upload.status === 'rejected' ? 'Imagem recusada pelo filtro de segurança' : 'Imagem enviada para revisão; publique após a aprovação');
+                mediaAssetId = upload.id;
+            }
+            const response = await this.api.createPost({ content, mediaAssetId });
 
             if (response && response.post) {
                 // Normalizar formato do post para compatibilidade com o feed
                 const normalizedPost = {
                     id: response.post.id,
                     content: response.post.content,
+                    mediaAssetId: response.post.media_asset_id,
                     created_at: response.post.created_at,
                     author: {
                         id: response.post.user_id,
@@ -1198,12 +1249,17 @@ class App {
 
                 this.state.addPost(normalizedPost);
                 this.elements.newPostContent.value = '';
+                if (imageInput) imageInput.value = '';
+                document.getElementById('post-image-preview')?.replaceChildren();
+                document.getElementById('post-image-preview')?.classList.add('hidden');
+                const uploadStatus = document.getElementById('post-upload-status');
+                if (uploadStatus) uploadStatus.textContent = '';
                 this.renderFeed();
                 Toast.success('Postagem criada com sucesso!');
             }
         } catch (error) {
             console.error('Erro ao criar post:', error);
-            Toast.error('Erro ao criar postagem');
+            Toast.error(error.message || 'Erro ao criar postagem');
         } finally {
             Loading.hide();
         }
@@ -2745,17 +2801,11 @@ class App {
     // ========== MENSAGENS (CORRESPONDÊNCIAS) ==========
 
     async loadMessages() {
-        const navMessages = document.getElementById('nav-messages');
-        if (navMessages) {
-            navMessages.addEventListener('click', async (e) => {
-                e.preventDefault();
-                this.showView('messages-view');
-                await this.loadConversations();
-            });
-        }
+        // A navegação e a renderização são controladas pelo módulo social unificado.
     }
 
     async loadConversations() {
+        if (window.YourLifeSocial) return window.YourLifeSocial.loadConversations();
         try {
             const conversations = await this.api.getConversations();
             const container = document.getElementById('conversations-list');
@@ -2834,6 +2884,7 @@ class App {
     }
 
     async openChat(userId) {
+            if (window.YourLifeSocial) return window.YourLifeSocial.openDirectConversation(userId);
             try {
                 this.currentChatUserId = userId;
                 const socialTopicButton = document.getElementById('open-social-topic-btn');
@@ -2935,6 +2986,7 @@ class App {
     }
 
     async sendMessage() {
+        if (window.YourLifeSocial) return window.YourLifeSocial.sendMessage();
         const input = document.getElementById('message-input');
         const content = input?.value?.trim();
 
