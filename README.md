@@ -67,6 +67,10 @@ A branch `main` é a vitrine pública do projeto e não possui login, cadastro o
 
 A branch `master` continua sendo a homologação da aplicação social completa. A branch `local-full` é destinada ao desenvolvimento local com banco e dados fictícios. O plano de separação e o fluxo futuro de aprovação manual estão em [doc/portfolio-architecture.md](doc/portfolio-architecture.md).
 
+### Estado da main
+
+A `main` é a versão de portfólio público. A entrada principal não redireciona para login e apresenta uma vitrine somente leitura, com conteúdo demonstrativo e sem cadastro, publicação ou acesso à rede privada.
+
 ### Estado da master
 
 A branch `master` reúne a atualização social em homologação: chat com grupos e Markdown sanitizado, chamadas com áudio, câmera e compartilhamento de tela, comunidades, upload moderado por Vercel Blob e edição autorizada de posts. O CI executa testes, checagem de tipos, auditoria e validação estrutural do servidor; a integração Git da Vercel cria apenas um Preview para esta branch.
