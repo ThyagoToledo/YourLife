@@ -21,6 +21,8 @@ As branches não são uma barreira de segurança. Segredos, permissões e conex�
 
 ## Portfólio público
 
+Deploy público atual: https://your-life.vercel.app
+
 A `main` deve permanecer somente leitura:
 
 - apresentação do projeto e das funcionalidades;
