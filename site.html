@@ -254,8 +254,8 @@
 
                 <fieldset class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
                     <legend class="px-1 font-semibold">Privacidade e condições</legend>
-                    <label class="flex items-start gap-2"><input name="ageConfirmed" type="checkbox" required class="mt-1"><span>Declaro ter pelo menos 13 anos. Contas de menores devem observar a autorização e supervisão do responsável legal.</span></label>
-                    <label class="flex items-start gap-2"><input name="termsAccepted" type="checkbox" required class="mt-1"><span>Li e aceito os <button type="button" id="register-terms-link" class="font-semibold text-blue-600 underline">Termos de Uso</button> (versão 2026-09-16).</span></label>
+                    <label class="flex items-start gap-2"><input name="ageConfirmed" type="checkbox" required class="mt-1"><span>Declaro ter pelo menos 18 anos. Este projeto ainda não possui fluxo de autorização e supervisão de responsável legal para menores.</span></label>
+                    <label class="flex items-start gap-2"><input name="termsAccepted" type="checkbox" required class="mt-1"><span>Li e aceito os <button type="button" id="register-terms-link" class="font-semibold text-blue-600 underline">Termos de Uso</button> (versão 2026-09-16-study-v2).</span></label>
                     <label class="flex items-start gap-2"><input name="privacyAcknowledged" type="checkbox" required class="mt-1"><span>Li o <button type="button" id="register-privacy-link" class="font-semibold text-blue-600 underline">Aviso de Privacidade</button> e estou ciente de como meus dados serão tratados.</span></label>
                     <label class="flex items-start gap-2"><input name="marketingConsent" type="checkbox" class="mt-1"><span>Aceito receber novidades e comunicações promocionais (opcional e revogável).</span></label>
                 </fieldset>
@@ -884,7 +884,7 @@
                         <div>
                             <h4 class="font-semibold text-gray-800 dark:text-white mb-2">2. Uso da Plataforma</h4>
                             <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
-                                <li>Você deve ter pelo menos 13 anos de idade para usar esta plataforma.</li>
+                                <li>Você deve ter pelo menos 18 anos de idade para usar esta plataforma.</li>
                                 <li>Você é responsável por manter a confidencialidade de sua conta e senha.</li>
                                 <li>Você concorda em não usar a plataforma para qualquer propósito ilegal ou não autorizado.</li>
                                 <li>Você não deve transmitir vírus, worms ou qualquer código de natureza destrutiva.</li>
@@ -892,17 +892,27 @@
                         </div>
 
                         <div>
-                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">3. Conteúdo do Usuário</h4>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">3. Natureza educacional e disponibilidade limitada</h4>
                             <p class="text-sm leading-relaxed mb-2">
-                                Você mantém todos os direitos sobre o conteúdo que publica na plataforma. No entanto, ao publicar conteúdo, você nos concede uma licença mundial, não exclusiva, isenta de royalties para usar, reproduzir e exibir esse conteúdo.
+                                O Your Life é um projeto experimental de estudos e portfólio, sem fins lucrativos. Não constitui serviço comercial, profissional, essencial, de emergência ou destinado a operação em grande escala.
                             </p>
                             <p class="text-sm leading-relaxed">
-                                Você é o único responsável pelo conteúdo que publica e deve garantir que não viola direitos de terceiros ou leis aplicáveis.
+                                A plataforma utiliza planos gratuitos e recursos limitados de provedores como Vercel e Neon. Por isso, pode apresentar lentidão, indisponibilidade, limites de armazenamento ou ser suspensa, modificada ou encerrada. Não garantimos funcionamento contínuo, preservação indefinida de conteúdo ou capacidade para grande quantidade de usuários. Não publique a única cópia de informações importantes.
                             </p>
                         </div>
 
                         <div>
-                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">4. Conduta Proibida</h4>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">4. Conteúdo e responsabilidade do usuário</h4>
+                            <p class="text-sm leading-relaxed mb-2">
+                                Você mantém todos os direitos sobre o conteúdo que publica na plataforma. No entanto, ao publicar conteúdo, você nos concede uma licença mundial, não exclusiva, isenta de royalties para usar, reproduzir e exibir esse conteúdo.
+                            </p>
+                            <p class="text-sm leading-relaxed">
+                                Você é responsável pelo conteúdo que publica e deve garantir que não viola direitos de terceiros ou leis aplicáveis. Podemos moderar, restringir ou remover conteúdo e contas após denúncia ou identificação de violação, sem assumir obrigação de monitoramento prévio de toda atividade.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">5. Conduta Proibida</h4>
                             <p class="text-sm leading-relaxed mb-2">Você concorda em não:</p>
                             <ul class="list-disc list-inside space-y-2 ml-4 text-sm">
                                 <li>Assediar, intimidar ou ameaçar outros usuários.</li>
@@ -914,9 +924,16 @@
                         </div>
 
                         <div>
-                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">5. Modificações e Encerramento</h4>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">6. Limitação de responsabilidade</h4>
                             <p class="text-sm leading-relaxed">
-                                Reservamos o direito de modificar ou descontinuar, temporária ou permanentemente, a plataforma com ou sem aviso prévio. Também podemos encerrar ou suspender sua conta a qualquer momento por violação destes termos.
+                                Na extensão permitida pela legislação, o projeto não responde por indisponibilidade dos serviços gratuitos de terceiros, perda decorrente da ausência de cópia de segurança pelo usuário, conteúdo publicado por usuários ou uso da plataforma em desacordo com estes Termos. Esta cláusula não exclui responsabilidades que não possam ser afastadas por lei, inclusive deveres aplicáveis de proteção de dados, segurança, atendimento aos titulares e reparação por conduta comprovadamente imputável aos responsáveis pelo projeto.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">7. Modificações e Encerramento</h4>
+                            <p class="text-sm leading-relaxed">
+                                Podemos modificar, limitar ou descontinuar a plataforma e encerrar ou suspender contas que violem estes Termos. Quando viável, comunicaremos mudanças relevantes e ofereceremos meios para exportação dos dados antes do encerramento, ressalvadas necessidades de segurança e obrigações legais.
                             </p>
                         </div>
                     </div>
@@ -937,6 +954,7 @@
                                 <li><strong>Informações de Perfil:</strong> Biografia, foto de perfil, interesses.</li>
                                 <li><strong>Conteúdo:</strong> Postagens, comentários, mensagens e interações na plataforma.</li>
                                 <li><strong>Dados de Uso:</strong> Informações sobre como você usa a plataforma, incluindo endereço IP, tipo de navegador e páginas visitadas.</li>
+                                <li><strong>Infraestrutura:</strong> Os dados podem ser processados e armazenados por provedores de hospedagem e banco de dados, atualmente Vercel e Neon, conforme a configuração técnica do projeto.</li>
                             </ul>
                         </div>
 
@@ -967,7 +985,7 @@
                         <div>
                             <h4 class="font-semibold text-gray-800 dark:text-white mb-2">4. Segurança dos Dados</h4>
                             <p class="text-sm leading-relaxed">
-                                Implementamos medidas de segurança técnicas e organizacionais para proteger suas informações contra acesso não autorizado, alteração, divulgação ou destruição. No entanto, nenhum método de transmissão pela Internet é 100% seguro.
+                                Adotamos medidas técnicas e administrativas proporcionais ao caráter experimental e ao risco para proteger suas informações. Nenhum sistema conectado à Internet é totalmente seguro. Evite inserir dados sensíveis, documentos sigilosos ou informações que não sejam necessárias ao uso demonstrativo da plataforma.
                             </p>
                         </div>
 
@@ -1005,12 +1023,12 @@
                 <!-- Footer -->
                 <section class="pt-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                        <strong>Versões vigentes:</strong> Termos 2026-09-16 · Aviso de Privacidade 2026-09-16
+                        <strong>Versões vigentes:</strong> Termos 2026-09-16-study-v2 · Aviso de Privacidade 2026-09-16-study-v2
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
                         Solicitações de acesso, correção, portabilidade, revogação ou eliminação podem ser abertas na Central de Privacidade da própria plataforma. A resposta observará as hipóteses legais de conservação aplicáveis.
                     </p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Canal de privacidade/encarregado: <span id="privacy-contact">Central de Privacidade da plataforma</span>.</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Canal do titular: <span id="privacy-contact">Central de Privacidade da plataforma</span>. Antes de qualquer abertura pública, será divulgado também um contato real do responsável pelo projeto.</p>
                 </section>
             </div>
 

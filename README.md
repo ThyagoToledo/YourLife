@@ -67,7 +67,7 @@ A branch `master` reúne a atualização social em homologação: chat com grupo
 
 ### Privacidade e LGPD
 
-O cadastro exige aceite versionado dos Termos de Uso, ciência do Aviso de Privacidade e confirmação de idade mínima. O consentimento de marketing é opcional e revogável. Usuários autenticados podem exportar seus dados e abrir solicitações de acesso, correção, portabilidade, revogação ou eliminação pela Central de Privacidade. Configure `PRIVACY_CONTACT_EMAIL` para publicar o canal do encarregado/controlador antes de colocar o serviço em produção.
+O Your Life é um projeto experimental de estudos e portfólio, sem fins lucrativos, executado em planos gratuitos e sem garantia de disponibilidade ou escala. Isso não afasta obrigações legais aplicáveis. O cadastro é restrito a maiores de 18 anos enquanto não existir fluxo de responsável legal, e exige aceite versionado dos Termos e ciência do Aviso de Privacidade. O consentimento de marketing é opcional e revogável. Usuários autenticados podem exportar seus dados e abrir solicitações de acesso, correção, portabilidade, revogação ou eliminação pela Central de Privacidade. Antes de qualquer abertura pública, configure `PRIVACY_CONTACT_EMAIL` com um canal real do responsável pelo projeto e submeta os textos a revisão jurídica.
 
 O fluxo de publicação é `feature -> master -> main`. Consulte o [guia de contribuição](CONTRIBUTING.md) para os critérios de validação. A produção permanece vinculada à `main`.
 
