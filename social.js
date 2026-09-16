@@ -5,6 +5,7 @@
     const socialState = {
         conversationId: null,
         conversationTitle: '',
+        topicId: null,
         attachmentIds: [],
         pollTimer: null,
         room: null,
@@ -19,6 +20,10 @@
         const node = document.createElement('div');
         node.textContent = value == null ? '' : String(value);
         return node.innerHTML;
+    }
+
+    function socialIcon(name, className = 'h-5 w-5') {
+        return `<svg class="${className}" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><use href="Icons/social-sprite.svg#${name}"></use></svg>`;
     }
 
     function renderMessage(content, format) {
@@ -102,9 +107,11 @@
             }
             list.innerHTML = conversations.map((conversation) => `
                 <button data-conversation-id="${escapeHTML(conversation.id)}" data-title="${escapeHTML(conversation.title || (conversation.kind === 'direct' ? 'Conversa direta' : 'Conversa'))}"
-                    class="social-conversation w-full text-left p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <span class="block font-medium text-gray-900 dark:text-white">${escapeHTML(conversation.title || (conversation.kind === 'direct' ? 'Conversa direta' : 'Conversa'))}</span>
+                    class="social-conversation w-full text-left p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 flex gap-3">
+                    <span class="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400">${socialIcon(conversation.kind === 'direct' ? 'chat' : conversation.kind === 'channel' ? 'chat' : 'group')}</span>
+                    <span class="min-w-0"><span class="block font-medium text-gray-900 dark:text-white">${escapeHTML(conversation.title || (conversation.kind === 'direct' ? 'Conversa direta' : 'Conversa'))}</span>
                     <span class="block text-xs text-gray-500 truncate">${escapeHTML(conversation.lastMessage || 'Sem mensagens')}</span>
+                    </span>
                 </button>
             `).join('');
             list.querySelectorAll('.social-conversation').forEach((button) => {
@@ -118,13 +125,15 @@
     async function selectConversation(id, title) {
         socialState.conversationId = id;
         socialState.conversationTitle = title;
+        socialState.topicId = null;
         document.getElementById('social-chat-title').textContent = title;
-        document.getElementById('social-chat-status').textContent = 'Markdown e anexos moderados disponíveis';
+        document.getElementById('social-chat-status').textContent = 'Tópico protegido · Markdown e anexos moderados';
         document.getElementById('social-send-btn').disabled = false;
         document.getElementById('social-audio-call-btn').disabled = false;
         document.getElementById('social-video-call-btn').disabled = false;
         document.getElementById('social-chat-panel').classList.remove('hidden');
         document.getElementById('social-chat-panel').classList.add('flex');
+        await loadTopics();
         await loadMessages();
         subscribeConversation(id);
         clearInterval(socialState.pollTimer);
@@ -284,6 +293,41 @@
         } catch (error) { window.Toast?.error(error.message); }
     }
 
+    async function loadTopics() {
+        const select = document.getElementById('social-topic-select');
+        if (!select || !socialState.conversationId) return;
+        try {
+            const topics = await socialRequest(`/conversations/${socialState.conversationId}/topics`);
+            select.innerHTML = '<option value="">Geral</option>' + topics.map((topic) => `<option value="${escapeHTML(topic.id)}">${escapeHTML(topic.title)} (${topic.commentCount})</option>`).join('');
+            select.value = socialState.topicId || '';
+        } catch (error) { console.warn('Tópicos indisponíveis:', error.message); }
+    }
+
+    async function createTopic() {
+        if (!socialState.conversationId) return;
+        const title = prompt('Título do tópico:');
+        if (!title) return;
+        const body = prompt('Mensagem inicial (opcional):') || '';
+        try {
+            const topic = await socialRequest(`/conversations/${socialState.conversationId}/topics`, { method: 'POST', body: { title, body } });
+            socialState.topicId = topic.id;
+            await loadTopics();
+            document.getElementById('social-topic-select').value = topic.id;
+        } catch (error) { window.Toast?.error(error.message); }
+    }
+
+    async function openDirectConversation(userId) {
+        try {
+            const conversation = await socialRequest('/conversations', {
+                method: 'POST',
+                body: { kind: 'direct', memberIds: [Number(userId)] }
+            });
+            showSocialView('social-chat-view');
+            await loadConversations();
+            await selectConversation(conversation.id, conversation.title || 'Conversa direta');
+        } catch (error) { window.Toast?.error(error.message); }
+    }
+
     async function loadCommunities() {
         const container = document.getElementById('communities-list');
         try {
@@ -326,7 +370,8 @@
             const calls = await socialRequest('/calls');
             container.innerHTML = calls.length ? calls.map((call) => `
                 <article class="flex items-center gap-3 p-3 border rounded-lg dark:border-gray-700">
-                    <div class="flex-1"><p class="font-medium dark:text-white">${escapeHTML(call.state)}</p><p class="text-xs text-gray-500">${new Date(call.createdAt).toLocaleString('pt-BR')}</p></div>
+                    <span class="text-blue-600 dark:text-blue-400">${socialIcon(call.kind === 'direct' ? 'phone' : 'group')}</span>
+                    <div class="flex-1"><p class="font-medium dark:text-white">${escapeHTML(call.topicTitle || call.title || (call.kind === 'direct' ? 'Conversa direta' : 'Tópico em grupo'))}</p><p class="text-xs text-gray-500">${escapeHTML(call.state)} · ${new Date(call.createdAt).toLocaleString('pt-BR')}</p></div>
                     ${call.participantState === 'invited' && call.state === 'ringing' ? `<button data-call="${call.id}" class="accept-call px-3 py-2 bg-green-600 text-white rounded">Atender</button><button data-call="${call.id}" class="decline-call px-3 py-2 bg-red-600 text-white rounded">Recusar</button>` : ''}
                 </article>`).join('') : '<p class="text-gray-500">Nenhuma ligação registrada.</p>';
             container.querySelectorAll('.accept-call').forEach((button) => button.addEventListener('click', async () => { await socialRequest(`/calls/${button.dataset.call}/accept`, { method: 'POST' }); await joinCall(button.dataset.call); }));
@@ -337,7 +382,7 @@
     async function startCall(withVideo) {
         if (!socialState.conversationId) return;
         try {
-            const call = await socialRequest('/calls', { method: 'POST', body: { conversationId: socialState.conversationId } });
+            const call = await socialRequest('/calls', { method: 'POST', body: { conversationId: socialState.conversationId, topicId: socialState.topicId } });
             await socialRequest(`/calls/${call.id}/accept`, { method: 'POST' });
             await joinCall(call.id, withVideo);
         } catch (error) { window.Toast?.error(error.message); }
@@ -471,6 +516,11 @@
         document.getElementById('create-group-btn')?.addEventListener('click', createGroup);
         document.getElementById('create-community-btn')?.addEventListener('click', createCommunity);
         document.getElementById('chat-settings-btn')?.addEventListener('click', openSettings);
+        document.getElementById('create-topic-btn')?.addEventListener('click', createTopic);
+        document.getElementById('social-topic-select')?.addEventListener('change', (event) => {
+            socialState.topicId = event.target.value || null;
+            document.getElementById('social-chat-status').textContent = socialState.topicId ? 'Tópico protegido · chamada vinculada a este tópico' : 'Tópico geral · Markdown e anexos moderados';
+        });
         document.getElementById('social-audio-call-btn')?.addEventListener('click', () => startCall(false));
         document.getElementById('social-video-call-btn')?.addEventListener('click', () => startCall(true));
         document.getElementById('test-devices-btn')?.addEventListener('click', () => enumerateDevices(true).catch((error) => window.Toast?.error(error.message)));
@@ -514,5 +564,5 @@
         }, 0);
     });
 
-    window.YourLifeSocial = { uploadImage, loadConversations, loadCommunities, loadCalls, connectRealtime: setupRealtime };
+    window.YourLifeSocial = { uploadImage, loadConversations, loadCommunities, loadCalls, openDirectConversation, connectRealtime: setupRealtime };
 })();

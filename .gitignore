@@ -6,6 +6,9 @@ node_modules/
 .env.local
 .env.production
 
+# Credenciais locais informadas por sessão
+.env.test
+
 # Banco de dados local
 database.sqlite
 *.db

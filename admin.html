@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel administrativo · Your Life</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <main class="mx-auto max-w-6xl p-6 md:p-10">
+    <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div><p class="mb-2 text-sm font-semibold uppercase tracking-[.2em] text-cyan-400">Your Life</p><h1 class="text-3xl font-bold">Painel administrativo</h1><p class="mt-2 text-slate-400">Área restrita ao administrador autorizado.</p></div>
+      <a href="site.html" class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-900">Voltar ao site</a>
+    </header>
+    <div id="message" class="mb-6 hidden rounded-lg border p-4"></div>
+    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="rounded-2xl border border-slate-800 bg-slate-900 p-5"><p class="text-sm text-slate-400">Usuários</p><strong id="users-count" class="mt-2 block text-3xl">—</strong></article>
+      <article class="rounded-2xl border border-slate-800 bg-slate-900 p-5"><p class="text-sm text-slate-400">Comunidades</p><strong id="communities-count" class="mt-2 block text-3xl">—</strong></article>
+      <article class="rounded-2xl border border-slate-800 bg-slate-900 p-5"><p class="text-sm text-slate-400">Conversas</p><strong id="conversations-count" class="mt-2 block text-3xl">—</strong></article>
+      <article class="rounded-2xl border border-slate-800 bg-slate-900 p-5"><p class="text-sm text-slate-400">Denúncias abertas</p><strong id="reports-count" class="mt-2 block text-3xl">—</strong></article>
+    </section>
+    <section class="mt-8 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900"><div class="border-b border-slate-800 p-5"><h2 class="text-xl font-semibold">Usuários e cargos</h2><p class="mt-1 text-sm text-slate-400">Somente o administrador pode nomear ou remover moderadores.</p></div><div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-950 text-slate-400"><tr><th class="p-4">ID</th><th class="p-4">Nome</th><th class="p-4">E-mail</th><th class="p-4">Cargo</th><th class="p-4">Status</th><th class="p-4">Ações</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
+    <section class="mt-8 grid gap-6 lg:grid-cols-2">
+      <form id="moderation-form" class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+        <h2 class="text-xl font-semibold">Ação de moderação</h2><p class="mt-1 text-sm text-slate-400">Toda ação exige justificativa e entra no registro de auditoria.</p>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2"><select id="target-type" class="rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="user">Usuário</option><option value="message">Mensagem</option><option value="post">Postagem</option><option value="comment">Comentário</option><option value="call">Ligação</option></select><input id="target-id" class="rounded-lg border border-slate-700 bg-slate-950 p-3" placeholder="ID do alvo" required><select id="moderation-action" class="rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="warn">Advertir</option><option value="suspend">Suspender</option><option value="ban">Banir</option><option value="unban">Desbanir</option><option value="delete">Remover conteúdo</option><option value="close_call">Encerrar ligação</option></select><input id="duration-hours" type="number" min="1" max="720" value="24" class="rounded-lg border border-slate-700 bg-slate-950 p-3" placeholder="Horas"></div>
+        <textarea id="moderation-reason" class="mt-3 min-h-24 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" placeholder="Justificativa obrigatória" required></textarea><button class="mt-3 rounded-lg bg-red-600 px-4 py-2 font-semibold hover:bg-red-500">Aplicar ação</button>
+      </form>
+      <section class="rounded-2xl border border-slate-800 bg-slate-900 p-5"><h2 class="text-xl font-semibold">Denúncias abertas</h2><div id="reports-list" class="mt-4 space-y-3 text-sm text-slate-300"></div></section>
+    </section>
+  </main>
+  <script>
+    const token = localStorage.getItem('authToken');
+    const message = document.getElementById('message');
+    function showMessage(text, error = false) { message.textContent = text; message.className = `mb-6 rounded-lg border p-4 ${error ? 'border-red-800 bg-red-950 text-red-200' : 'border-emerald-800 bg-emerald-950 text-emerald-200'}`; message.classList.remove('hidden'); }
+    async function request(path, options = {}) { const response = await fetch(`/api${path}`, { ...options, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...options.headers }, body: options.body && typeof options.body !== 'string' ? JSON.stringify(options.body) : options.body }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Erro HTTP ${response.status}`); return data; }
+    async function setRole(userId, role) { try { await request(`/admin/users/${userId}/role`, { method: 'POST', body: { role } }); showMessage('Cargo atualizado com segurança.'); await load(); } catch (error) { showMessage(error.message, true); } }
+    function renderUsers(users) { document.getElementById('users-table').innerHTML = users.map((user) => `<tr class="border-t border-slate-800"><td class="p-4 text-slate-400">${user.id}</td><td class="p-4">${escapeHtml(user.name)}</td><td class="p-4 text-slate-300">${escapeHtml(user.email)}</td><td class="p-4">${user.platformRole === 'admin' ? '<span class="text-cyan-400">Administrador</span>' : escapeHtml(user.platformRole)}</td><td class="p-4">${escapeHtml(user.accountStatus)}</td><td class="p-4">${user.platformRole === 'admin' ? '<span class="text-xs text-slate-500">Protegido</span>' : `<select data-role-user="${user.id}" class="rounded border border-slate-700 bg-slate-950 p-2"><option value="member" ${user.platformRole === 'member' ? 'selected' : ''}>Membro</option><option value="moderator" ${user.platformRole === 'moderator' ? 'selected' : ''}>Moderador</option></select>`}</td></tr>`).join(''); document.querySelectorAll('[data-role-user]').forEach((select) => select.addEventListener('change', () => setRole(select.dataset.roleUser, select.value))); }
+    function renderReports(reports) { document.getElementById('reports-list').innerHTML = reports.length ? reports.map((report) => `<article class="rounded-lg border border-slate-700 p-3"><div class="flex justify-between gap-2"><strong>${escapeHtml(report.targetType)} · ${escapeHtml(report.targetId)}</strong><span>${escapeHtml(report.status)}</span></div><p class="mt-2 text-slate-400">${escapeHtml(report.reason)}</p><button data-report-target="${escapeHtml(report.targetId)}" data-report-type="${escapeHtml(report.targetType)}" class="mt-2 text-cyan-400">Usar como alvo</button></article>`).join('') : '<p class="text-slate-500">Nenhuma denúncia pendente.</p>'; document.querySelectorAll('[data-report-target]').forEach((button) => button.addEventListener('click', () => { document.getElementById('target-type').value = button.dataset.reportType; document.getElementById('target-id').value = button.dataset.reportTarget; })); }
+    async function load() { if (!token) { showMessage('Faça login como administrador para continuar.', true); return; } try { await request('/admin/me'); const [overview, users, reports] = await Promise.all([request('/admin/overview'), request('/admin/users'), request('/moderation/reports')]); document.getElementById('users-count').textContent = overview.users; document.getElementById('communities-count').textContent = overview.communities; document.getElementById('conversations-count').textContent = overview.conversations; document.getElementById('reports-count').textContent = overview.openReports; renderUsers(users); renderReports(reports); } catch (error) { showMessage(error.message, true); } }
+    function escapeHtml(value) { const node = document.createElement('span'); node.textContent = value ?? ''; return node.innerHTML; }
+    document.getElementById('moderation-form').addEventListener('submit', async (event) => { event.preventDefault(); try { await request('/moderation/actions', { method: 'POST', body: { targetType: document.getElementById('target-type').value, targetId: document.getElementById('target-id').value, action: document.getElementById('moderation-action').value, durationHours: Number(document.getElementById('duration-hours').value), reason: document.getElementById('moderation-reason').value } }); showMessage('Ação aplicada e registrada na auditoria.'); event.target.reset(); await load(); } catch (error) { showMessage(error.message, true); } });
+    load();
+  </script>
+</body>
+</html>

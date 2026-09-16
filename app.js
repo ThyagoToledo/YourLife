@@ -535,6 +535,25 @@ class App {
             if (dropdownEmail) dropdownEmail.textContent = user.email;
         }
 
+        document.getElementById('open-social-topic-btn')?.addEventListener('click', async () => {
+            const userId = document.getElementById('open-social-topic-btn').dataset.userId;
+            if (userId) await window.YourLifeSocial?.openDirectConversation?.(userId);
+        });
+
+        // O link é apenas uma conveniência visual; o backend continua sendo a autoridade.
+        const adminLink = document.getElementById('nav-admin');
+        if (adminLink) {
+            this.api.request('/admin/me')
+                .then(() => { adminLink.classList.remove('hidden'); adminLink.classList.add('flex'); })
+                .catch(() => { adminLink.classList.add('hidden'); adminLink.classList.remove('flex'); });
+        }
+        const moderationLink = document.getElementById('nav-moderation');
+        if (moderationLink) {
+            this.api.request('/moderation/reports')
+                .then(() => { moderationLink.classList.remove('hidden'); moderationLink.classList.add('flex'); })
+                .catch(() => { moderationLink.classList.add('hidden'); moderationLink.classList.remove('flex'); });
+        }
+
         // Configura dropdowns após o DOM estar visível
         setTimeout(() => {
             this.setupDropdowns();
@@ -2744,8 +2763,13 @@ class App {
     }
 
     async openChat(userId) {
-        try {
-            this.currentChatUserId = userId;
+            try {
+                this.currentChatUserId = userId;
+                const socialTopicButton = document.getElementById('open-social-topic-btn');
+                if (socialTopicButton) {
+                    socialTopicButton.dataset.userId = String(userId);
+                    socialTopicButton.classList.remove('hidden');
+                }
 
             // Busca informações do usuário
             const user = await this.api.getUser(userId);
