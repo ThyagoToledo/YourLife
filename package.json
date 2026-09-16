@@ -7,6 +7,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "migrate": "node scripts/migrate.js",
+    "local:db": "docker compose -f docker-compose.local.yml up -d",
+    "local:db:down": "docker compose -f docker-compose.local.yml down",
+    "local": "npm run local:db && npm run migrate && npm start",
     "test": "node --test",
     "type-check": "tsc --noEmit",
     "vercel-build": "echo 'Build completo!'"

@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yourlife-postgres-local
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yourlife
+      POSTGRES_PASSWORD: yourlife
+      POSTGRES_DB: yourlife
+    ports:
+      - "5433:5432"
+    volumes:
+      - yourlife-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  yourlife-postgres-data:
