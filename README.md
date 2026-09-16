@@ -63,13 +63,13 @@ Acesse o portfólio público local em: http://localhost:3000/ (na `main`). Para 
 
 ### Portfólio público e branches
 
-A branch `main` é a vitrine pública do projeto e não possui login, cadastro ou acesso às funcionalidades sociais privadas. Ela exibe apenas conteúdo demonstrativo.
+A branch `main` reutiliza a interface visual da aplicação mantida na `master`, mas funciona como demonstração estática: não possui login, cadastro, API, banco ou acesso às funcionalidades sociais privadas. Todos os perfis, posts, conversas e comunidades exibidos são fictícios.
 
 A branch `master` continua sendo a homologação da aplicação social completa. A branch `local-full` é destinada ao desenvolvimento local com banco e dados fictícios. O plano de separação e o fluxo futuro de aprovação manual estão em [doc/portfolio-architecture.md](doc/portfolio-architecture.md).
 
 ### Estado da main
 
-A `main` é a versão de portfólio público. A entrada principal não redireciona para login e apresenta uma vitrine somente leitura, com conteúdo demonstrativo e sem cadastro, publicação ou acesso à rede privada.
+A `main` é a versão pública do portfólio. Ela abre diretamente uma cópia limitada da interface original do Your Life, com navegação local entre as telas e conteúdo fictício. Alterações futuras devem preservar o layout da `master` sem importar seus scripts de autenticação, API, upload, chamadas ou persistência.
 
 ### Estado da master
 

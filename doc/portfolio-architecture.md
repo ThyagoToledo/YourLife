@@ -4,7 +4,7 @@ Este documento registra a separação entre a vitrine pública do Your Life e a 
 
 ## Objetivos
 
-- `main` representa o portfólio público e não solicita login.
+- `main` representa o portfólio público, reutiliza a interface visual da `master` e não solicita login.
 - `master` continua sendo a branch de homologação da aplicação social completa.
 - `local-full` preserva o fluxo social completo para desenvolvimento local, com banco local e dados fictícios.
 - O login, as solicitações de acesso e a aprovação manual de membros serão reativados em uma etapa posterior.
@@ -25,11 +25,13 @@ Deploy público atual: https://your-life.vercel.app
 
 A `main` deve permanecer somente leitura:
 
-- apresentação do projeto e das funcionalidades;
-- exemplos fictícios de feed, correspondências, grupos e comunidades;
+- cópia limitada da interface visual mantida na `master`;
+- navegação local entre Feed, Perfil, Amigos, Conselhos, Correspondências e Comunidades;
+- exemplos fictícios de perfis, posts, correspondências, grupos e comunidades;
 - nenhuma conta, sessão, postagem, comentário ou mensagem real;
 - nenhuma consulta pública às tabelas privadas;
 - nenhum upload ou chamada de áudio/vídeo;
+- nenhum carregamento dos scripts de autenticação, API, estado ou recursos sociais da aplicação privada;
 - solicitação de acesso será adicionada em uma etapa posterior.
 
 O conteúdo exibido publicamente deve ser sintético ou ter autorização específica para aparecer na vitrine. Perfis privados não devem ser listados no portfólio.
