@@ -12,11 +12,11 @@
         },
         {
             "src": "/",
-            "dest": "/index.html"
+            "dest": "/portfolio.html"
         },
         {
             "src": "/(site|admin|moderation|config)\\.html",
-            "dest": "/index.html"
+            "dest": "/portfolio.html"
         },
         {
             "src": "/(.*\\.(html|js|css|png|jpg|jpeg|gif|svg|ico))",
