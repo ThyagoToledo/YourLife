@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Testes e validações
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências reproduzíveis
+        run: npm ci
+
+      - name: Validar política de documentação
+        shell: bash
+        run: |
+          extras=$(git ls-files '*.md' '*.MD' | grep -Evi '^(README|CONTRIBUTING)\.md$' || true)
+          if [ -n "$extras" ]; then
+            echo "Somente README.md e CONTRIBUTING.md podem ser versionados no repositório:"
+            echo "$extras"
+            exit 1
+          fi
+
+      - name: Executar testes
+        run: npm test
+
+      - name: Verificar tipos
+        run: npm run type-check
+
+      - name: Auditar dependências de produção
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Validar inicialização da aplicação
+        env:
+          JWT_SECRET: ci-only-secret-that-is-never-used-in-production
+        run: node -e "require('./server'); console.log('Servidor carregado com sucesso')"

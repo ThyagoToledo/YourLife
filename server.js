@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const { sql } = require('@vercel/postgres');
+const { createSocialRouter } = require('./routes/social');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,7 +37,16 @@ app.use(cors({
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.static('.'));
+const publicFiles = new Set([
+    'index.html', 'site.html', 'config.html',
+    'app.js', 'api.js', 'state.js', 'utils.js', 'social.js'
+]);
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/:file', (req, res, next) => {
+    if (!publicFiles.has(req.params.file)) return next();
+    res.sendFile(path.join(__dirname, req.params.file));
+});
+app.use('/Icons', express.static(path.join(__dirname, 'Icons'), { dotfiles: 'deny', fallthrough: false }));
 
 console.log('✅ Servidor configurado para Vercel Postgres');
 
@@ -189,6 +199,8 @@ function authenticateToken(req, res, next) {
         next();
     });
 }
+
+app.use('/api/v2', createSocialRouter({ db: sql, authenticateToken }));
 
 // ============================================
 // ROTAS DE AUTENTICAÇÃO
@@ -347,12 +359,16 @@ app.put('/api/users/me', authenticateToken, async (req, res) => {
     try {
         const { name, bio, avatar, cover_image, interests } = req.body;
 
+        const currentResult = await sql`SELECT name, bio, avatar, cover_image FROM users WHERE id = ${req.user.id}`;
+        const current = currentResult.rows[0];
+        if (!current) return res.status(404).json({ success: false, error: 'Usuário não encontrado' });
+
         await sql`
             UPDATE users
-            SET name = ${name || ''},
-                bio = ${bio || ''},
-                avatar = ${avatar || ''},
-                cover_image = ${cover_image || ''}
+            SET name = ${name === undefined ? current.name : name},
+                bio = ${bio === undefined ? current.bio : bio},
+                avatar = ${avatar === undefined ? current.avatar : avatar},
+                cover_image = ${cover_image === undefined ? current.cover_image : cover_image}
             WHERE id = ${req.user.id}
         `;
 
@@ -464,6 +480,41 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Erro ao criar post:', error);
         res.status(500).json({ success: false, error: 'Erro ao criar post' });
+    }
+});
+
+// Editar uma publicação própria
+app.put('/api/posts/:id', authenticateToken, async (req, res) => {
+    try {
+        const content = String(req.body.content || '').trim();
+        if (!content || content.length > 5000) {
+            return res.status(400).json({ success: false, error: 'Conteúdo inválido' });
+        }
+        const result = await sql`
+            UPDATE posts SET content = ${content}
+            WHERE id = ${parseInt(req.params.id)} AND user_id = ${req.user.id}
+            RETURNING id, user_id, content, created_at
+        `;
+        if (!result.rows[0]) return res.status(404).json({ success: false, error: 'Publicação não encontrada' });
+        res.json({ success: true, post: result.rows[0] });
+    } catch (error) {
+        console.error('Erro ao editar publicação:', error);
+        res.status(500).json({ success: false, error: 'Erro ao editar publicação' });
+    }
+});
+
+// Excluir uma publicação própria
+app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
+    try {
+        const result = await sql`
+            DELETE FROM posts WHERE id = ${parseInt(req.params.id)} AND user_id = ${req.user.id}
+            RETURNING id
+        `;
+        if (!result.rows[0]) return res.status(404).json({ success: false, error: 'Publicação não encontrada' });
+        res.status(204).end();
+    } catch (error) {
+        console.error('Erro ao excluir publicação:', error);
+        res.status(500).json({ success: false, error: 'Erro ao excluir publicação' });
     }
 });
 
@@ -1156,6 +1207,8 @@ app.get('/api/updates', authenticateToken, async (req, res) => {
         res.json({
             success: true,
             updates: {
+                likes: [],
+                comments: [],
                 notifications: notifications.rows,
                 hasUpdates: notifications.rows.length > 0
             }

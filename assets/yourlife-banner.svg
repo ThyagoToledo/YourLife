@@ -1,0 +1,39 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description">
+  <title id="title">YourLife</title>
+  <desc id="description">Banner da rede social YourLife</desc>
+  <defs>
+    <linearGradient id="background" x1="80" y1="20" x2="1120" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset="0.52" stop-color="#312E81"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#5EEAD4"/>
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="34"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="360" rx="32" fill="url(#background)"/>
+  <circle cx="1040" cy="70" r="150" fill="#5EEAD4" fill-opacity="0.13" filter="url(#blur)"/>
+  <circle cx="170" cy="330" r="170" fill="#A78BFA" fill-opacity="0.18" filter="url(#blur)"/>
+  <g transform="translate(92 82)">
+    <rect width="196" height="196" rx="52" fill="#FFFFFF" fill-opacity="0.09" stroke="#FFFFFF" stroke-opacity="0.2"/>
+    <circle cx="74" cy="91" r="22" fill="url(#accent)"/>
+    <circle cx="126" cy="91" r="22" fill="url(#accent)"/>
+    <path d="M52 141C67 120 83 113 100 113C117 113 133 120 148 141" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <text x="342" y="148" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" letter-spacing="-2">YourLife</text>
+  <text x="346" y="203" fill="#CCFBF1" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400">Conecte-se com quem importa.</text>
+  <g transform="translate(346 238)" fill="none" stroke="#FFFFFF" stroke-opacity="0.48">
+    <rect width="130" height="42" rx="21"/>
+    <rect x="146" width="118" height="42" rx="21"/>
+    <rect x="280" width="156" height="42" rx="21"/>
+  </g>
+  <g fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="600">
+    <text x="379" y="265">CONVERSAS</text>
+    <text x="523" y="265">CHAMADAS</text>
+    <text x="660" y="265">COMUNIDADES</text>
+  </g>
+</svg>

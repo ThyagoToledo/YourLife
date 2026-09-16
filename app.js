@@ -580,6 +580,7 @@ class App {
 
                 this.showMainApp();
                 await this.loadInitialData();
+                window.YourLifeSocial?.connectRealtime?.();
                 Toast.success('Conta criada com sucesso! Bem-vindo!');
                 
                 // Mostrar aviso sobre Termos e Privacidade
@@ -644,6 +645,7 @@ class App {
             this.state.setCurrentUser(response.user);
             this.showMainApp();
             await this.loadInitialData();
+            window.YourLifeSocial?.connectRealtime?.();
             Toast.success('Login realizado com sucesso!');
             
             // Mostrar aviso sobre Termos e Privacidade
@@ -812,11 +814,10 @@ class App {
         // Se for o próprio usuário, mostra botão de deletar
         if (author.id === this.currentUserId) {
             return `
-                <button class="delete-post-button text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-lg transition-colors text-sm font-medium" 
-                        data-post-id="${this.currentPostId || ''}"
-                        title="Deletar post">
-                    Deletar
-                </button>
+                <div class="flex gap-2">
+                    <button class="edit-post-button text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-lg transition-colors text-sm font-medium" title="Editar post">Editar</button>
+                    <button class="delete-post-button text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-lg transition-colors text-sm font-medium" title="Deletar post">Deletar</button>
+                </div>
             `;
         }
 
@@ -940,6 +941,22 @@ class App {
 
     // Anexa event listeners ao post
     attachPostEventListeners(element, post) {
+        const editButton = element.querySelector('.edit-post-button');
+        if (editButton) {
+            editButton.addEventListener('click', async () => {
+                const content = prompt('Edite sua publicação:', post.content);
+                if (!content || content.trim() === post.content) return;
+                try {
+                    await this.api.updatePost(post.id, { content: content.trim() });
+                    await this.loadFeed();
+                    Toast.success('Post atualizado com sucesso');
+                } catch (error) {
+                    console.error('Erro ao editar post:', error);
+                    Toast.error('Erro ao editar post');
+                }
+            });
+        }
+
         // Deletar post
         const deleteButton = element.querySelector('.delete-post-button');
         if (deleteButton) {
@@ -1970,17 +1987,19 @@ class App {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">URL do Avatar</label>
-                            <input type="url" name="avatar" value="${user.avatar || ''}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="https://...">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto do perfil</label>
+                            <div class="flex items-center gap-4">
+                                <img src="${Validation.sanitizeHTML(user.avatar || '')}" alt="Foto atual" class="w-16 h-16 rounded-full object-cover bg-gray-100">
+                                <input type="file" name="avatarFile" accept="image/jpeg,image/png,image/webp"
+                                       class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">JPEG, PNG ou WebP, até 5 MB. A imagem será analisada antes de aparecer.</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">URL da Imagem de Capa</label>
-                            <input type="url" name="cover_image" value="${user.cover_image || ''}" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="https://...">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imagem de capa</label>
+                            <input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp"
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
                         </div>
 
                         <div>
@@ -2030,12 +2049,29 @@ class App {
                     await this.api.updateProfile({
                         name: formData.get('name'),
                         bio: formData.get('bio'),
-                        avatar: formData.get('avatar') || null,
-                        cover_image: formData.get('cover_image') || null,
                         interests: interests
                     });
 
+                    const mediaUpdate = {};
+                    const mediaNotices = [];
+                    const avatarFile = formData.get('avatarFile');
+                    const coverFile = formData.get('coverFile');
+                    if (avatarFile?.size) {
+                        const uploaded = await window.YourLifeSocial.uploadImage(avatarFile, 'avatar');
+                        if (uploaded.status === 'approved') mediaUpdate.avatarAssetId = uploaded.id;
+                        else mediaNotices.push(uploaded.status === 'rejected' ? 'Foto do perfil recusada pela moderação.' : 'Foto do perfil aguardando revisão.');
+                    }
+                    if (coverFile?.size) {
+                        const uploaded = await window.YourLifeSocial.uploadImage(coverFile, 'cover');
+                        if (uploaded.status === 'approved') mediaUpdate.coverAssetId = uploaded.id;
+                        else mediaNotices.push(uploaded.status === 'rejected' ? 'Imagem de capa recusada pela moderação.' : 'Imagem de capa aguardando revisão.');
+                    }
+                    if (Object.keys(mediaUpdate).length) {
+                        await this.api.request('/v2/profile/media', { method: 'PATCH', body: mediaUpdate });
+                    }
+
                     Toast.success('Perfil atualizado com sucesso!');
+                    mediaNotices.forEach((notice) => Toast.info(notice));
                     closeModal();
 
                     // Recarrega o usuário atual da API
@@ -2777,7 +2813,7 @@ class App {
                 <div class="flex ${msg.isFromMe ? 'justify-end' : 'justify-start'} mb-2">
                     <div class="${msg.isFromMe ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'} 
                                 rounded-2xl px-4 py-2 max-w-xs lg:max-w-md shadow-sm">
-                        <p class="break-words">${msg.content}</p>
+                        <p class="break-words">${Validation.sanitizeHTML(msg.content)}</p>
                         <span class="text-xs ${msg.isFromMe ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'} block mt-1">
                             ${DateUtils.formatTimestamp(msg.createdAt)}
                         </span>
