@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <strong>Acesso ao Site:</strong> <a href="https://your-life-gamma.vercel.app">https://your-life-gamma.vercel.app</a>
+  <strong>Acesso ao portfólio:</strong> <a href="https://your-life.vercel.app">https://your-life.vercel.app</a>
 </p>
 
 <p align="center">
