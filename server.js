@@ -8,12 +8,15 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('node:crypto');
 const path = require('path');
 const { sql } = require('@vercel/postgres');
 const { createSocialRouter } = require('./routes/social');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const TERMS_VERSION = '2026-09-16';
+const PRIVACY_VERSION = '2026-09-16';
 
 // Validação obrigatória do JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -392,17 +395,35 @@ app.post('/api/moderation/actions', authenticateToken, requireModerator, async (
 // ROTAS DE AUTENTICAÇÃO
 // ============================================
 
+app.get('/api/legal/documents', (req, res) => {
+    res.json({
+        termsVersion: TERMS_VERSION,
+        privacyVersion: PRIVACY_VERSION,
+        privacyContactEmail: process.env.PRIVACY_CONTACT_EMAIL || null
+    });
+});
+
 // Registro de novo usuário
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const {
+            name, email, password, termsAccepted, privacyAcknowledged, ageConfirmed,
+            marketingConsent = false, termsVersion, privacyVersion
+        } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, error: 'Dados incompletos' });
         }
+        if (termsAccepted !== true || privacyAcknowledged !== true || ageConfirmed !== true) {
+            return res.status(400).json({ success: false, code: 'LEGAL_ACCEPTANCE_REQUIRED', error: 'Aceite os Termos, confirme a leitura do Aviso de Privacidade e a idade mínima' });
+        }
+        if (termsVersion !== TERMS_VERSION || privacyVersion !== PRIVACY_VERSION) {
+            return res.status(409).json({ success: false, code: 'LEGAL_VERSION_OUTDATED', error: 'Os documentos legais foram atualizados. Recarregue a página e revise-os novamente' });
+        }
+        const normalizedEmail = String(email).trim().toLowerCase();
 
         // Verificar se email já existe
-        const existingUser = await sql`SELECT * FROM users WHERE email = ${email}`;
+        const existingUser = await sql`SELECT * FROM users WHERE lower(email) = ${normalizedEmail}`;
         if (existingUser.rows.length > 0) {
             return res.status(400).json({ success: false, error: 'Email já cadastrado' });
         }
@@ -414,11 +435,31 @@ app.post('/api/auth/register', async (req, res) => {
         const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4F46E5&color=fff&size=128`;
 
         // Inserir usuário
-        const result = await sql`
-            INSERT INTO users (name, email, password, avatar)
-            VALUES (${name}, ${email}, ${hashedPassword}, ${defaultAvatar})
-            RETURNING id, name, email, avatar, bio, created_at
-        `;
+        const ipHash = crypto.createHmac('sha256', JWT_SECRET).update(req.ip || 'unknown').digest('hex');
+        const userAgent = String(req.headers['user-agent'] || '').slice(0, 500);
+        const result = await sql.query(
+            `WITH new_user AS (
+                INSERT INTO users (name, email, password, avatar, age_confirmed_at)
+                VALUES ($1, $2, $3, $4, NOW())
+                RETURNING id, name, email, avatar, bio, created_at
+             ), consent_rows AS (
+                INSERT INTO user_consents (id, user_id, purpose, document_type, document_version, granted, ip_hash, user_agent)
+                SELECT consent.id, new_user.id, consent.purpose, consent.document_type, consent.document_version, consent.granted, $11, $12
+                FROM new_user
+                CROSS JOIN (VALUES
+                    ($5::uuid, 'terms_acceptance', 'terms', $8, TRUE),
+                    ($6::uuid, 'privacy_acknowledgement', 'privacy', $9, TRUE),
+                    ($7::uuid, 'marketing', NULL, NULL, $10)
+                ) AS consent(id, purpose, document_type, document_version, granted)
+                RETURNING user_id
+             )
+             SELECT new_user.* FROM new_user CROSS JOIN (SELECT COUNT(*) FROM consent_rows) recorded`,
+            [
+                String(name).trim(), normalizedEmail, hashedPassword, defaultAvatar,
+                crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID(),
+                TERMS_VERSION, PRIVACY_VERSION, marketingConsent === true, ipHash, userAgent
+            ]
+        );
 
         const user = result.rows[0];
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
@@ -505,6 +546,111 @@ app.get('/api/users/me', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Erro ao buscar perfil:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar perfil' });
+    }
+});
+
+// Direitos do titular e preferências de privacidade (LGPD)
+app.get('/api/privacy/consents', authenticateToken, async (req, res) => {
+    try {
+        const result = await sql`
+            SELECT purpose, document_type AS "documentType", document_version AS "documentVersion",
+                   granted, accepted_at AS "acceptedAt", revoked_at AS "revokedAt"
+            FROM user_consents WHERE user_id = ${req.user.id}
+            ORDER BY accepted_at DESC
+        `;
+        res.json({ termsVersion: TERMS_VERSION, privacyVersion: PRIVACY_VERSION, consents: result.rows });
+    } catch (error) {
+        console.error('Erro ao carregar consentimentos:', error);
+        res.status(500).json({ success: false, error: 'Erro ao carregar preferências de privacidade' });
+    }
+});
+
+app.put('/api/privacy/marketing', authenticateToken, async (req, res) => {
+    try {
+        const granted = req.body.granted === true;
+        const ipHash = crypto.createHmac('sha256', JWT_SECRET).update(req.ip || 'unknown').digest('hex');
+        const userAgent = String(req.headers['user-agent'] || '').slice(0, 500);
+        await sql.query(
+            `WITH revoked AS (
+                UPDATE user_consents SET revoked_at = NOW()
+                WHERE user_id = $1 AND purpose = 'marketing' AND revoked_at IS NULL
+             )
+             INSERT INTO user_consents (id, user_id, purpose, granted, ip_hash, user_agent)
+             VALUES ($2, $1, 'marketing', $3, $4, $5)`,
+            [req.user.id, crypto.randomUUID(), granted, ipHash, userAgent]
+        );
+        res.json({ success: true, granted });
+    } catch (error) {
+        console.error('Erro ao atualizar preferência de marketing:', error);
+        res.status(500).json({ success: false, error: 'Erro ao atualizar preferência' });
+    }
+});
+
+app.get('/api/privacy/export', authenticateToken, async (req, res) => {
+    try {
+        const [profile, interests, posts, comments, messages, consents] = await Promise.all([
+            sql`SELECT id, name, email, avatar, bio, cover_image AS "coverImage", created_at AS "createdAt" FROM users WHERE id = ${req.user.id}`,
+            sql`SELECT interest FROM user_interests WHERE user_id = ${req.user.id} ORDER BY id`,
+            sql`SELECT id, content, created_at AS "createdAt" FROM posts WHERE user_id = ${req.user.id} ORDER BY created_at`,
+            sql`SELECT id, post_id AS "postId", content, created_at AS "createdAt" FROM comments WHERE user_id = ${req.user.id} ORDER BY created_at`,
+            sql`SELECT id, conversation_id AS "conversationId", content, format, created_at AS "createdAt", edited_at AS "editedAt", deleted_at AS "deletedAt" FROM chat_messages WHERE sender_id = ${req.user.id} ORDER BY created_at`,
+            sql`SELECT purpose, document_type AS "documentType", document_version AS "documentVersion", granted, accepted_at AS "acceptedAt", revoked_at AS "revokedAt" FROM user_consents WHERE user_id = ${req.user.id} ORDER BY accepted_at`
+        ]);
+        res.setHeader('Content-Disposition', `attachment; filename="yourlife-dados-${req.user.id}.json"`);
+        res.json({ exportedAt: new Date().toISOString(), profile: profile.rows[0], interests: interests.rows, posts: posts.rows, comments: comments.rows, messages: messages.rows, consents: consents.rows });
+    } catch (error) {
+        console.error('Erro ao exportar dados:', error);
+        res.status(500).json({ success: false, error: 'Erro ao exportar dados' });
+    }
+});
+
+app.get('/api/privacy/requests', authenticateToken, async (req, res) => {
+    try {
+        const result = await sql`SELECT id, request_type AS "requestType", details, status, response_note AS "responseNote", created_at AS "createdAt", updated_at AS "updatedAt" FROM data_subject_requests WHERE user_id = ${req.user.id} ORDER BY created_at DESC`;
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Erro ao carregar solicitações' });
+    }
+});
+
+app.post('/api/privacy/requests', authenticateToken, async (req, res) => {
+    try {
+        const requestType = String(req.body.requestType || '');
+        const details = String(req.body.details || '').trim().slice(0, 2000);
+        if (!['access', 'correction', 'deletion', 'revocation', 'portability'].includes(requestType)) return res.status(400).json({ success: false, error: 'Tipo de solicitação inválido' });
+        const result = await sql`INSERT INTO data_subject_requests (id, user_id, request_type, details) VALUES (${crypto.randomUUID()}, ${req.user.id}, ${requestType}, ${details}) RETURNING id, request_type AS "requestType", status, created_at AS "createdAt"`;
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao registrar solicitação LGPD:', error);
+        res.status(500).json({ success: false, error: 'Erro ao registrar solicitação' });
+    }
+});
+
+app.get('/api/admin/privacy-requests', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await sql`
+            SELECT d.id, d.user_id AS "userId", u.name, u.email, d.request_type AS "requestType", d.details,
+                   d.status, d.response_note AS "responseNote", d.created_at AS "createdAt"
+            FROM data_subject_requests d JOIN users u ON u.id = d.user_id
+            ORDER BY CASE d.status WHEN 'open' THEN 0 WHEN 'reviewing' THEN 1 ELSE 2 END, d.created_at ASC LIMIT 200
+        `;
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Erro ao carregar solicitações LGPD' });
+    }
+});
+
+app.patch('/api/admin/privacy-requests/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const status = String(req.body.status || '');
+        const responseNote = String(req.body.responseNote || '').trim().slice(0, 2000);
+        if (!['reviewing', 'completed', 'rejected'].includes(status)) return res.status(400).json({ success: false, error: 'Status inválido' });
+        const result = await sql`UPDATE data_subject_requests SET status = ${status}, response_note = ${responseNote}, updated_at = NOW() WHERE id = ${req.params.id} RETURNING id, status`;
+        if (!result.rows[0]) return res.status(404).json({ success: false, error: 'Solicitação não encontrada' });
+        await recordAudit(req.admin.id, `privacy-request:${status}`, 'privacy_request', req.params.id, { responseNote });
+        res.json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Erro ao atualizar solicitação LGPD' });
     }
 });
 
