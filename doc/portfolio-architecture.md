@@ -71,3 +71,5 @@ O caráter educacional ou a ausência de fins lucrativos não elimina automatica
 - [ ] Migrar autenticação para cookie seguro.
 - [ ] Restringir CORS e configurar `PRIVACY_CONTACT_EMAIL`.
 - [ ] Fazer revisão jurídica antes de convidar membros reais.
+
+Na `main`, `npm start` inicia apenas a vitrine estática por meio de `portfolio-server.js`, sem banco, autenticação ou API social. O ambiente completo e o comando para PostgreSQL local estão documentados na branch `local-full`.

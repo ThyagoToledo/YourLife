@@ -4,7 +4,7 @@
   "description": "Rede social Your Life - Conecte-se com quem importa",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node portfolio-server.js",
     "dev": "nodemon server.js",
     "migrate": "node scripts/migrate.js",
     "test": "node --test",

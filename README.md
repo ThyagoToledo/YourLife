@@ -59,7 +59,7 @@ npm run migrate
 npm start
 ```
 
-Acesse a aplicação local em: http://localhost:3000/site.html
+Acesse o portfólio público local em: http://localhost:3000/ (na `main`). Para executar a rede social completa, use a branch `local-full` e o comando documentado em [doc/portfolio-architecture.md](doc/portfolio-architecture.md).
 
 ### Portfólio público e branches
 
