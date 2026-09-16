@@ -24,7 +24,7 @@ const server = http.createServer((request, response) => {
         const filePath = path.resolve(root, relative);
         if (filePath.startsWith(path.resolve(root, 'Icons')) && fs.existsSync(filePath)) return sendFile(response, filePath);
     }
-    const requested = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
+    const requested = url.pathname === '/' ? 'portfolio.html' : url.pathname.slice(1);
     const fileName = allowedFiles.has(requested) ? requested : 'index.html';
     sendFile(response, path.join(root, fileName));
 });
