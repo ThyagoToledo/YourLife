@@ -1,74 +1,761 @@
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-br" class="dark dark-mode-transition">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Life</title>
-    <meta name="description" content="Prévia visual do Your Life.">
+    <meta name="description" content="Your Life">
     <link rel="icon" type="image/png" href="Icons/AraraFinal.png">
+    <!-- Carrega o Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configura Tailwind para dark mode
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <!-- Carrega a fonte Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root { --page:#061337; --text:#f7f8ff; --muted:#c4d0e5; --blue:#75b7ff; --quiet:#7183a5; }
-        * { box-sizing:border-box; }
-        html, body { min-height:100%; }
-        body { margin:0; color:var(--text); background:var(--page); font-family:"DM Sans",ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
-        a { color:inherit; text-decoration:none; }
-        .page { min-height:100vh; overflow:hidden; background-color:var(--page); background-image:linear-gradient(rgba(99,145,220,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(99,145,220,.1) 1px,transparent 1px); background-size:48px 48px; }
-        .page::before { content:""; position:absolute; width:680px; height:680px; left:42%; top:-390px; border-radius:50%; background:rgba(31,90,202,.28); filter:blur(100px); pointer-events:none; }
-        .wrap { position:relative; width:min(100% - 64px,1640px); margin:0 auto; }
-        header { display:flex; align-items:center; justify-content:space-between; padding:36px 0; }
-        .brand { display:flex; align-items:center; gap:18px; }
-        .brand img { width:52px; height:52px; object-fit:contain; }
-        .brand-name { font-family:"Space Grotesk",sans-serif; font-size:24px; font-weight:600; }
-        .pill { padding:10px 19px; border:1px solid rgba(104,178,255,.38); border-radius:999px; color:#c9e2ff; background:rgba(24,73,154,.22); font-size:16px; }
-        .hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(420px,.88fr); align-items:center; gap:clamp(56px,8vw,150px); min-height:calc(100vh - 124px); padding:38px 0 110px; }
-        .eyebrow { margin:0 0 42px; color:var(--blue); font-size:17px; font-weight:700; letter-spacing:.28em; text-transform:uppercase; }
-        h1 { max-width:810px; margin:0 0 38px; font-family:"Space Grotesk",sans-serif; font-size:clamp(56px,6.4vw,106px); line-height:.99; letter-spacing:-.065em; }
-        .intro { max-width:780px; margin:0; color:var(--muted); font-size:clamp(19px,1.45vw,26px); line-height:1.75; }
-        .preview { padding:24px; border:1px solid rgba(151,192,255,.3); border-radius:34px; background:rgba(11,25,57,.7); box-shadow:0 32px 90px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.05); backdrop-filter:blur(16px); transform:rotate(1deg); }
-        .window { overflow:hidden; border:1px solid rgba(143,178,234,.14); border-radius:25px; background:#050b20; }
-        .window-head { display:flex; justify-content:space-between; align-items:flex-start; padding:34px 30px 24px; }
-        .window-head h2 { margin:0 0 8px; font-size:21px; }
-        .window-head p { margin:0; color:var(--quiet); font-size:16px; }
-        .dot { width:19px; height:19px; margin-top:8px; border-radius:50%; background:#46d7a1; box-shadow:0 0 19px rgba(70,215,161,.55); }
-        .items { display:grid; gap:17px; padding:0 30px 30px; }
-        .item { display:grid; grid-template-columns:58px 1fr auto; align-items:center; gap:17px; padding:18px; border-radius:18px; background:#101b37; }
-        .avatar { display:grid; place-items:center; width:58px; height:58px; border-radius:50%; font-weight:600; }
-        .blue { color:#8fc3ff; background:#17366c; } .purple { color:#c8baff; background:#302b72; } .green { color:#73e3c5; background:#104f51; }
-        .item strong { display:block; margin-bottom:5px; font-size:18px; font-weight:600; }
-        .item span { color:var(--quiet); font-size:15px; }
-        .item time { align-self:start; color:#627495; font-size:14px; white-space:nowrap; }
-        @media (max-width:1080px) { .hero { grid-template-columns:1fr; min-height:auto; padding-top:70px; } .preview { max-width:720px; margin:0 auto; transform:none; } }
-        @media (max-width:720px) { .wrap { width:min(100% - 36px,1640px); } header { padding:24px 0; } .brand img { width:42px; height:42px; } .brand-name { font-size:20px; } .pill { padding:8px 12px; font-size:12px; } .hero { padding:62px 0 84px; gap:48px; } .eyebrow { margin-bottom:25px; font-size:12px; letter-spacing:.2em; } h1 { margin-bottom:25px; font-size:clamp(45px,14vw,72px); } .intro { font-size:17px; line-height:1.65; } .preview { padding:12px; border-radius:22px; } .window-head { padding:22px 17px 17px; } .window-head h2 { font-size:17px; } .window-head p,.item span { font-size:12px; } .items { gap:10px; padding:0 17px 17px; } .item { grid-template-columns:42px 1fr auto; gap:10px; padding:12px; } .avatar { width:42px; height:42px; font-size:12px; } .item strong { font-size:13px; } .item time { font-size:11px; } }
+        /* Estilo base com a fonte Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Remove qualquer espaço em branco no HTML */
+        html {
+            margin: 0;
+            padding: 0;
+            background-color: #1f2937;
+        }
+
+        html.dark {
+            background-color: #1f2937;
+        }
+
+        /* Transição suave para dark mode */
+        .dark-mode-transition {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark-mode-transition * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Classes para controlar a visibilidade das "paginas" */
+        .view {
+            display: none;
+            /* Todas as visualizacoes comecam escondidas */
+        }
+
+        .view.active {
+            display: block;
+            /* A visualizacao ativa e mostrada */
+        }
+
+        /* Animação da logo */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .logo-animate {
+            animation: fadeInScale 0.6s ease-out forwards;
+        }
+
+        /* Animação de fade-in para toasts */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Customização da scrollbar para mensagens */
+        #messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #messages-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark #messages-container::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        #messages-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark #messages-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Garantir que o container de mensagens tenha scroll suave */
+        #messages-container {
+            scroll-behavior: smooth;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
     </style>
 </head>
-<body>
-    <main class="page">
-        <div class="wrap">
-            <header>
-                <a class="brand" href="/" aria-label="Your Life início"><img src="Icons/AraraFinal.png" alt=""><span class="brand-name">Your Life</span></a>
-                <span class="pill">Projeto educacional · portfólio</span>
-            </header>
-            <section class="hero" aria-label="Prévia do Your Life">
-                <div>
-                    <p class="eyebrow">Comunicação com propósito</p>
-                    <h1>Um espaço para conectar o que importa.</h1>
-                    <p class="intro">Your Life explora uma experiência social mais humana: conversas, comunidades e grupos em um só lugar.</p>
-                </div>
-                <div class="preview">
-                    <div class="window">
-                        <div class="window-head"><div><h2>Correspondências</h2><p>Uma interface para conversas que importam</p></div><span class="dot" aria-label="Demonstração ativa"></span></div>
-                        <div class="items">
-                            <div class="item"><span class="avatar blue">AS</span><div><strong>Grupo de estudos</strong><span>Novo tópico: ideias para o projeto</span></div><time>agora</time></div>
-                            <div class="item"><span class="avatar purple">JL</span><div><strong>Conversa direta</strong><span>Vamos construir juntos?</span></div><time>10m</time></div>
-                            <div class="item"><span class="avatar green">YL</span><div><strong>Comunidade Your Life</strong><span>Canais, tópicos e moderação</span></div><time>ontem</time></div>
+
+<body class="bg-gray-900 m-0 p-0"><div id="demo-notice" role="status" class="px-4 py-2 bg-gray-800 text-gray-400 text-sm border-b border-gray-700">Demonstração · dados fictícios · somente leitura</div>
+    <div id="main-app">
+
+        <!-- Header (Barra Superior) -->
+        <header
+            class="flex items-center justify-between h-16 px-4 bg-white dark:bg-gray-800 shadow-md md:px-8 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-3 logo-animate">
+                <!-- Logo Arara -->
+                <img src="Icons/AraraFinal.png" alt="Logo Your Life" class="w-10 h-10 object-contain">
+                <span class="text-xl font-bold text-blue-600 dark:text-blue-400">Your Life</span>
+            </div>
+
+            <div class="flex-1 max-w-xs mx-4">
+                <label for="search" class="sr-only">Buscar</label>
+                <input id="search" name="search" type="search"
+                    class="w-full px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Buscar usuarios ou postagens...">
+                <!-- BACKEND: Conforme o usuario digita, fazer GET /api/search?q=... -->
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Notificações -->
+                <div class="relative">
+                    <button id="notifications-button"
+                        class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 relative">
+                        <!-- Icone de Notificacao (Sino) -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        <span id="notification-badge-header"
+                            class="hidden absolute top-0 right-0 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full"></span>
+                    </button>
+
+                    <!-- Dropdown de Notificações -->
+                    <div id="notifications-dropdown"
+                        class="hidden absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-[500px] overflow-hidden">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="font-bold text-gray-800 dark:text-white">Notificações</h3>
+                        </div>
+                        <div id="notifications-list" class="overflow-y-auto max-h-[400px]">
+                            <!-- Notificações serão injetadas aqui -->
                         </div>
                     </div>
                 </div>
-            </section>
+
+                <!-- Menu do Usuario -->
+                <div class="relative">
+                    <button
+                        class="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors"
+                        id="user-menu-button">
+                        <img id="user-menu-avatar" class="w-8 h-8 rounded-full"
+                            src="Icons/AraraFinal.png" alt="Foto do Usuario">
+                        <span id="user-menu-name"
+                            class="hidden font-medium text-gray-700 dark:text-gray-200 md:block">Usuario</span>
+                        <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown do Usuario -->
+                    <div id="user-menu-dropdown"
+                        class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <p class="font-semibold text-gray-800 dark:text-white" id="dropdown-user-name">Usuario</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400" id="dropdown-user-email">
+                                email@exemplo.com</p>
+                        </div>
+                        <div class="py-2">
+                            <button id="toggle-dark-mode"
+                                class="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                                    </path>
+                                </svg>
+                                <span id="dark-mode-text">Tema Escuro</span>
+                            </button>
+                            <button id="privacy-center-button" class="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3 5 6v5c0 4.6 2.9 7.7 7 9 4.1-1.3 7-4.4 7-9V6l-7-3Z"></path></svg>
+                                Privacidade e meus dados
+                            </button>
+                            <button id="logout-button"
+                                class="w-full text-left px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                    </path>
+                                </svg>
+                                Sair da Conta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Conteudo Principal (Layout com Sidebar) -->
+        <div class="flex">
+
+            <!-- Sidebar (Menu Esquerdo) -->
+            <aside
+                class="w-64 py-8 overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
+                <nav class="px-4">
+                    <h3 class="px-4 text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">
+                        Menu</h3>
+                    <div class="mt-4 space-y-2">
+                        <a href="#" id="nav-feed"
+                            class="flex items-center px-4 py-2 font-medium text-white bg-blue-600 rounded-lg group">
+                            Feed
+                        </a>
+                        <a href="#" id="nav-profile"
+                            class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Meu Perfil
+                        </a>
+                        <a href="#" id="nav-friends"
+                            class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Amigos
+                        </a>
+                        <!-- Funcionalidade principal (Conselhos) da documentacao -->
+                        <a href="#" id="nav-advice"
+                            class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Conselhos
+                        </a>
+                        <a href="#" id="nav-messages"
+                            class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group relative">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#chat"></use></svg>
+                            Correspondências
+                            <span id="messages-badge"
+                                class="hidden absolute top-1 right-1 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full">0</span>
+                        </a>
+                        <a href="admin.html" id="nav-admin" class="hidden items-center gap-2 px-4 py-2 font-medium text-cyan-700 dark:text-cyan-300 rounded-lg hover:bg-cyan-50 dark:hover:bg-slate-700 group">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#shield"></use></svg>
+                            Administração
+                        </a>
+                        <a href="moderation.html" id="nav-moderation" class="hidden items-center gap-2 px-4 py-2 font-medium text-violet-700 dark:text-violet-300 rounded-lg hover:bg-violet-50 dark:hover:bg-slate-700 group">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#shield"></use></svg>
+                            Moderação
+                        </a>
+                        <a href="#" id="nav-communities"
+                            class="flex items-center px-4 py-2 font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            Comunidades
+                        </a>
+                        <!-- Link para Termos e Política -->
+                        <a href="#" id="nav-terms"
+                            class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Termos de Uso
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Area de Conteudo Principal -->
+            <main class="flex-1 p-4 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+
+                <!--
+                ========================================
+                VISUALIZACAO: FEED
+                ========================================
+                -->
+                <div id="feed-view" class="view active max-w-2xl mx-auto">
+                    <!-- Caixa de Nova Postagem -->
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Criar Postagem</h2>
+                        <textarea id="new-post-content"
+                            class="w-full h-24 p-2 mt-4 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="No que você está pensando?"></textarea>
+                        <div id="post-image-preview" class="hidden mt-4 relative"></div>
+                        <div class="flex items-center justify-between gap-3 mt-4">
+                            <label class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#image"></use></svg>
+                                <span>Adicionar imagem</span>
+                                <input id="new-post-image" type="file" accept="image/jpeg,image/png,image/webp" class="hidden">
+                            </label>
+                            <span id="post-upload-status" class="text-sm text-gray-500"></span>
+                            <!-- BACKEND: POST /api/posts com { content: "..." } -->
+                            <button id="submit-post-button"
+                                class="px-6 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700">
+                                Postar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Container do Feed -->
+                    <div id="feed-container" class="mt-8 space-y-6">
+                        <!-- Postagens serao injetadas aqui pelo JS -->
+                        <!-- BACKEND: GET /api/feed -->
+                    </div>
+                </div>
+
+                <!--
+                ========================================
+                VISUALIZACAO: PERFIL
+                ========================================
+                -->
+                <div id="profile-view" class="view max-w-4xl mx-auto">
+                    <!-- BACKEND: GET /api/users/{userId} -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <!-- Imagem de Capa -->
+                        <div>
+                            <img id="profile-cover-img" class="w-full h-48 object-cover"
+                                src="Icons/AraraFinal.png" alt="Imagem de Capa">
+                        </div>
+
+                        <!-- Informacoes do Perfil -->
+                        <div class="p-6">
+                            <div class="flex items-end -mt-20">
+                                <img id="profile-avatar" class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800"
+                                    src="Icons/AraraFinal.png" alt="Foto do Perfil">
+                                <button
+                                    class="ml-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    Editar Perfil
+                                    <!-- BACKEND: PUT /api/users/me -->
+                                </button>
+                            </div>
+
+                            <h1 id="profile-name" class="mt-4 text-3xl font-bold text-gray-900 dark:text-white"></h1>
+                            <p id="profile-bio" class="mt-2 text-gray-600 dark:text-gray-400"></p>
+
+                            <!-- Estatísticas -->
+                            <div class="mt-4 flex gap-6">
+                                <div class="text-center">
+                                    <p id="profile-posts-count"
+                                        class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Posts</p>
+                                </div>
+                                <div class="text-center">
+                                    <p id="profile-friends-count"
+                                        class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Amigos</p>
+                                </div>
+                                <div class="text-center">
+                                    <p id="profile-likes-count"
+                                        class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Curtidas</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Interesses
+                                </h3>
+                                <div id="profile-interests" class="flex flex-wrap gap-2 mt-2">
+                                    <!-- Interesses serao injetados aqui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abas (Postagens, Amigos, Conselhos) -->
+                    <div class="mt-6">
+                        <div class="border-b border-gray-200 dark:border-gray-700">
+                            <nav class="flex -mb-px space-x-8">
+                                <a href="#" id="profile-posts-tab"
+                                    class="profile-tab px-1 py-4 text-base font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
+                                    data-tab="posts">Postagens</a>
+                                <a href="#" id="profile-friends-tab"
+                                    class="profile-tab px-1 py-4 text-base font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+                                    data-tab="friends">Amigos</a>
+                                <a href="#" id="profile-advices-tab"
+                                    class="profile-tab px-1 py-4 text-base font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+                                    data-tab="advices">Conselhos</a>
+                            </nav>
+                        </div>
+
+                        <!-- Conteudo da Aba Postagens -->
+                        <div id="profile-posts-content" class="profile-tab-content mt-6 space-y-6">
+                            <div id="profile-posts-container">
+                                <!-- Postagens do perfil serao injetadas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Conteudo da Aba Amigos -->
+                        <div id="profile-friends-content" class="profile-tab-content mt-6 space-y-6 hidden">
+                            <div id="profile-friends-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Amigos serao injetados aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Conteudo da Aba Conselhos -->
+                        <div id="profile-advices-content" class="profile-tab-content mt-6 space-y-6 hidden">
+                            <div id="profile-advices-list" class="grid grid-cols-1 gap-4">
+                                <!-- Conselhos serao injetados aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: AMIGOS -->
+                <div id="friends-view" class="view max-w-4xl mx-auto hidden">
+                    <!-- Tabs -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6 border border-gray-200 dark:border-gray-700">
+                        <div class="flex border-b border-gray-200 dark:border-gray-700">
+                            <button id="friends-tab"
+                                class="flex-1 px-6 py-3 font-semibold text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-colors">
+                                Amigos
+                            </button>
+                            <button id="requests-tab"
+                                class="flex-1 px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 relative transition-colors">
+                                Pedidos
+                                <span id="requests-badge"
+                                    class="hidden absolute top-2 right-2 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo: Amigos -->
+                    <div id="friends-content" class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Meus Amigos</h2>
+                            <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                                + Adicionar Amigo
+                            </button>
+                        </div>
+                        <div id="friends-container" class="space-y-4">
+                            <!-- Amigos serão injetados aqui -->
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo: Pedidos -->
+                    <div id="requests-content" class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 hidden">
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">Pedidos de Amizade</h2>
+                        <div id="friend-requests-container" class="space-y-4">
+                            <!-- Pedidos serão injetados aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: CONSELHOS -->
+                <!-- VIEW: CONSELHOS -->
+                <div id="advice-view" class="view max-w-4xl mx-auto hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Conselhos do Dia</h2>
+                            <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                                + Criar Conselho
+                            </button>
+                        </div>
+                    </div>
+                    <div id="advices-container" class="space-y-4">
+                        <!-- Conselhos serão injetados aqui -->
+                    </div>
+                </div>
+
+                <!--
+                ========================================
+                VISUALIZACAO: CORRESPONDÊNCIAS (MENSAGENS) - Estilo Instagram
+                ========================================
+                -->
+                <div id="messages-view" class="view mx-auto hidden h-[calc(100vh-120px)]">
+                    <div class="flex h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+
+                        <!-- Sidebar de Conversas -->
+                        <div class="w-full md:w-96 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                            <!-- Header -->
+                            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mensagens</h1>
+                                    <div class="flex items-center gap-1">
+                                    <button id="new-message-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" title="Nova mensagem">
+                                        <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                    </button>
+                                    <button id="message-create-group-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" title="Criar grupo com amigos">
+                                        <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#group"></use></svg>
+                                    </button>
+                                    </div>
+                                </div>
+                                <!-- Campo de busca -->
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        id="search-conversations"
+                                        placeholder="Buscar conversas..."
+                                        class="w-full px-4 py-2 pl-10 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    >
+                                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Lista de Conversas -->
+                            <div id="conversations-list" class="flex-1 overflow-y-auto">
+                                <!-- Conversas serão injetadas aqui via JavaScript -->
+                                <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+                                    <svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                    </svg>
+                                    <p class="text-sm">Nenhuma conversa ainda</p>
+                                    <p class="text-xs mt-1">Envie uma mensagem para começar</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Área de Chat -->
+                        <div class="flex-1 flex flex-col">
+                            <!-- Estado inicial - Nenhuma conversa selecionada -->
+                            <div id="no-chat-selected" class="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                                <div class="text-center">
+                                    <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Suas Mensagens</h3>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">Envie mensagens privadas para seus amigos</p>
+                                    <button class="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium">
+                                        Enviar mensagem
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Chat ativo (inicialmente oculto) -->
+                            <div id="active-chat" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+                                <!-- Header do Chat -->
+                                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+                                    <div class="flex items-center gap-3">
+                                        <img id="chat-user-avatar" src="" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-600">
+                                        <div class="flex-1">
+                                            <h3 id="chat-user-name" class="font-semibold text-gray-900 dark:text-white"></h3>
+                                            <p id="chat-user-status" class="text-xs text-gray-500 dark:text-gray-400">Online</p>
+                                        </div>
+                                        <select id="message-topic-select" class="hidden lg:block max-w-36 px-2 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600" title="Tópico"><option value="">Geral</option></select>
+                                        <button id="message-create-topic-btn" class="hidden lg:inline-flex p-2 border rounded-lg dark:border-gray-600" title="Criar tópico">+ Tópico</button>
+                                        <button id="message-audio-call-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="Ligação de áudio" disabled><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#phone"></use></svg></button>
+                                        <button id="message-video-call-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="Ligação de vídeo" disabled><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#video"></use></svg></button>
+                                        <button id="chat-wallpaper-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="Papel de parede"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#image"></use></svg></button>
+                                        <button id="message-settings-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full" title="Configurações"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#settings"></use></svg></button>
+                                    </div>
+                                </div>
+
+                                <!-- Container de Mensagens -->
+                                <div id="messages-container" class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900" style="max-height: calc(100vh - 280px);">
+                                    <div id="messages-list" class="space-y-4 min-h-full">
+                                        <!-- Mensagens serão injetadas aqui via JavaScript -->
+                                    </div>
+                                </div>
+
+                                <!-- Input de Mensagem -->
+                                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+                                    <div class="flex items-center gap-3">
+                                        <div class="relative"><button id="message-emoji-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" title="Adicionar emoji">
+                                            <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </button><div id="message-emoji-picker" class="hidden absolute bottom-12 left-0 z-20 w-64 p-3 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-xl shadow-xl grid grid-cols-8 gap-2"></div></div>
+                                        <label class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer" title="Anexar imagem"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#image"></use></svg><input id="message-attachment" type="file" accept="image/jpeg,image/png,image/webp" class="hidden"></label>
+                                        <input
+                                            type="text"
+                                            id="message-input"
+                                            placeholder="Digite uma mensagem..."
+                                            class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                        <button id="message-send-btn" class="p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition-colors" title="Enviar" disabled>
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <p id="message-upload-status" class="mt-1 text-xs text-gray-500"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="social-chat-view" class="hidden" hidden aria-hidden="true">
+                    <div class="flex h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <aside class="w-full md:w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between gap-2">
+                                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">Chat e grupos</h1>
+                                    <button id="create-group-btn" class="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#group"></use></svg><span>Grupo</span></button>
+                                </div>
+                            </div>
+                            <div id="social-conversation-list" class="flex-1 overflow-y-auto"></div>
+                        </aside>
+                        <section class="hidden md:flex flex-1 flex-col" id="social-chat-panel">
+                            <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                                <div class="flex-1">
+                                    <h2 id="social-chat-title" class="font-semibold text-gray-900 dark:text-white">Escolha uma conversa</h2>
+                                    <p id="social-chat-status" class="text-xs text-gray-500 dark:text-gray-400"></p>
+                                </div>
+                                <div class="hidden lg:flex items-center gap-2">
+                                    <label for="social-topic-select" class="sr-only">Tópico</label>
+                                    <select id="social-topic-select" class="max-w-40 px-2 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600" title="Selecionar tópico">
+                                        <option value="">Geral</option>
+                                    </select>
+                                    <button id="create-topic-btn" class="inline-flex items-center gap-1 px-2 py-2 border rounded-lg text-sm dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700" title="Criar tópico">+ Tópico</button>
+                                </div>
+                                    <button id="social-audio-call-btn" class="inline-flex items-center gap-2 px-3 py-2 border rounded-lg dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700" title="Iniciar ligação de áudio neste tópico" disabled><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#phone"></use></svg><span>Áudio</span></button>
+                                    <button id="social-video-call-btn" class="inline-flex items-center gap-2 px-3 py-2 border rounded-lg dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700" title="Iniciar ligação de vídeo neste tópico" disabled><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#video"></use></svg><span>Vídeo</span></button>
+                                <button id="chat-settings-btn" class="px-3 py-2 border rounded-lg dark:border-gray-600">Configurações</button>
+                            </div>
+                            <div id="social-messages" class="flex-1 overflow-y-auto p-5 space-y-3 bg-gray-50 dark:bg-gray-900">
+                                <p class="text-center text-gray-500">Selecione ou crie uma conversa.</p>
+                            </div>
+                            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                                <div class="flex flex-wrap gap-2 mb-2 text-sm">
+                                    <button type="button" data-md="**" class="markdown-tool px-2 py-1 border rounded dark:border-gray-600"><strong>B</strong></button>
+                                    <button type="button" data-md="*" class="markdown-tool px-2 py-1 border rounded dark:border-gray-600"><em>I</em></button>
+                                    <button type="button" data-md="~~" class="markdown-tool px-2 py-1 border rounded dark:border-gray-600"><s>S</s></button>
+                                    <button type="button" data-md="`" class="markdown-tool px-2 py-1 border rounded dark:border-gray-600">Código</button>
+                                    <button type="button" data-prefix="> " class="markdown-prefix px-2 py-1 border rounded dark:border-gray-600">Citação</button>
+                                    <label class="px-2 py-1 border rounded cursor-pointer dark:border-gray-600">Anexar imagem<input id="social-attachment" type="file" accept="image/jpeg,image/png,image/webp" class="hidden"></label>
+                                    <span id="social-upload-status" class="text-gray-500"></span>
+                                </div>
+                                <div id="markdown-preview" class="hidden mb-2 p-3 border rounded-lg prose dark:prose-invert max-w-none dark:border-gray-600"></div>
+                                <div class="flex gap-2 items-end">
+                                    <textarea id="social-message-input" rows="2" maxlength="8000" placeholder="Mensagem com Markdown..." class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 dark:text-white rounded-lg resize-none"></textarea>
+                                    <button id="toggle-preview-btn" class="px-3 py-2 border rounded-lg dark:border-gray-600">Prévia</button>
+                                    <button id="social-send-btn" class="px-5 py-2 bg-blue-600 text-white rounded-lg" disabled>Enviar</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div id="calls-view" class="hidden fixed inset-0 z-50 bg-gray-950/80 p-4 md:p-8 overflow-y-auto">
+                    <div id="active-call-bar" class="hidden mb-4 p-4 bg-blue-700 text-white rounded-lg items-center gap-3">
+                        <span class="flex-1">Ligação ativa</span>
+                        <button id="toggle-mic-btn" class="inline-flex items-center gap-2 px-3 py-2 bg-blue-900 rounded" title="Ativar ou desativar microfone"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#microphone"></use></svg><span>Microfone</span></button>
+                        <button id="toggle-camera-btn" class="inline-flex items-center gap-2 px-3 py-2 bg-blue-900 rounded" title="Ativar ou desativar câmera"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#video"></use></svg><span>Câmera</span></button>
+                        <button id="share-screen-btn" class="inline-flex items-center gap-2 px-3 py-2 bg-blue-900 rounded" title="Compartilhar tela"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="Icons/social-sprite.svg#screen"></use></svg><span>Tela</span></button>
+                        <button id="leave-call-btn" class="px-3 py-2 bg-red-600 rounded">Sair</button>
+                    </div>
+                    <div class="grid lg:grid-cols-3 gap-5">
+                        <section class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ligações</h1>
+                            <div id="call-videos" class="grid sm:grid-cols-2 gap-3 mb-5"></div>
+                            <div id="calls-list" class="space-y-3"><p class="text-gray-500">Carregando histórico...</p></div>
+                        </section>
+                        <aside class="bg-white dark:bg-gray-800 rounded-lg shadow p-5 h-fit">
+                            <h2 class="font-semibold text-gray-900 dark:text-white mb-4">Áudio e vídeo</h2>
+                            <label class="block text-sm mb-1 dark:text-gray-300">Microfone</label>
+                            <select id="microphone-select" class="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"></select>
+                            <label class="block text-sm mb-1 dark:text-gray-300">Câmera</label>
+                            <select id="camera-select" class="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"></select>
+                            <label class="block text-sm mb-1 dark:text-gray-300">Fone/saída</label>
+                            <select id="speaker-select" class="w-full p-2 mb-3 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"></select>
+                            <button id="test-devices-btn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg">Testar dispositivos</button>
+                            <video id="device-preview" class="hidden mt-4 w-full rounded bg-black" autoplay muted playsinline></video>
+                            <p id="device-help" class="mt-3 text-xs text-gray-500"></p>
+                        </aside>
+                    </div>
+                </div>
+
+                <div id="communities-view" class="view hidden max-w-6xl mx-auto">
+                    <div class="flex items-center justify-between mb-5">
+                        <div><h1 class="text-2xl font-bold text-gray-900 dark:text-white">Comunidades</h1><p class="text-sm text-gray-500">Canais públicos ou privados com texto e voz.</p></div>
+                        <button id="create-community-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg">+ Comunidade</button>
+                    </div>
+                    <div id="communities-list" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                </div>
+
+            </main>
+
         </div>
-    </main>
-</body>
-</html>
+
+    </div> <!-- Fim de #main-app -->
+<script>
+const $ = id => document.getElementById(id);
+const card = 'p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white';
+const people = ['Ana Silva', 'Lucas Lima', 'Marina Costa'];
+const posts = [
+ ['Ana Silva','Hoje terminei meu primeiro projeto de estudos. Cada pequeno passo faz diferença.'],
+ ['Lucas Lima','Qual livro ou projeto inspirou vocês nesta semana?'],
+ ['Marina Costa','Uma pausa para conversar e compartilhar boas ideias.']
+];
+function notice() { $('demo-notice').textContent = 'Demonstração: esta ação está disponível apenas na rede privada.'; }
+function show(view) {
+ document.querySelectorAll('.view').forEach(el => { const active=el.id===view+'-view'; el.classList.toggle('active',active); el.classList.toggle('hidden',!active); });
+ document.querySelectorAll('[id^="nav-"]').forEach(el=>{el.classList.toggle('bg-blue-600',el.id==='nav-'+view);el.classList.toggle('text-white',el.id==='nav-'+view);});
+}
+['feed','profile','friends','advice','messages','communities'].forEach(v => $('nav-'+v).addEventListener('click', e=>{e.preventDefault();show(v);}));
+const postMarkup = ([name,text]) => '<article class="'+card+'"><div class="flex items-center gap-3 mb-4"><img src="Icons/AraraFinal.png" alt="" class="w-10 h-10 rounded-full"><div><strong>'+name+'</strong><p class="text-xs text-gray-400">Hoje · exemplo</p></div></div><p>'+text+'</p><div class="flex gap-6 mt-5 text-sm text-gray-400"><button data-demo>Curtir</button><button data-demo>Comentar</button></div></article>';
+$('feed-container').innerHTML=posts.map(postMarkup).join('');
+$('profile-posts-container').innerHTML=posts.slice(0,1).map(postMarkup).join('');
+$('user-menu-name').textContent='Visitante';
+$('dropdown-user-name').textContent='Visitante';
+$('dropdown-user-email').textContent='Perfil demonstrativo';
+$('profile-name').textContent='Ana Silva';
+$('profile-bio').textContent='Aprendendo, criando e compartilhando ideias. Perfil fictício.';
+$('profile-posts-count').textContent='3';
+$('profile-friends-count').textContent='3';
+$('profile-likes-count').textContent='12';
+$('profile-interests').textContent='Tecnologia · Livros · Fotografia';
+$('friends-container').innerHTML=people.map(name=>'<div class="'+card+' flex items-center gap-3"><img src="Icons/AraraFinal.png" alt="" class="w-12 h-12 rounded-full"><strong>'+name+'</strong></div>').join('');
+$('profile-friends-list').innerHTML=$('friends-container').innerHTML;
+$('advices-container').innerHTML='<article class="'+card+'"><h3 class="font-semibold mb-3">Um passo de cada vez</h3><p>Reserve um momento do dia para algo que você gosta de aprender.</p></article>';
+$('profile-advices-list').innerHTML=$('advices-container').innerHTML;
+$('friend-requests-container').innerHTML='<p class="text-gray-400">Nenhum pedido neste exemplo.</p>';
+$('communities-list').innerHTML=['Grupo de estudos','Fotografia','Livros e ideias'].map(name=>'<article class="'+card+'"><h2 class="font-bold text-xl mb-3">'+name+'</h2><p class="text-gray-400 mb-4">Comunidade demonstrativa · 12 membros</p><p># geral</p><p># projetos</p><button data-demo class="mt-4 text-blue-400">Participar</button></article>').join('');
+const chats=['Ana Silva','Lucas Lima','Grupo de estudos'];
+function conversation(i) {
+ $('chat-user-name').textContent=chats[i];
+ $('chat-user-avatar').src='Icons/AraraFinal.png';
+ $('chat-user-status').textContent=i===2?'3 participantes · exemplo':'Conversa demonstrativa';
+ $('messages-list').innerHTML='<div class="p-4 rounded-2xl bg-gray-700 text-white w-fit">Olá! Tudo bem? Vamos compartilhar as ideias?</div><div class="p-4 rounded-2xl bg-blue-600 text-white w-fit ml-auto mt-4">Sim! Já separei algumas referências.</div>';
+ $('no-chat-selected').classList.add('hidden');
+ $('active-chat').classList.remove('hidden');
+}
+$('conversations-list').innerHTML=chats.map((name,i)=>'<button data-chat="'+i+'" class="w-full text-left p-5 border-b border-gray-700 hover:bg-gray-700 text-white"><strong>'+name+'</strong><p class="mt-2 text-sm text-gray-400">Vamos compartilhar as ideias?</p></button>').join('');
+conversation(0);
+document.querySelectorAll('[data-chat]').forEach(el=>el.addEventListener('click',()=>conversation(Number(el.dataset.chat))));
+$('notifications-list').innerHTML='<p class="p-4 text-gray-400">Nenhuma notificação. Você está visualizando uma demonstração.</p>';
+[['notifications-button','notifications-dropdown'],['user-menu-button','user-menu-dropdown']].forEach(([button,panel])=>$(button).addEventListener('click',()=>$(panel).classList.toggle('hidden')));
+$('toggle-dark-mode').addEventListener('click',()=>document.documentElement.classList.toggle('dark'));
+document.querySelectorAll('.profile-tab').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.profile-tab-content').forEach(p=>p.classList.toggle('hidden',p.id!=='profile-'+el.dataset.tab+'-content'));}));
+['friends','requests'].forEach(name=>$(name+'-tab').addEventListener('click',()=>{ $('friends-content').classList.toggle('hidden',name!=='friends');$('requests-content').classList.toggle('hidden',name!=='requests'); }));
+// Read-only examples: no inputs, uploads, account operations or real calls.
+document.querySelectorAll('input,textarea,select').forEach(el=>{el.disabled=true;el.title='Disponível na rede privada';});
+document.querySelectorAll('button').forEach(el=>{
+ if(el.matches('[data-chat],#notifications-button,#user-menu-button,#toggle-dark-mode,#friends-tab,#requests-tab')) return;
+ el.disabled=false; el.addEventListener('click',notice);
+});
+['nav-admin','nav-moderation','logout-button','privacy-center-button','nav-terms'].forEach(id=>$(id)?.remove());
+const sidebar=document.querySelector('aside');
+sidebar.classList.remove('hidden','md:block');
+sidebar.classList.add('max-md:w-40','shrink-0');
+show('feed');
+</script></body></html>
