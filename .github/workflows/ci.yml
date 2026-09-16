@@ -39,9 +39,9 @@ jobs:
       - name: Validar política de documentação
         shell: bash
         run: |
-          extras=$(git ls-files '*.md' '*.MD' | grep -Evi '^(README|CONTRIBUTING)\.md$' || true)
+          extras=$(git ls-files '*.md' '*.MD' | grep -Evi '^(README|CONTRIBUTING)\.md$|^doc/.*\.md$' || true)
           if [ -n "$extras" ]; then
-            echo "Somente README.md e CONTRIBUTING.md podem ser versionados no repositório:"
+            echo "Arquivos Markdown devem estar na raiz (README/CONTRIBUTING) ou em doc/:"
             echo "$extras"
             exit 1
           fi
