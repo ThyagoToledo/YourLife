@@ -14,13 +14,9 @@ class ApiService {
         const isProduction = window.location.hostname !== 'localhost' &&
             window.location.hostname !== '127.0.0.1';
 
-        if (isProduction) {
-            // Em produção (Vercel), o backend está na mesma origem
-            this.baseUrl = `${window.location.origin}/api`;
-        } else {
-            // Em desenvolvimento local
-            this.baseUrl = 'http://localhost:3000/api';
-        }
+        // O frontend e a API são servidos pela mesma origem em produção e no desenvolvimento.
+        // Isso permite usar qualquer porta local sem codificá-la no cliente.
+        this.baseUrl = `${window.location.origin}/api`;
 
         console.log('🔗 API Base URL:', this.baseUrl);
         console.log('🌍 Modo:', isProduction ? 'Produção (Vercel)' : 'Desenvolvimento');
@@ -283,12 +279,6 @@ class ApiService {
 
     async unlikePost(postId) {
         return await this.request(`/posts/${postId}/like`, {
-            method: 'DELETE',
-        });
-    }
-
-    async deletePost(postId) {
-        return await this.request(`/posts/${postId}`, {
             method: 'DELETE',
         });
     }

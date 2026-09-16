@@ -3,7 +3,7 @@
 // ============================================
 
 export interface User {
-    id: string;
+    id: number;
     name: string;
     email: string;
     avatar: string;
@@ -36,7 +36,7 @@ export interface Post {
 }
 
 export interface PostAuthor {
-    id: string;
+    id: number;
     name: string;
     avatar: string;
 }
@@ -51,7 +51,7 @@ export interface Comment {
 }
 
 export interface CommentAuthor {
-    id: string;
+    id: number;
     name: string;
     avatar?: string;
 }
@@ -120,7 +120,66 @@ export interface AppState {
     searchResults: SearchResult | null;
 }
 
-export type ViewType = 'feed' | 'profile' | 'friends' | 'advice' | 'search' | 'notifications';
+export type ViewType = 'feed' | 'profile' | 'friends' | 'advice' | 'search' | 'notifications' | 'messages' | 'social-chat' | 'calls' | 'communities';
+
+export type ConversationKind = 'direct' | 'group' | 'channel';
+export type MessageFormat = 'plain' | 'markdown';
+export type MediaStatus = 'pending' | 'processing' | 'approved' | 'review' | 'rejected' | 'failed';
+export type CallState = 'ringing' | 'accepted' | 'active' | 'ended' | 'declined' | 'missed' | 'failed';
+
+export interface Conversation {
+    id: string;
+    kind: ConversationKind;
+    title: string | null;
+    communityId?: string | null;
+    role: 'owner' | 'admin' | 'member';
+    lastMessageId?: string | null;
+    lastMessage?: string | null;
+    lastMessageAt?: string | null;
+}
+
+export interface ChatMessage {
+    id: string;
+    conversationId: string;
+    senderId: number;
+    senderName: string;
+    content: string;
+    format: MessageFormat;
+    replyToId?: string | null;
+    createdAt: string;
+    editedAt?: string | null;
+    deletedAt?: string | null;
+}
+
+export interface MediaAsset {
+    id: string;
+    purpose: 'avatar' | 'cover' | 'post' | 'message' | 'community';
+    fileName: string;
+    contentType: 'image/jpeg' | 'image/png' | 'image/webp';
+    byteSize?: number | null;
+    status: MediaStatus;
+    publicUrl?: string | null;
+    createdAt: string;
+}
+
+export interface Community {
+    id: string;
+    name: string;
+    description: string;
+    visibility: 'public' | 'private';
+    role: 'owner' | 'admin' | 'moderator' | 'member';
+    memberCount: number;
+}
+
+export interface CallRecord {
+    id: string;
+    conversationId: string;
+    state: CallState;
+    participantState: 'invited' | 'joined' | 'declined' | 'left' | 'missed';
+    createdAt: string;
+    startedAt?: string | null;
+    endedAt?: string | null;
+}
 
 export interface ApiConfig {
     baseUrl: string;
