@@ -41,8 +41,7 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 const publicFiles = new Set([
-    'index.html', 'portfolio.html', 'site.html', 'config.html', 'admin.html', 'moderation.html',
-    'app.js', 'api.js', 'state.js', 'utils.js', 'social.js'
+    'index.html', 'portfolio.html'
 ]);
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/:file', (req, res, next) => {

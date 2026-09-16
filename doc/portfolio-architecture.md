@@ -62,6 +62,7 @@ O caráter educacional ou a ausência de fins lucrativos não elimina automatica
 
 - [x] Criar uma vitrine pública inicial na `main`.
 - [x] Remover login e cadastro da vitrine pública.
+- [x] Impedir publicação estática das páginas privadas na `main`.
 - [x] Documentar o plano nas branches de portfólio e homologação.
 - [ ] Criar banco local e seed fictício para `local-full`.
 - [ ] Implementar solicitação de acesso sem cadastro automático.
