@@ -69,3 +69,14 @@ O caráter educacional ou a ausência de fins lucrativos não elimina automatica
 - [ ] Migrar autenticação para cookie seguro.
 - [ ] Restringir CORS e configurar `PRIVACY_CONTACT_EMAIL`.
 - [ ] Fazer revisão jurídica antes de convidar membros reais.
+
+## Como executar `local-full`
+
+Na branch `local-full`, instale o Docker Desktop, copie `.env.local.example` para `.env.local` e gere uma chave local para `JWT_SECRET`. Depois execute:
+
+```bash
+npm ci
+npm run local
+```
+
+O banco local usa PostgreSQL na porta `5433`, aplica as migrações e inicia a aplicação social em `http://localhost:3000/site.html`. O volume do Docker é persistente; nenhum dado do Neon é copiado automaticamente.
